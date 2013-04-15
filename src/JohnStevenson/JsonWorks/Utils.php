@@ -131,14 +131,18 @@ class Utils
         return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
     }
 
-    public static function copyData($data, $fromAssoc = false)
+    public static function copyData($data, $fromAssoc = false, $callback = null)
     {
+        if ($callback) {
+            $data = call_user_func_array($callback, array($data));
+        }
+
         if (($object = is_object($data)) || is_array($data)) {
             $result = array();
 
             foreach ($data as $key => $value) {
                 if (is_object($value) || is_array($value)) {
-                   $value = static::copyData($value, $fromAssoc);
+                   $value = static::copyData($value, $fromAssoc, $callback);
                 }
                 $result[$key] = $value;
             }

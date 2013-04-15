@@ -273,7 +273,8 @@ class Document
 
         while ($pointers) {
             $type = gettype($this->element);
-            $key = array_shift($pointers);
+            $test = $pointers;
+            $key = array_shift($test);
 
             if ('object' === $type) {
 
@@ -293,6 +294,8 @@ class Document
             if (!$result) {
                 return false;
             }
+
+            array_shift($pointers);
          }
 
          return true;
