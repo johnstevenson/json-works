@@ -131,6 +131,26 @@ class Utils
         return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
     }
 
+    public static function encodeDataKeys($data)
+    {
+        return static::copyData($data, true, array('\\'.get_called_class(), 'encodeCallback'));
+    }
+
+    public static function encodeCallback($data)
+    {
+        if (is_object($data) || (is_array($data) && !static::indexedArray($data))) {
+            $result = array();
+
+            foreach ($data as $key => $value) {
+                $key = static::encodePathKey($key);
+                $result[$key] = $value;
+            }
+            $data = (object) $result;
+        }
+
+        return $data;
+    }
+
     public static function copyData($data, $fromAssoc = false, $callback = null)
     {
         if ($callback) {
