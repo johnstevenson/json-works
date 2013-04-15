@@ -1,0 +1,24 @@
+{
+
+  "name": "johnstevenson/json-works",
+  "description": "Create, edit and validate json",
+  "keywords": ["json", "schema"],
+  "homepage": "http://github.com/johnstevenson/json-works",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "John Stevenson",
+      "email": "john-stevenson@blueyonder.co.uk"
+    }
+  ],
+
+  "require": {
+    "php": ">=5.3.2"
+  },
+
+  "autoload": {
+    "psr-0": {"JohnStevenson\\JsonWorks": "src/"}
+  }
+
+}
