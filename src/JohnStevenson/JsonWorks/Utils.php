@@ -182,4 +182,37 @@ class Utils
         for (reset($array), $base = 0; key($array) === $base++; next($array));
         return is_null(key($array));
     }
+
+    public static function uniqueArray($data, $check = false)
+    {
+        $equals = array();
+        $count = count($data);
+
+        for ($i = 0; $i < $count; ++$i) {
+            if (in_array($i, $equals)) {
+                continue;
+            }
+            for ($j = $i + 1; $j < $count; ++$j) {
+                if (Utils::equals($data[$i], $data[$j])) {
+                    $equals[] = $j;
+                    if ($check) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ($check) {
+            $result = empty($equals);
+        } else {
+            $result = array();
+            foreach ($data as $key => $value) {
+                if (!in_array($key, $equals)) {
+                    $result[] = $value;
+                }
+            }
+        }
+
+        return $result;
+     }
 }

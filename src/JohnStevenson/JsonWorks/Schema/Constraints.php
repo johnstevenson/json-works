@@ -117,7 +117,7 @@ class Constraints
 
         # uniqueItems
         if ($value = Utils::get($schema, 'uniqueItems', false)) {
-            if (!$this->validateUnique($data)) {
+            if (!Utils::uniqueArray($data, true)) {
                 $this->throwError('contains duplicate values');
             }
         }

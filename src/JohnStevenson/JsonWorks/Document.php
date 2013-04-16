@@ -423,6 +423,6 @@ class Document
             return $match[1] ? '{}' : '[]';
         }, $result);
 
-        return $result;
+        return $result. $newLine;
     }
 }
