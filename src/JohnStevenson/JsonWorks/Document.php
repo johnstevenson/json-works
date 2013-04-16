@@ -34,10 +34,10 @@ class Document
         $this->schema = new Schema\Model($schema);
     }
 
-    public function toJson(&$json, $prettyPrint = true)
+    public function toJson(&$json, $pretty = true, $tabs = false)
     {
         if ($result = $this->validate()) {
-            $json = $this->encodeData($prettyPrint);
+            $json = $this->encodeData($pretty);
         }
 
         return $result;
@@ -104,13 +104,13 @@ class Document
         $pointers = is_array($path) ? $path : Utils::decodePath($path);
         $key = array_pop($pointers);
 
-        if ($result = $this->get($pointers, $dummy)) {
+        if ($result = $this->getValue($pointers, $dummy)) {
 
-            if (!$key) {
+            if (0 === strlen($key)) {
                 $this->loadData(null);
             } elseif (is_array($this->element)) {
                 $key = (int) $key;
-                unset($this->element[$key]);
+                array_splice($this->element, $key, 1);
             } elseif (is_object($this->element)) {
                 unset($this->element->$key);
             }
@@ -305,10 +305,10 @@ class Document
     {
         $result = false;
 
-        if ($this->get($fromPath, $value)) {
-            if ($result = $this->add($toPath, $value)) {
+        if ($this->getValue($fromPath, $value)) {
+            if ($result = $this->addValue($toPath, $value)) {
                 if ($delete) {
-                    $this->delete($fromPath);
+                    $this->deleteValue($fromPath);
                 }
              }
         }
@@ -333,18 +333,20 @@ class Document
     }
 
     /**
-     * Encodes data into pretty-printed JSON
-     *
-     * Based on code from https://github.com/composer/composer
-     * MIT license. Copyright (c) 2011 Nils Adermann, Jordi Boggiano
-     *
-     * @return string Encoded json
-     */
-    protected function encodeData($prettyPrint = true)
+    * Encodes data into JSON
+    *
+    * Based on code from https://github.com/composer/composer
+    * MIT license. Copyright (c) 2011 Nils Adermann, Jordi Boggiano
+    *
+    * @param boolean $pretty
+    * @param boolean $tabs Use tabs rather than spaces
+    * @return string Encoded json
+    */
+    protected function encodeData($pretty = true, $tabs = false)
     {
         if (version_compare(PHP_VERSION, '5.4', '>=')) {
-            $pretty = $prettyPrint ? JSON_PRETTY_PRINT : 0;
-            $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $pretty;
+            $prettyPrint = $pretty ? JSON_PRETTY_PRINT : 0;
+            $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $prettyPrint;
             return json_encode($this->data, $options);
         }
 
@@ -354,8 +356,9 @@ class Document
         $result = $string = '';
         $inString = $escaped = false;
         $level = 0;
-        $newLine = $prettyPrint ? chr(10) : null;
-        $space = $prettyPrint ? chr(32) : null;
+        $newLine = $pretty ? chr(10) : null;
+        $space = $pretty ? chr(32) : null;
+        $indent = $pretty ? ($tabs ? chr(9) : chr(32)) : null;
         $convert = function_exists('mb_convert_encoding');
 
         for ($i = 0; $i < $len; $i++) {
@@ -400,7 +403,7 @@ class Document
                 $result .= $newLine;
                 # decrease indent level
                 $level--;
-                $result .= str_repeat($space, $level * 4);
+                $result .= str_repeat($indent, $level * 4);
             }
 
             $result .= $char;
@@ -414,7 +417,7 @@ class Document
                     $level++;
                 }
 
-                $result .= str_repeat($space, $level * 4);
+                $result .= str_repeat($indent, $level * 4);
             }
         }
 
