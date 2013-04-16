@@ -38,6 +38,11 @@ class Document
     {
         if ($result = $this->validate()) {
             $json = $this->encodeData($pretty);
+            if ($tabs) {
+                $json = preg_replace_callback('/^( +)/m', function($m) {
+                    return str_repeat("\t", strlen($m[1]));
+                }, $json);
+            }
         }
 
         return $result;
@@ -338,11 +343,10 @@ class Document
     * Based on code from https://github.com/composer/composer
     * MIT license. Copyright (c) 2011 Nils Adermann, Jordi Boggiano
     *
-    * @param boolean $pretty
-    * @param boolean $tabs Use tabs rather than spaces
+    * @param boolean $pretty Format the output
     * @return string Encoded json
     */
-    protected function encodeData($pretty = true, $tabs = false)
+    protected function encodeData($pretty = true)
     {
         if (version_compare(PHP_VERSION, '5.4', '>=')) {
             $prettyPrint = $pretty ? JSON_PRETTY_PRINT : 0;
@@ -358,7 +362,6 @@ class Document
         $level = 0;
         $newLine = $pretty ? chr(10) : null;
         $space = $pretty ? chr(32) : null;
-        $indent = $pretty ? ($tabs ? chr(9) : chr(32)) : null;
         $convert = function_exists('mb_convert_encoding');
 
         for ($i = 0; $i < $len; $i++) {
@@ -403,7 +406,7 @@ class Document
                 $result .= $newLine;
                 # decrease indent level
                 $level--;
-                $result .= str_repeat($indent, $level * 4);
+                $result .= str_repeat($space, $level * 4);
             }
 
             $result .= $char;
@@ -417,7 +420,7 @@ class Document
                     $level++;
                 }
 
-                $result .= str_repeat($indent, $level * 4);
+                $result .= str_repeat($space, $level * 4);
             }
         }
 
