@@ -38,9 +38,9 @@ class Document
     {
         if ($result = $this->validate()) {
             $json = $this->encodeData($pretty);
-            if ($tabs) {
+            if ($tabs && $pretty) {
                 $json = preg_replace_callback('/^( +)/m', function($m) {
-                    return str_repeat("\t", strlen($m[1]));
+                    return str_repeat("\t", (int) strlen($m[1]) / 4);
                 }, $json);
             }
         }
