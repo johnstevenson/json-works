@@ -185,34 +185,25 @@ class Utils
 
     public static function uniqueArray($data, $check = false)
     {
-        $equals = array();
+        $out = array();
         $count = count($data);
+        $equals = array();
 
         for ($i = 0; $i < $count; ++$i) {
-            if (in_array($i, $equals)) {
-                continue;
-            }
-            for ($j = $i + 1; $j < $count; ++$j) {
-                if (Utils::equals($data[$i], $data[$j])) {
-                    $equals[] = $j;
-                    if ($check) {
-                        break;
+            if (!in_array($i, $equals)) {
+                $out[] = $data[$i];
+
+                for ($j = $i + 1; $j < $count; ++$j) {
+                    if (Utils::equals($data[$i], $data[$j])) {
+                        $equals[] = $j;
+                        if ($check) {
+                            return false;
+                        }
                     }
                 }
             }
         }
 
-        if ($check) {
-            $result = empty($equals);
-        } else {
-            $result = array();
-            foreach ($data as $key => $value) {
-                if (!in_array($key, $equals)) {
-                    $result[] = $value;
-                }
-            }
-        }
-
-        return $result;
+        return $check ? true : $out;
      }
 }

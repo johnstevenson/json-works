@@ -14,7 +14,7 @@ class UniqueArrayTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckWithScalarFalse()
     {
-        $value = array(1, 'str', false, 'str');
+        $value = array(1, 'str', 'str', false);
         $this->assertFalse(Utils::uniqueArray($value, true));
     }
 
