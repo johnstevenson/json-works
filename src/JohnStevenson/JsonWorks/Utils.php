@@ -212,7 +212,7 @@ class Utils
 
             foreach ($data as $item) {
                 $itemSchema = $objSchema ?: (next($schema->items) ?: null);
-                $result[] = $this->order($item, $itemSchema);
+                $result[] = static::orderData($item, $itemSchema);
             }
 
         } else {
