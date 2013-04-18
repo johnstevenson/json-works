@@ -22,24 +22,23 @@ class Model
     {
         while ($keys && $schema) {
             $type = gettype($schema);
-
             $key = array_shift($keys);
+
             if ('array' === $type) {
                 $key = (int) $key;
             }
-
             $schema = Utils::get($schema, $key);
          }
 
         return $schema;
     }
 
-    public function initCallback($data)
+    public function initCallback(\RecursiveArrayIterator $data)
     {
         if ('$ref' === $data->key()) {
             $ref = $data->current();
 
-            if (is_string($ref)) {
+            if (is_string($ref) && 0 === strpos($ref, '#')) {
                 $this->references[$ref] = null;
             } else {
                 throw new \RuntimeException('Invalid reference');
@@ -49,7 +48,7 @@ class Model
         return $data;
     }
 
-    public function resolveCallback($data)
+    public function resolveCallback(\RecursiveArrayIterator $data)
     {
         if ('$ref' === $data->key()) {
             $schema = Utils::get($this->references, $data->current());
@@ -69,7 +68,7 @@ class Model
                 if ($schema = $this->find($this->data, $keys)) {
                     $this->references[$ref] = $schema;
                 } else {
-                    throw new \RuntimeException('Unable to resolve ref '.$ref);
+                    throw new \RuntimeException('Unable to find ref '.$ref);
                 }
             }
 
@@ -78,6 +77,7 @@ class Model
             }
 
             $this->data = Utils::copyData($this->data, array($this, 'resolveCallback'));
+            $this->references = array();
         }
     }
 
@@ -86,10 +86,9 @@ class Model
         $result = $schema;
 
         if ($ref = Utils::get($schema, '$ref')) {
+            $refSchema = Utils::get($this->references, $ref);
 
-            if (!$refSchema = Utils::get($this->references, $ref)) {
-                throw new \RuntimeException('Unable to find ref '.$ref);
-            } elseif ($refSchema === $schema || in_array($ref, $parents)) {
+            if (in_array($ref, $parents)) {
                 throw new \RuntimeException('Circular reference to ref '.$ref);
             } elseif (Utils::get($refSchema, '$ref')) {
                 $parents[] = $ref;

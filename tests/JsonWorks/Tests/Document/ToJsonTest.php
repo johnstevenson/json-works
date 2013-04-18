@@ -4,21 +4,26 @@ namespace JsonWorks\Tests\Document;
 
 use \JohnStevenson\JsonWorks\Utils as Utils;
 
-class PruneDataTest extends \JsonWorks\Tests\Base
+class ToJsonTest extends \JsonWorks\Tests\Base
 {
-    public function testSimpleNoData()
+    protected function getExpectedJson($expected)
+    {
+        return json_encode(json_decode($expected));
+    }
+
+    public function testNoData()
     {
         $schema = null;
         $data = null;
         $expected = null;
 
         $document = $this->getDocument($schema, $data);
-        $result = $this->callMethod($document, 'pruneData');
+        $result = $document->toJson($json, false);
         $this->assertTrue($result);
-        $this->assertEquals(json_decode($expected), $document->data);
+        $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testSimpleNoSchema()
+    public function testPruneNoSchema()
     {
         $schema = null;
 
@@ -35,12 +40,12 @@ class PruneDataTest extends \JsonWorks\Tests\Base
         }';
 
         $document = $this->getDocument($schema, $data);
-        $result = $this->callMethod($document, 'pruneData');
+        $result = $document->toJson($json, false);
         $this->assertTrue($result);
-        $this->assertEquals(json_decode($expected), $document->data);
+        $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testSimpleSchemaFail()
+    public function testNoPruneSchema()
     {
         $schema = '{
             "required": ["prop2"]
@@ -56,12 +61,30 @@ class PruneDataTest extends \JsonWorks\Tests\Base
         $expected = $data;
 
         $document = $this->getDocument($schema, $data);
-        $result = $this->callMethod($document, 'pruneData');
-        $this->assertFalse($result);
-        $this->assertEquals(json_decode($expected), $document->data);
+        $result = $document->toJson($json, false, false);
+        $this->assertTrue($result);
+        $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testNestedNoSchema()
+    public function testPruneSchemaFail()
+    {
+        $schema = '{
+            "required": ["prop2"]
+        }';
+
+        $data = '{
+            "prop1": "",
+            "prop2": {},
+            "prop3": [],
+            "prop4": null
+        }';
+
+        $document = $this->getDocument($schema, $data);
+        $result = $document->toJson($json, false);
+        $this->assertFalse($result);
+    }
+
+    public function testPruneNestedNoSchema()
     {
         $schema = null;
 
@@ -93,12 +116,12 @@ class PruneDataTest extends \JsonWorks\Tests\Base
         }';
 
         $document = $this->getDocument($schema, $data);
-        $result = $this->callMethod($document, 'pruneData');
+        $result = $document->toJson($json, false);
         $this->assertTrue($result);
-        $this->assertEquals(json_decode($expected), $document->data);
+        $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testNestedSchemaFail()
+    public function testNoPruneNestedSchema()
     {
         $schema = '{
             "properties": {
@@ -130,8 +153,42 @@ class PruneDataTest extends \JsonWorks\Tests\Base
         $expected = $data;
 
         $document = $this->getDocument($schema, $data);
-        $result = $this->callMethod($document, 'pruneData');
+        $result = $document->toJson($json, false, false);
+        $this->assertTrue($result);
+        $this->assertEquals($this->getExpectedJson($expected), $json);
+    }
+
+    public function testPruneNestedSchemaFail()
+    {
+        $schema = '{
+            "properties": {
+                "prop1": {
+                    "properties": {
+                        "nested1": {
+                            "required": ["nested3"]
+                        }
+                    }
+                }
+            }
+        }';
+
+        $data = '{
+            "prop1": {
+                "nested1": {
+                    "nested2": {
+                        "inner1": ["hidden"],
+                        "inner2": {}
+                    },
+                    "nested3": []
+                }
+            },
+            "prop2": "string",
+            "prop3": [],
+            "prop4": null
+        }';
+
+        $document = $this->getDocument($schema, $data);
+        $result = $document->toJson($json, false);
         $this->assertFalse($result);
-        $this->assertEquals(json_decode($expected), $document->data);
     }
 }

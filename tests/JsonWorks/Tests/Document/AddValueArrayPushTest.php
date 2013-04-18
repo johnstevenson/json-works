@@ -2,9 +2,9 @@
 
 namespace JsonWorks\Tests\Document;
 
-class AddValueArrayTest extends \JsonWorks\Tests\Base
+class AddValueArrayPushTest extends \JsonWorks\Tests\Base
 {
-    public function testSinglePushDashSchemaNone()
+    public function testRootSingleDashSchemaNone()
     {
         $schema = null;
         $data = null;
@@ -17,7 +17,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testSinglePushDashSchemaArray()
+    public function testRootSingleDashSchemaArray()
     {
         $schema = '{
             "type" : "array",
@@ -37,7 +37,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testSinglePushDashSchemaObject()
+    public function testRootSingleDashSchemaObject()
     {
         $schema = '{
             "type" : "object",
@@ -57,7 +57,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testSinglePushZeroSchemaNone()
+    public function testRootSingleZeroSchemaNone()
     {
         $schema = null;
         $data = null;
@@ -70,7 +70,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testSinglePushZeroSchemaArray()
+    public function testRootSingleZeroSchemaArray()
     {
         $schema = '{
             "type" : "array",
@@ -90,7 +90,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testSinglePushZeroSchemaObject()
+    public function testRootSingleZeroSchemaObject()
     {
         $schema = '{
             "type" : "object",
@@ -110,7 +110,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testMultiPushDash()
+    public function testRootMultiDash()
     {
         $schema = '{
             "type": "array",
@@ -136,7 +136,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testMultiPushZero()
+    public function testRootMultiZero()
     {
         $schema = '{
             "type": "array",
@@ -162,7 +162,7 @@ class AddValueArrayTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $document->data);
     }
 
-    public function testMultiPushMixed()
+    public function testRootMultiMixed()
     {
         $schema = '{
             "type": "array",

@@ -36,13 +36,9 @@ class Document
 
     public function toJson(&$json, $pretty = true, $prune = true, $tabs = false)
     {
-        if ($prune) {
-            $result = $this->pruneData();
-        } else {
-            $result = $this->validate();
-        }
+        $data = $prune ? ($this->data = Utils::pruneData($this->data)) : $this->data;
 
-        if ($result) {
+        if ($result = $this->checkData($data)) {
             $json = $this->encodeData($pretty);
             if ($tabs && $pretty) {
                 $json = preg_replace_callback('/^( +)/m', function($m) {
@@ -113,9 +109,11 @@ class Document
     public function deleteValue($path)
     {
         $pointers = is_array($path) ? $path : Utils::decodePath($path);
-        $key = array_pop($pointers);
 
         if ($result = $this->getValue($pointers, $dummy)) {
+
+            $key = array_pop($pointers);
+            $this->getValue($pointers, $dummy);
 
             if (0 === strlen($key)) {
                 $this->loadData(null);
@@ -133,6 +131,8 @@ class Document
     public function getValue($path, &$value)
     {
         $result = false;
+        $value = null;
+
         $pointers = is_array($path) ? $path : Utils::decodePath($path);
 
         if ($this->workGet($pointers, false)) {
@@ -285,6 +285,7 @@ class Document
             $type = gettype($this->element);
             $test = $pointers;
             $key = array_shift($test);
+            $result = false;
 
             if ('object' === $type) {
 
@@ -439,45 +440,5 @@ class Document
         }, $result);
 
         return $result. $newLine;
-    }
-
-    protected function pruneData()
-    {
-        if ($this->data) {
-            $props = 0;
-            $data = $this->workPrune(new \RecursiveArrayIterator($this->data), $props);
-            if ($result = $this->checkData($data)) {
-                $this->data = $data;
-            }
-        }
-
-        return $this->data ? $result : true;
-    }
-
-    protected function workPrune($data, &$props)
-    {
-        $object = is_string($data->key());
-        $result = array();
-
-        while ($data->valid()) {
-
-            if ($data->hasChildren()) {
-                $currentProps = $props;
-                $value = $this->workPrune($data->getChildren(), $props);
-
-                if ($props > $currentProps) {
-                    $result[$data->key()] = $value;
-                }
-                $props = $currentProps;
-
-            } else {
-                $result[$data->key()] = $data->current();
-            }
-            $data->next();
-        }
-
-        $props = count($result);
-
-        return $object ? (object) $result: $result;
     }
 }

@@ -56,6 +56,53 @@ class ResolverTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $value);
     }
 
+    /**
+    * @expectedException        RuntimeException
+    * @expectedExceptionMessage Invalid reference
+    *
+    */
+    public function testInvalidRef1()
+    {
+        $schema = '{
+            "type" : "object",
+            "properties":
+            {
+                "prop1": {"$ref": "/definitions/alphanum"},
+                "prop2": {}
+            }
+        }';
+
+        $data = null;
+        $this->getDocument($schema, $data);
+
+    }
+
+    /**
+    * @expectedException        RuntimeException
+    * @expectedExceptionMessage Invalid reference
+    *
+    */
+    public function testInvalidRef2()
+    {
+        $schema = '{
+            "type" : "object",
+            "properties":
+            {
+                "prop1": {"$ref": 8},
+                "prop2": {}
+            }
+        }';
+
+        $data = null;
+        $this->getDocument($schema, $data);
+
+    }
+
+    /**
+    * @expectedException        RuntimeException
+    * @expectedExceptionMessage Unable to find ref
+    *
+    */
     public function testNotFound()
     {
         $schema = '{
@@ -68,8 +115,6 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-
-        $this->setExpectedException('RuntimeException');
         $this->getDocument($schema, $data);
     }
 
@@ -104,6 +149,11 @@ class ResolverTest extends \JsonWorks\Tests\Base
 
     }
 
+    /**
+    * @expectedException        RuntimeException
+    * @expectedExceptionMessage Circular reference
+    *
+    */
     public function testCircular()
     {
         $schema = '{
@@ -120,8 +170,6 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-
-        $this->setExpectedException('RuntimeException');
         $this->getDocument($schema, $data);
     }
 
@@ -166,6 +214,11 @@ class ResolverTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $value);
     }
 
+    /**
+    * @expectedException        RuntimeException
+    * @expectedExceptionMessage Circular reference
+    *
+    */
     public function testCompoundCircular()
     {
         $schema = '{
@@ -196,8 +249,6 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-
-        $this->setExpectedException('RuntimeException');
         $this->getDocument($schema, $data);
     }
 }
