@@ -61,7 +61,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $expected = $data;
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJson($json, false, false);
+        $result = $document->toJsonEx($json, false, false, false);
         $this->assertTrue($result);
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
@@ -153,7 +153,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $expected = $data;
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJson($json, false, false);
+        $result = $document->toJsonEx($json, false, false, false);
         $this->assertTrue($result);
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }

@@ -34,12 +34,24 @@ class Document
         $this->schema = new Schema\Model($schema);
     }
 
-    public function toJson(&$json, $pretty = true, $prune = true, $tabs = false)
+    public function toJson(&$json, $pretty)
     {
-        $data = $prune ? ($this->data = Utils::pruneData($this->data)) : $this->data;
+        return $this->toJsonEx($json, $pretty, true, true);
+    }
 
-        if ($result = $this->checkData($data)) {
-            $json = $this->encodeData($pretty);
+    public function toJsonEx(&$json, $pretty, $prune, $order, $tabs = false)
+    {
+        if ($prune) {
+            $this->data = Utils::pruneData($this->data);
+        }
+
+        if ($order) {
+            $this->data = Utils::orderData($this->data, $this->schema->data);
+        }
+
+        if ($result = $this->validate()) {
+            $json = Utils::getJson($this->data, $pretty);
+
             if ($tabs && $pretty) {
                 $json = preg_replace_callback('/^( +)/m', function($m) {
                     return str_repeat("\t", (int) strlen($m[1]) / 4);
@@ -341,104 +353,5 @@ class Document
         }
 
         return $result;
-    }
-
-    /**
-    * Encodes data into JSON
-    *
-    * Based on code from https://github.com/composer/composer
-    * MIT license. Copyright (c) 2011 Nils Adermann, Jordi Boggiano
-    *
-    * @param boolean $pretty Format the output
-    * @return string Encoded json
-    */
-    protected function encodeData($pretty = true)
-    {
-        if (version_compare(PHP_VERSION, '5.4', '>=')) {
-            $prettyPrint = $pretty ? JSON_PRETTY_PRINT : 0;
-            $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $prettyPrint;
-            return json_encode($this->data, $options);
-        }
-
-        $json = json_encode($this->data);
-
-        if (!$pretty) {
-            return $json;
-        }
-
-        $len = strlen($json);
-        $result = $string = '';
-        $inString = $escaped = false;
-        $level = 0;
-        $newLine = $pretty ? chr(10) : null;
-        $space = $pretty ? chr(32) : null;
-        $convert = function_exists('mb_convert_encoding');
-
-        for ($i = 0; $i < $len; $i++) {
-            $char = $json[$i];
-
-            # are we inside a json string?
-            if ('"' === $char && !$escaped) {
-                $inString = !$inString;
-            }
-
-            if ($inString) {
-                $string .= $char;
-                $escaped = '\\' === $char ? !$escaped : false;
-
-                continue;
-
-            } elseif ($string) {
-                # end of the json string
-                $string .= $char;
-
-                # unescape slashes
-                $string = str_replace('\\/', '/', $string);
-
-                # unescape unicode
-                if ($convert) {
-                    $string = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function($match) {
-                        return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-                    }, $string);
-                }
-
-                $result .= $string;
-                $string = '';
-
-                continue;
-            }
-
-            if (':' === $char) {
-                # add space after colon
-                $char .= $space;
-            } elseif (strpbrk($char, '}]')) {
-                # char is an end element, so add a newline
-                $result .= $newLine;
-                # decrease indent level
-                $level--;
-                $result .= str_repeat($space, $level * 4);
-            }
-
-            $result .= $char;
-
-            if (strpbrk($char, ',{[')) {
-                # char is a start element, so add a newline
-                $result .= $newLine;
-
-                # increase indent level if not a comma
-                if (',' !== $char) {
-                    $level++;
-                }
-
-                $result .= str_repeat($space, $level * 4);
-            }
-        }
-
-        # collapse empty {} and []
-        $result = preg_replace_callback('#(\{\s+\})|(\[\s+\])#', function($match) {
-            return $match[1] ? '{}' : '[]';
-        }, $result);
-
-        return $result. $newLine;
     }
 }
