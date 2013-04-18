@@ -19,7 +19,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
     public function testFromAssoc()
     {
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj = Utils::copyData($arr, true);
+        $obj = Utils::copyData($arr);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj);
@@ -41,7 +41,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
         $obj1 = (object) array('users' => array($arr));
 
-        $obj2 = Utils::copyData($obj1, true);
+        $obj2 = Utils::copyData($obj1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj2->users[0]);
@@ -66,7 +66,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
         $obj1 = (object) array('users' => array($arr));
         $arr1 = array(9, $obj1);
 
-        $arr2 = Utils::copyData($arr1, true);
+        $arr2 = Utils::copyData($arr1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $arr2[1]->users[0]);

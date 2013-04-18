@@ -133,54 +133,55 @@ class Utils
 
     public static function encodeDataKeys($data)
     {
-        return static::copyData($data, true, array('\\'.get_called_class(), 'encodeCallback'));
+        return static::copyData($data, array('\\'.get_called_class(), 'encodeCallback'));
     }
 
     public static function encodeCallback($data)
     {
-        if (is_object($data) || (is_array($data) && !static::indexedArray($data))) {
+        if (is_string($data->key())) {
             $result = array();
 
-            foreach ($data as $key => $value) {
-                $key = static::encodePathKey($key);
-                $result[$key] = $value;
+            while ($data->valid()) {
+                $key = static::encodePathKey($data->key());
+                $result[$key] = $data->current();
+                $data->next();
             }
-            $data = (object) $result;
+            $data = new \RecursiveArrayIterator((object) $result);
         }
 
         return $data;
     }
 
-    public static function copyData($data, $fromAssoc = false, $callback = null)
+    public static function copyData($data, $callback = null)
+    {
+        if (is_object($data) || is_array($data)) {
+            $iterator = new \RecursiveArrayIterator($data);
+            $data = static::iterCopy($iterator, $callback);
+        }
+
+        return $data;
+    }
+
+    public static function iterCopy($data, $callback = null)
     {
         if ($callback) {
             $data = call_user_func_array($callback, array($data));
         }
 
-        if (($object = is_object($data)) || is_array($data)) {
-            $result = array();
+        $object = is_string($data->key());
+        $result = array();
 
-            foreach ($data as $key => $value) {
-                if (is_object($value) || is_array($value)) {
-                   $value = static::copyData($value, $fromAssoc, $callback);
-                }
-                $result[$key] = $value;
+        while ($data->valid()) {
+
+            if ($data->hasChildren()) {
+                $result[$data->key()] = static::iterCopy($data->getChildren(), $callback);
+            } else {
+                $result[$data->key()] = $data->current();
             }
-
-            if ($object || ($fromAssoc && !static::indexedArray($data))) {
-                $result = (object) $result;
-            }
-
-        } else {
-            $result = $data;
+            $data->next();
         }
 
-        return $result;
-    }
-
-    public static function indexedArray($array) {
-        for (reset($array), $base = 0; key($array) === $base++; next($array));
-        return is_null(key($array));
+        return $object ? (object) $result: $result;
     }
 
     public static function uniqueArray($data, $check = false)

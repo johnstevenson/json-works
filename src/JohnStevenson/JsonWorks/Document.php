@@ -34,9 +34,15 @@ class Document
         $this->schema = new Schema\Model($schema);
     }
 
-    public function toJson(&$json, $pretty = true, $tabs = false)
+    public function toJson(&$json, $pretty = true, $prune = true, $tabs = false)
     {
-        if ($result = $this->validate()) {
+        if ($prune) {
+            $result = $this->pruneData();
+        } else {
+            $result = $this->validate();
+        }
+
+        if ($result) {
             $json = $this->encodeData($pretty);
             if ($tabs && $pretty) {
                 $json = preg_replace_callback('/^( +)/m', function($m) {
@@ -57,7 +63,7 @@ class Document
     {
         $this->lastPushIndex = 0;
         $pointers = is_array($path) ? $path : Utils::decodePath($path);
-        $value = Utils::copyData($value, true);
+        $value = Utils::copyData($value);
 
         if (!$pointers) {
             # empty path, add value to root
@@ -146,15 +152,14 @@ class Document
     {
         if (is_string($input)) {
 
-            if (preg_match('/^(\{|\[)/', $input, $match)) {
+             if (preg_match('/^(\{|\[)/', $input, $match)) {
                 $input = json_decode($input);
             } else {
                 $input = json_decode(@file_get_contents($input));
             }
+        }
 
-            $result = $input ?: false;
-
-        } elseif (is_array($input) || is_null($input)) {
+        if (is_array($input) || is_null($input)) {
             $result = $isData;
         } else {
             $result = is_object($input);
@@ -356,6 +361,10 @@ class Document
 
         $json = json_encode($this->data);
 
+        if (!$pretty) {
+            return $json;
+        }
+
         $len = strlen($json);
         $result = $string = '';
         $inString = $escaped = false;
@@ -430,5 +439,45 @@ class Document
         }, $result);
 
         return $result. $newLine;
+    }
+
+    protected function pruneData()
+    {
+        if ($this->data) {
+            $props = 0;
+            $data = $this->workPrune(new \RecursiveArrayIterator($this->data), $props);
+            if ($result = $this->checkData($data)) {
+                $this->data = $data;
+            }
+        }
+
+        return $this->data ? $result : true;
+    }
+
+    protected function workPrune($data, &$props)
+    {
+        $object = is_string($data->key());
+        $result = array();
+
+        while ($data->valid()) {
+
+            if ($data->hasChildren()) {
+                $currentProps = $props;
+                $value = $this->workPrune($data->getChildren(), $props);
+
+                if ($props > $currentProps) {
+                    $result[$data->key()] = $value;
+                }
+                $props = $currentProps;
+
+            } else {
+                $result[$data->key()] = $data->current();
+            }
+            $data->next();
+        }
+
+        $props = count($result);
+
+        return $object ? (object) $result: $result;
     }
 }

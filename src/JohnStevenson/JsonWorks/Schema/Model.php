@@ -14,8 +14,8 @@ class Model
 
     public function __construct($input)
     {
-        $this->data = Utils::copyData((object) $input, false, array($this, 'init'));
-        $this->checkReferences();
+        $this->data = Utils::copyData((object) $input, array($this, 'initCallback'));
+        $this->resolveReferences();
     }
 
     public function find($schema, array $keys)
@@ -34,11 +34,12 @@ class Model
         return $schema;
     }
 
-    public function init($data)
+    public function initCallback($data)
     {
-        if ($ref = Utils::get($data, '$ref')) {
+        if ('$ref' === $data->key()) {
+            $ref = $data->current();
 
-            if (is_object($data) && is_string($ref)) {
+            if (is_string($ref)) {
                 $this->references[$ref] = null;
             } else {
                 throw new \RuntimeException('Invalid reference');
@@ -48,7 +49,39 @@ class Model
         return $data;
     }
 
-    public function resolve($schema, $parents = array())
+    public function resolveCallback($data)
+    {
+        if ('$ref' === $data->key()) {
+            $schema = Utils::get($this->references, $data->current());
+            $data = new \RecursiveArrayIterator($schema);
+        }
+
+        return $data;
+    }
+
+    private function resolveReferences()
+    {
+        if ($this->references) {
+
+            foreach (array_keys($this->references) as $ref) {
+                $keys = Utils::decodePath($ref);
+
+                if ($schema = $this->find($this->data, $keys)) {
+                    $this->references[$ref] = $schema;
+                } else {
+                    throw new \RuntimeException('Unable to resolve ref '.$ref);
+                }
+            }
+
+            foreach ($this->references as $ref => $schema) {
+                $this->references[$ref] = $this->resolve($schema);
+            }
+
+            $this->data = Utils::copyData($this->data, array($this, 'resolveCallback'));
+        }
+    }
+
+    private function resolve($schema, $parents = array())
     {
         $result = $schema;
 
@@ -67,27 +100,5 @@ class Model
         }
 
         return $result;
-    }
-
-    protected function checkReferences()
-    {
-        if ($this->references) {
-
-            foreach (array_keys($this->references) as $ref) {
-                $keys = Utils::decodePath($ref);
-
-                if ($schema = $this->find($this->data, $keys)) {
-                    $this->references[$ref] = $schema;
-                } else {
-                    throw new \RuntimeException('Unable to resolve ref '.$ref);
-                }
-            }
-
-            foreach ($this->references as $ref => $schema) {
-                $this->references[$ref] = $this->resolve($schema);
-            }
-
-            $this->data = Utils::copyData($this->data, false, array($this, 'resolve'));
-        }
     }
 }

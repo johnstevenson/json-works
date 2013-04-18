@@ -51,7 +51,7 @@ class Base extends \PHPUnit_Framework_TestCase
         return new \JohnStevenson\JsonWorks\Document($data, $schema);
     }
 
-    public function callMethod($obj, $name, array $args)
+    public function callMethod($obj, $name, $args = array())
     {
         $class = new \ReflectionClass($obj);
         $method = $class->getMethod($name);

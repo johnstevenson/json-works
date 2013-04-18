@@ -73,6 +73,37 @@ class ResolverTest extends \JsonWorks\Tests\Base
         $this->getDocument($schema, $data);
     }
 
+    public function testInArray()
+    {
+        $schema = '{
+            "properties": {
+                "prop1": {
+                    "allOf": [
+                        {"$ref": "#/definitions/def1"},
+                        {"$ref": "#/definitions/def2"}
+                    ]
+                }
+            },
+            "definitions": {
+                "def1": {"type": "integer"},
+                "def2": {"maximum": 5}
+            }
+        }';
+
+        $data = null;
+
+        $document = $this->getDocument($schema, $data);
+
+        $expected = $document->schema->data->definitions->def1;
+        $value = $document->schema->data->properties->prop1->allOf[0];
+        $this->assertEquals($expected, $value);
+
+        $expected = $document->schema->data->definitions->def2;
+        $value = $document->schema->data->properties->prop1->allOf[1];
+        $this->assertEquals($expected, $value);
+
+    }
+
     public function testCircular()
     {
         $schema = '{
