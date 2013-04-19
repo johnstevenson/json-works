@@ -2,8 +2,6 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
-use \JohnStevenson\JsonWorks\Utils as Utils;
-
 class Validator
 {
     public $error;

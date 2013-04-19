@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Document;
 
-use \JohnStevenson\JsonWorks\Utils as Utils;
+use \JohnStevenson\JsonWorks\Utils;
 
 class ToJsonTest extends \JsonWorks\Tests\Base
 {

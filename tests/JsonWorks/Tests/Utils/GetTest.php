@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Utils;
 
-use \JohnStevenson\JsonWorks\Utils as Utils;
+use \JohnStevenson\JsonWorks\Utils;
 
 class GetTest extends \PHPUnit_Framework_TestCase
 {

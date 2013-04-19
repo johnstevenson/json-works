@@ -2,7 +2,7 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
-use \JohnStevenson\JsonWorks\Utils as Utils;
+use \JohnStevenson\JsonWorks\Utils;
 
 class Model
 {

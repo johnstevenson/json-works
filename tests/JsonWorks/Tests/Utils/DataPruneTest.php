@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Utils;
 
-use \JohnStevenson\JsonWorks\Utils as Utils;
+use \JohnStevenson\JsonWorks\Utils;
 
 class DataPruneTest extends \JsonWorks\Tests\Base
 {
