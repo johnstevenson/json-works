@@ -14,7 +14,7 @@ A PHP library to create, edit, query and validate [JSON](http://www.json.org/).
 <a name="About"></a>
 ## About
 
-The library is intended to be used with complex or deeply-nested json structures. Or any place where it easier to do something like the following:
+The library is intended to be used with deeply-nested json structures. Or any place where it easier to do something like this:
 
 ```php
 <?php
@@ -23,19 +23,19 @@ $document->addValue('/path/to/nested/array/-', array('firstName'=> 'Fred', 'last
 $json = $document->toJson(true);
 ```
 
-which will output the following json:
+which will give you the following json:
 
 ```json
 {
-    "path": {
-        "to": {
-            "nested": {
-                "array": [
-                    {"firstName": "Fred", "lastName": "Blogg"}
-                ]
-            }
-        }
-    }
+	"path": {
+		"to": {
+			"nested": {
+				"array": [
+					{"firstName": "Fred", "lastName": "Blogg"}
+				]
+			}
+		}
+	}
 }
 ```
 
@@ -45,18 +45,11 @@ You can get to this value by calling:
 $fred = $document->getValue('/path/to/nested/array/0');
 ```
 
-You can update it with:
+or update it with:
 
 ```php
 $document->addValue('/path/to/nested/array/0/lastName', 'Bloggs');
 ```
-
-or delete it with:
-
-```php
-$document->deleteValue('/path/to/nested/array/0');
-```
-
 or move it with:
 
 ```php
@@ -68,13 +61,37 @@ to get:
 
 ```json
 {
-    "users": [
-        {"firstName": "Fred", "lastName": "Bloggs"}
-    ]
+	"users": [
+		{"firstName": "Fred", "lastName": "Bloggs"}
+	]
 }
 ```
 
+then delete it with:
+
+```php
+$document->deleteValue('/users/0');
+```
+
+
+
 ### Validation
+
+```json
+{
+	"properties": {
+		"users": {
+			"type": "array",
+			"items": {
+				"firstName": {"type": "string"},
+				"lastName": {"type": "string"},
+				"required": ["firstName", "lastName"]
+			}
+		}
+	}
+}
+```
+
 
 <a name="Installation"></a>
 ## Installation
@@ -82,9 +99,9 @@ The easiest way is [through composer][composer]. Just create a `composer.json` f
 
 ```json
 {
-    "require": {
-        "johnstevenson/json-works": "1.0.*"
-    }
+	"require": {
+		"johnstevenson/json-works": "1.0.*"
+	}
 }
 ```
 
@@ -100,7 +117,7 @@ Full usage [documentation][wiki] can be found in the Wiki.
 
 Json-Works is licensed under the MIT License - see the `LICENSE` file for details
 
-  [composer]: http://getcomposer.org
-  [download]: https://github.com/johnstevenson/json-works/archive/master.zip
-  [wiki]:https://github.com/johnstevenson/json-works/wiki/Home
+	[composer]: http://getcomposer.org
+	[download]: https://github.com/johnstevenson/json-works/archive/master.zip
+	[wiki]:https://github.com/johnstevenson/json-works/wiki/Home
 
