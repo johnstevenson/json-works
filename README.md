@@ -14,7 +14,7 @@ A PHP library to create, edit, query and validate [JSON](http://www.json.org/).
 <a name="About"></a>
 ## About
 
-The library is intended to be used with deeply-nested json structures. Or any place where it easier to do something like this:
+The library is intended to be used with nested json structures, or with json data that needs validation. Or in any situation where it is easier to do something like this:
 
 ```php
 <?php
@@ -48,12 +48,12 @@ We can get to this value by calling:
 $fred = $document->getValue('/path/to/nested/array/0');
 ```
 
-or update it with:
+and update it with:
 
 ```php
 $document->addValue('/path/to/nested/array/0/lastName', 'Bloggs');
 ```
-or move it with:
+and move it with:
 
 ```php
 $document->moveValue('/path/to/nested/array/0', '/users/-');
@@ -62,7 +62,7 @@ $document->tidy();
 $json = $document->toJson(true);
 ```
 
-to get:
+to end up with:
 
 ```json
 {
@@ -141,12 +141,12 @@ The easiest way is [through composer][composer]. Just create a `composer.json` f
 }
 ```
 
-Then include `require 'vendor/autoload.php'` somewhere in your bootstrap code. Alternatively, you can [download][download] and extract it (or clone this repo) and point a PSR-0 autoloader to the `src` directory.
+Then include `require 'vendor/autoload.php'` somewhere in your bootstrap code. Alternatively, you can [download][download] and extract it then point a PSR-0 autoloader to the `src` directory.
 
 <a name="Usage"></a>
 ## Usage
 
-Full usage [documentation][wiki] can be found in the Wiki.
+Full usage [documentation][wiki] is currently being written and will be available in the Wiki.
 
 <a name="License"></a>
 ## License
