@@ -78,7 +78,7 @@ Full usage [documentation][wiki] can be found in the Wiki.
 <a name="License"></a>
 ## License
 
-Json-Rpc is licensed under the MIT License - see the `LICENSE` file for details
+Json-Works is licensed under the MIT License - see the `LICENSE` file for details
 
   [composer]: http://getcomposer.org
   [download]: https://github.com/johnstevenson/json-works/archive/master.zip
