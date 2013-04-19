@@ -19,11 +19,11 @@ class GetValueTest extends \JsonWorks\Tests\Base
 
         $path = '/prop1/prop11';
         $expected = 'prop11 value';
-        $this->assertTrue($document->getValue($path, $value), 'Testing success: '.$path);
+        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
         $this->assertEquals($expected, $value);
 
         $path = '/prop1/prop111';
-        $this->assertFalse($document->getValue($path, $value), 'Testing fail: '.$path);
+        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
         $this->assertNull($value);
     }
 
@@ -43,11 +43,11 @@ class GetValueTest extends \JsonWorks\Tests\Base
 
         $path = '/1/1/2';
         $expected = 'item112 value';
-        $this->assertTrue($document->getValue($path, $value), 'Testing success: '.$path);
+        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
         $this->assertEquals($expected, $value);
 
         $path = '/0/3';
-        $this->assertFalse($document->getValue($path, $value), 'Testing fail: '.$path);
+        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
         $this->assertNull($value);
     }
 
@@ -77,34 +77,34 @@ class GetValueTest extends \JsonWorks\Tests\Base
         # success tests
         $path = '/prop1/firstName';
         $expected = 'Fred';
-        $this->assertTrue($document->getValue($path, $value), 'Testing success: '.$path);
+        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
         $this->assertEquals($expected, $value);
 
         $path = '/prop2/collection';
-        $this->assertTrue($document->getValue($path, $value), 'Testing success: '.$path);
+        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
         $this->assertInternalType('array', $value);
 
         $path = '/prop2/collection/1/lastName';
         $expected = 'Bloggs';
-        $this->assertTrue($document->getValue($path, $value), 'Testing success: '.$path);
+        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
         $this->assertEquals($expected, $value);
 
         $path = '/prop2/collection/3/1/firstName';
         $expected = 'Harry';
-        $this->assertTrue($document->getValue($path, $value), 'Testing success: '.$path);
+        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
         $this->assertEquals($expected, $value);
 
         # fail tests
         $path = '/prop1/lastName';
-        $this->assertFalse($document->getValue($path, $value), 'Testing fail: '.$path);
+        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
         $this->assertNull($value);
 
         $path = '/prop2/collection/0/lastName';
-        $this->assertFalse($document->getValue($path, $value), 'Testing fail: '.$path);
+        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
         $this->assertNull($value);
 
         $path = '/prop2/collection/3/0/firstName';
-        $this->assertFalse($document->getValue($path, $value), 'Testing fail: '.$path);
+        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
         $this->assertNull($value);
 
     }

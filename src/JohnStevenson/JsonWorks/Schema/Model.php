@@ -14,7 +14,7 @@ class Model
 
     public function __construct($input)
     {
-        $this->data = Utils::copyData((object) $input, array($this, 'initCallback'));
+        $this->data = Utils::dataCopy((object) $input, array($this, 'initCallback'));
         $this->resolveReferences();
     }
 
@@ -63,7 +63,7 @@ class Model
         if ($this->references) {
 
             foreach (array_keys($this->references) as $ref) {
-                $keys = Utils::decodePath($ref);
+                $keys = Utils::pathDecode($ref);
 
                 if ($schema = $this->find($this->data, $keys)) {
                     $this->references[$ref] = $schema;
@@ -76,7 +76,7 @@ class Model
                 $this->references[$ref] = $this->resolve($schema);
             }
 
-            $this->data = Utils::copyData($this->data, array($this, 'resolveCallback'));
+            $this->data = Utils::dataCopy($this->data, array($this, 'resolveCallback'));
             $this->references = array();
         }
     }

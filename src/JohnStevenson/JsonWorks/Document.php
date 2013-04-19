@@ -34,44 +34,11 @@ class Document
         $this->schema = new Schema\Model($schema);
     }
 
-    public function toJson(&$json, $pretty)
-    {
-        return $this->toJsonEx($json, $pretty, true, true);
-    }
-
-    public function toJsonEx(&$json, $pretty, $prune, $order, $tabs = false)
-    {
-        if ($prune) {
-            $this->data = Utils::pruneData($this->data);
-        }
-
-        if ($order) {
-            $this->data = Utils::orderData($this->data, $this->schema->data);
-        }
-
-        if ($result = $this->validate()) {
-            $json = Utils::getJson($this->data, $pretty);
-
-            if ($tabs && $pretty) {
-                $json = preg_replace_callback('/^( +)/m', function($m) {
-                    return str_repeat("\t", (int) strlen($m[1]) / 4);
-                }, $json);
-            }
-        }
-
-        return $result;
-    }
-
-    public function validate()
-    {
-        return $this->checkData($this->data);
-    }
-
     public function addValue($path, $value)
     {
         $this->lastPushIndex = 0;
-        $pointers = is_array($path) ? $path : Utils::decodePath($path);
-        $value = Utils::copyData($value);
+        $pointers = is_array($path) ? $path : Utils::pathDecode($path);
+        $value = Utils::dataCopy($value);
 
         if (!$pointers) {
             # empty path, add value to root
@@ -89,7 +56,7 @@ class Document
             $this->workingData = null;
         } else {
             # data exists so copy it
-            $this->workingData = Utils::copyData($this->data);
+            $this->workingData = Utils::dataCopy($this->data);
         }
 
         # create any new keys and get referenced element
@@ -120,12 +87,12 @@ class Document
 
     public function deleteValue($path)
     {
-        $pointers = is_array($path) ? $path : Utils::decodePath($path);
+        $pointers = is_array($path) ? $path : Utils::pathDecode($path);
 
-        if ($result = $this->getValue($pointers, $dummy)) {
+        if ($result = $this->hasValue($pointers, $dummy)) {
 
             $key = array_pop($pointers);
-            $this->getValue($pointers, $dummy);
+            $this->hasValue($pointers, $dummy);
 
             if (0 === strlen($key)) {
                 $this->loadData(null);
@@ -140,15 +107,23 @@ class Document
         return $result;
     }
 
-    public function getValue($path, &$value)
+    public function getValue($path, $default = null)
+    {
+        if (!$this->hasValue($path, $value)) {
+            $value = $default;        }
+
+        return $value;
+    }
+
+    public function hasValue($path, &$value)
     {
         $result = false;
         $value = null;
 
-        $pointers = is_array($path) ? $path : Utils::decodePath($path);
+        $pointers = is_array($path) ? $path : Utils::pathDecode($path);
 
         if ($this->workGet($pointers, false)) {
-            $value = Utils::copyData($this->element);
+            $value = Utils::dataCopy($this->element);
             $result = true;
         }
 
@@ -158,6 +133,31 @@ class Document
     public function moveValue($fromPath, $toPath)
     {
         return $this->workMove($fromPath, $toPath, true);
+    }
+
+    public function tidy($order = false)
+    {
+        $this->data = Utils::dataPrune($this->data);
+        if ($order) {
+            $this->data = Utils::dataOrder($this->data, $this->schema->data);
+        }
+    }
+
+    public function toJson($pretty, $tabs = false)
+    {
+        $json = Utils::dataToJson($this->data, $pretty);
+        if ($tabs && $pretty) {
+            $json = preg_replace_callback('/^( +)/m', function($m) {
+                return str_repeat("\t", (int) strlen($m[1]) / 4);
+            }, $json);
+        }
+
+        return $json;
+    }
+
+    public function validate($lax = false)
+    {
+        return $this->checkData($this->data, $lax);
     }
 
     protected function checkInput($input, $isData)
@@ -328,7 +328,7 @@ class Document
     {
         $result = false;
 
-        if ($this->getValue($fromPath, $value)) {
+        if ($this->hasValue($fromPath, $value)) {
             if ($result = $this->addValue($toPath, $value)) {
                 if ($delete) {
                     $this->deleteValue($fromPath);

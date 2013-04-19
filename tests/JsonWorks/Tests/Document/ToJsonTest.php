@@ -18,8 +18,10 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $expected = null;
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJson($json, false);
-        $this->assertTrue($result);
+        $document->tidy();
+
+        $json = $document->toJson(false);
+        $this->assertTrue($document->validate());
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
@@ -40,8 +42,10 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         }';
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJson($json, false);
-        $this->assertTrue($result);
+        $document->tidy();
+
+        $json = $document->toJson(false);
+        $this->assertTrue($document->validate());
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
@@ -61,8 +65,9 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $expected = $data;
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJsonEx($json, false, false, false);
-        $this->assertTrue($result);
+
+        $json = $document->toJson(false);
+        $this->assertTrue($document->validate());
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
@@ -80,8 +85,9 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         }';
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJson($json, false);
-        $this->assertFalse($result);
+        $document->tidy();
+
+        $this->assertFalse($document->validate());
     }
 
     public function testPruneNestedNoSchema()
@@ -116,8 +122,10 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         }';
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJson($json, false);
-        $this->assertTrue($result);
+        $document->tidy();
+
+        $json = $document->toJson(false);
+        $this->assertTrue($document->validate());
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
@@ -153,8 +161,9 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $expected = $data;
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJsonEx($json, false, false, false);
-        $this->assertTrue($result);
+
+        $json = $document->toJson(false);
+        $this->assertTrue($document->validate());
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
@@ -188,7 +197,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         }';
 
         $document = $this->getDocument($schema, $data);
-        $result = $document->toJson($json, false);
-        $this->assertFalse($result);
+        $document->tidy();
+        $this->assertFalse($document->validate());
     }
 }

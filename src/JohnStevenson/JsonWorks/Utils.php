@@ -94,64 +94,6 @@ class Utils
         return true;
     }
 
-    public static function addToPath($path, $key)
-    {
-        if (strlen($encoded = static::encodePathKey($key))) {
-            $encoded = '/'.$encoded;
-        }
-
-        return $path.$encoded;
-    }
-
-    public static function decodePath($path)
-    {
-        $keys = explode('/', $path);
-        array_shift($keys);
-
-        foreach ($keys as &$value) {
-            $value = str_replace('~0', '~', str_replace('~1', '/', $value));
-        }
-
-        return $keys;
-    }
-
-    public static function encodePath($keys)
-    {
-        $result = '';
-
-        foreach ((array) $keys as $value) {
-            $result = static::addToPath($result, $value);
-        }
-
-        return $result;
-    }
-
-    public static function encodePathKey($key)
-    {
-        return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
-    }
-
-    public static function encodeDataKeys($data)
-    {
-        return static::copyData($data, array('\\'.get_called_class(), 'encodeCallback'));
-    }
-
-    public static function encodeCallback($data)
-    {
-        if (is_string($data->key())) {
-            $result = array();
-
-            while ($data->valid()) {
-                $key = static::encodePathKey($data->key());
-                $result[$key] = $data->current();
-                $data->next();
-            }
-            $data = new \RecursiveArrayIterator((object) $result);
-        }
-
-        return $data;
-    }
-
     public static function uniqueArray($data, $check = false)
     {
         $out = array();
@@ -176,7 +118,64 @@ class Utils
         return $check ? true : $out;
     }
 
-    public static function copyData($data, $callback = null)
+    public static function pathAdd($path, $key)
+    {
+        if (strlen($encoded = static::pathEncodeKey($key))) {
+            $encoded = '/'.$encoded;
+        }
+
+        return $path.$encoded;
+    }
+
+    public static function pathDecode($path)
+    {
+        $keys = explode('/', $path);
+        array_shift($keys);
+
+        foreach ($keys as &$value) {
+            $value = str_replace('~0', '~', str_replace('~1', '/', $value));
+        }
+
+        return $keys;
+    }
+
+    public static function pathEncode($keys)
+    {
+        $result = '';
+        foreach ((array) $keys as $value) {
+            $result = static::pathAdd($result, $value);
+        }
+
+        return $result;
+    }
+
+    public static function pathEncodeKey($key)
+    {
+        return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
+    }
+
+    public static function pathEncodeDataKeys($data)
+    {
+        return static::dataCopy($data, array('\\'.get_called_class(), 'pathCallback'));
+    }
+
+    public static function pathCallback($data)
+    {
+        if (is_string($data->key())) {
+            $result = array();
+
+            while ($data->valid()) {
+                $key = static::pathEncodeKey($data->key());
+                $result[$key] = $data->current();
+                $data->next();
+            }
+            $data = new \RecursiveArrayIterator((object) $result);
+        }
+
+        return $data;
+    }
+
+    public static function dataCopy($data, $callback = null)
     {
         if ($iterator = static::getIterator($data)) {
             $data = static::iterCopy($iterator, $callback);
@@ -185,7 +184,7 @@ class Utils
         return $data;
     }
 
-    public static function pruneData($data)
+    public static function dataPrune($data)
     {
         if ($iterator = static::getIterator($data)) {
             $data = static::iterPrune($iterator, $props);
@@ -194,14 +193,14 @@ class Utils
         return $data;
     }
 
-    public static function orderData($data, $schema)
+    public static function dataOrder($data, $schema)
     {
         if (is_object($data) && ($properties = Utils::get($schema, 'properties'))) {
             $result = array();
 
             foreach ($properties as $key => $value) {
                 if (isset($data->$key)) {
-                    $result[$key] = static::orderData($data->$key, $properties->$key);
+                    $result[$key] = static::dataOrder($data->$key, $properties->$key);
                     unset($data->$key);
                 }
             }
@@ -212,7 +211,7 @@ class Utils
 
             foreach ($data as $item) {
                 $itemSchema = $objSchema ?: (next($schema->items) ?: null);
-                $result[] = static::orderData($item, $itemSchema);
+                $result[] = static::dataOrder($item, $itemSchema);
             }
 
         } else {
@@ -229,7 +228,7 @@ class Utils
     * @param boolean $pretty Format the output
     * @return string Encoded json
     */
-    public static function getJson($data, $pretty)
+    public static function dataToJson($data, $pretty)
     {
         if (version_compare(PHP_VERSION, '5.4', '>=')) {
             $prettyPrint = $pretty ? JSON_PRETTY_PRINT : 0;

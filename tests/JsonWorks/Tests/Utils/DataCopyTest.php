@@ -4,12 +4,12 @@ namespace JsonWorks\Tests\Utils;
 
 use \JohnStevenson\JsonWorks\Utils as Utils;
 
-class CopyDataTest extends \PHPUnit_Framework_TestCase
+class DataCopyTest extends \PHPUnit_Framework_TestCase
 {
     public function testFromObject()
     {
         $obj1 = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj2 = Utils::copyData($obj1);
+        $obj2 = Utils::dataCopy($obj1);
 
         $obj1->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -19,7 +19,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
     public function testFromAssoc()
     {
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj = Utils::copyData($arr);
+        $obj = Utils::dataCopy($arr);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj);
@@ -29,7 +29,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
     {
         $obj = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
         $obj1 = (object) array('users' => array($obj));
-        $obj2 = Utils::copyData($obj1);
+        $obj2 = Utils::dataCopy($obj1);
 
         $obj1->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -41,7 +41,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
         $obj1 = (object) array('users' => array($arr));
 
-        $obj2 = Utils::copyData($obj1);
+        $obj2 = Utils::dataCopy($obj1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj2->users[0]);
@@ -53,7 +53,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
         $obj1 = (object) array('users' => array($obj));
         $arr1 = array(9, $obj1);
 
-        $arr2 = Utils::copyData($arr1);
+        $arr2 = Utils::dataCopy($arr1);
 
         $arr1[1]->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -66,7 +66,7 @@ class CopyDataTest extends \PHPUnit_Framework_TestCase
         $obj1 = (object) array('users' => array($arr));
         $arr1 = array(9, $obj1);
 
-        $arr2 = Utils::copyData($arr1);
+        $arr2 = Utils::dataCopy($arr1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $arr2[1]->users[0]);

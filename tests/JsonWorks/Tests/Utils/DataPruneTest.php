@@ -4,14 +4,14 @@ namespace JsonWorks\Tests\Utils;
 
 use \JohnStevenson\JsonWorks\Utils as Utils;
 
-class PruneDataTest extends \JsonWorks\Tests\Base
+class DataPruneTest extends \JsonWorks\Tests\Base
 {
     public function testNoData()
     {
         $data = '';
         $expected = '';
 
-        $result = Utils::pruneData(json_decode($data));
+        $result = Utils::dataPrune(json_decode($data));
         $this->assertEquals(json_decode($expected), $result);
     }
 
@@ -29,7 +29,7 @@ class PruneDataTest extends \JsonWorks\Tests\Base
             "prop4": null
         }';
 
-        $result = Utils::pruneData(json_decode($data));
+        $result = Utils::dataPrune(json_decode($data));
         $this->assertEquals(json_decode($expected), $result);
     }
 
@@ -62,7 +62,7 @@ class PruneDataTest extends \JsonWorks\Tests\Base
             "prop4": null
         }';
 
-        $result = Utils::pruneData(json_decode($data));
+        $result = Utils::dataPrune(json_decode($data));
         $this->assertEquals(json_decode($expected), $result);
     }
 }

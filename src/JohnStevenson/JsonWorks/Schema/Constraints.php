@@ -16,7 +16,7 @@ class Constraints
 
     public function validate($data, $schema, $key = null)
     {
-        $this->path = Utils::addToPath($this->path, $key);
+        $this->path = Utils::pathAdd($this->path, $key);
 
         $this->validateCommon($data, $schema);
         $type = gettype($data);
