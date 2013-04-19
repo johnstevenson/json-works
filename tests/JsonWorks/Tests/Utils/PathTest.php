@@ -86,14 +86,14 @@ class PathTest extends \PHPUnit_Framework_TestCase
     {
         $value = array('key1' => 'value1', 'key~2//sub' => 'value2');
         $expected = (object) array('key1' => 'value1', 'key~02~1~1sub' => 'value2');
-        $this->assertEquals($expected, Utils::pathEncodeDataKeys($value));
+        $this->assertEquals($expected, Utils::pathDataEncode($value));
     }
 
     public function testEncodeDataWithObject()
     {
         $value = (object) array('key1' => 'value1', 'key~2//sub' => 'value2');
         $expected = (object) array('key1' => 'value1', 'key~02~1~1sub' => 'value2');
-        $this->assertEquals($expected, Utils::pathEncodeDataKeys($value));
+        $this->assertEquals($expected, Utils::pathDataEncode($value));
     }
 
     public function testEncodeDataDeepFromObject()
@@ -103,20 +103,20 @@ class PathTest extends \PHPUnit_Framework_TestCase
 
         $obj2 = (object) array('first~1name' => 'Fred', 'last~1Name' => 'Bloggs');
         $expected = (object) array('users' => array($obj2));
-        $this->assertEquals($expected, Utils::pathEncodeDataKeys($value));
+        $this->assertEquals($expected, Utils::pathDataEncode($value));
     }
 
     public function testEncodeDataWithIndexedArray()
     {
         $value = array(1, 2, 3);
         $expected = $value;
-        $this->assertEquals($expected, Utils::pathEncodeDataKeys($value));
+        $this->assertEquals($expected, Utils::pathDataEncode($value));
     }
 
     public function testEncodeDataWithString()
     {
         $value = 'value';
         $expected = $value;
-        $this->assertEquals($expected, Utils::pathEncodeDataKeys($value));
+        $this->assertEquals($expected, Utils::pathDataEncode($value));
     }
 }

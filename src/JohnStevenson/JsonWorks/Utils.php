@@ -154,7 +154,7 @@ class Utils
         return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
     }
 
-    public static function pathEncodeDataKeys($data)
+    public static function pathDataEncode($data)
     {
         return static::dataCopy($data, array('\\'.get_called_class(), 'pathCallback'));
     }
