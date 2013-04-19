@@ -39,13 +39,13 @@ which will output the following json:
 }
 ```
 
-You can get this value by calling:
+You can get to this value by calling:
 
 ```php
-$fred = $document->getValue('/path/to/nested/array/0')
+$fred = $document->getValue('/path/to/nested/array/0');
 ```
 
-And you can update it with:
+You can update it with:
 
 ```php
 $document->addValue('/path/to/nested/array/0/lastName', 'Bloggs');
@@ -56,6 +56,26 @@ or delete it with:
 ```php
 $document->deleteValue('/path/to/nested/array/0');
 ```
+
+or move it with:
+
+```php
+$document->moveValue('/path/to/nested/array/0', '/users/-');
+$json = $document->toJson(true);
+```
+
+to get:
+
+```json
+{
+    "users": [
+        {"firstName": "Fred", "lastName": "Bloggs"}
+    ]
+}
+```
+
+### Validation
+
 <a name="Installation"></a>
 ## Installation
 The easiest way is [through composer][composer]. Just create a `composer.json` file and run `php composer.phar install` to install it:
