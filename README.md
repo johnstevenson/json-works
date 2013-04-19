@@ -21,10 +21,12 @@ The library is intended to be used with deeply-nested json structures. Or any pl
 $document = new JohnStevenson\JsonWorks\Document();
 
 $document->addValue('/path/to/nested/array/-', array('firstName'=> 'Fred', 'lastName' => 'Blogg'));
+
+# prettyPrint
 $json = $document->toJson(true);
 ```
 
-which will give you the following json:
+which will give us the following json:
 
 ```json
 {
@@ -40,7 +42,7 @@ which will give you the following json:
 }
 ```
 
-You can get to this value by calling:
+We can get to this value by calling:
 
 ```php
 $fred = $document->getValue('/path/to/nested/array/0');
@@ -55,6 +57,8 @@ or move it with:
 
 ```php
 $document->moveValue('/path/to/nested/array/0', '/users/-');
+
+$document->tidy();
 $json = $document->toJson(true);
 ```
 
@@ -76,26 +80,53 @@ $document->deleteValue('/users/0');
 
 The `/path/to/value` notation shown above is [JSON Pointer][pointer] syntax, which identifies specific json elements by following a path from the root of the document. Each token is prefixed with a `/` and references a matching property name for objects or an index for arrays, for example `/3`. Arrays also use the special `/-` token, which points to the non-existent member after the last item and indicates that the value should be added.
 
-Json-Works can build json structures by using these references, but it can sometimes get it wrong. What if your object contains numeric property names: `"3": {"name": "Bloggs"}`? What if you need to check that the value of `"name"` is always a string? This is where validation can be useful.
+Json-Works can build json structures by using these references, but it can sometimes get it wrong. What if our object contains numeric property names: `"3": {"name": "Bloggs", "age": 42}`? What if we need to check that the value of `"age"` is always a number? This is where validation can be useful.
 
 
 
 ### Validation
 
+Json-Works includes an implementation of [JSON Schema][schema], version 4. This allows us to validate our data and can also help Json-Works build the document. The following example schema describes a simple structure comprising an object with a single property named `"users"`, which is an array containing objects whose properties are all required and whose types are defined. 
+
 ```json
 {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
 	"properties": {
 		"users": {
 			"type": "array",
 			"items": {
-				"firstName": {"type": "string"},
-				"lastName": {"type": "string"},
-				"required": ["firstName", "lastName"]
+                "properties": {
+				    "firstName": {"type": "string"},
+				    "lastName": {"type": "string"}				    
+                },
+                "required": ["firstName", "lastName"]
 			}
-		}
+		},
+    "additionalProperties": false
 	}
 }
 ```
+Now when we try to add values, Json-Works will only do so if they are valid. So we have to check.
+
+```php
+$result = $document->addValue('/date', date('Y-m-d');
+# false, no additionalProperties are allowed
+
+$result = $document->addValue('/users/-', array('firstName'=> 'Fred', 'lastName' => 'Bloggs'));
+# true
+
+$result = $document->addValue('/users/-', array('firstName'=> 'Fred', 'lastName' => 3));
+# false, lastName is not a string
+
+$result = $document->addValue('/users/0', array('firstName'=> 'Fred'));
+# true, required values are not checked when we are building
+
+# but are if we validate directly
+$result = $document->validate();
+# false - lastName is missing
+```
+Without a schema, any value can be added anywhere.
 
 
 <a name="Installation"></a>
@@ -123,6 +154,7 @@ Full usage [documentation][wiki] can be found in the Wiki.
 Json-Works is licensed under the MIT License - see the `LICENSE` file for details.
 
 [pointer]: http://tools.ietf.org/html/rfc6901/
+[schema]: http://json-schema.org/
 [composer]: http://getcomposer.org
 [download]: https://github.com/johnstevenson/json-works/archive/master.zip
 [wiki]:https://github.com/johnstevenson/json-works/wiki/Home
