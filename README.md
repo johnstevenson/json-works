@@ -19,6 +19,7 @@ The library is intended to be used with deeply-nested json structures. Or any pl
 ```php
 <?php
 $document = new JohnStevenson\JsonWorks\Document();
+
 $document->addValue('/path/to/nested/array/-', array('firstName'=> 'Fred', 'lastName' => 'Blogg'));
 $json = $document->toJson(true);
 ```
@@ -73,6 +74,10 @@ then delete it with:
 $document->deleteValue('/users/0');
 ```
 
+The `/path/to/value` notation shown above is [JSON Pointer][pointer] syntax, which identifies specific json elements by following a path from the root of the document. Each token is prefixed with a `/` and references a matching property name for objects or an index for arrays, for example `/3`. Arrays also use the special `/-` token, which points to the non-existent member after the last item and indicates that the value should be added.
+
+Json-Works can build json structures by using these references, but it can sometimes get it wrong. What if your object contains numeric property names: `"3": {"name": "Bloggs"}`? What if you need to check that the value of `"name"` is always a string? This is where validation can be useful.
+
 
 
 ### Validation
@@ -115,9 +120,10 @@ Full usage [documentation][wiki] can be found in the Wiki.
 <a name="License"></a>
 ## License
 
-Json-Works is licensed under the MIT License - see the `LICENSE` file for details
+Json-Works is licensed under the MIT License - see the `LICENSE` file for details.
 
-	[composer]: http://getcomposer.org
-	[download]: https://github.com/johnstevenson/json-works/archive/master.zip
-	[wiki]:https://github.com/johnstevenson/json-works/wiki/Home
+[pointer]: http://tools.ietf.org/html/rfc6901/
+[composer]: http://getcomposer.org
+[download]: https://github.com/johnstevenson/json-works/archive/master.zip
+[wiki]:https://github.com/johnstevenson/json-works/wiki/Home
 
