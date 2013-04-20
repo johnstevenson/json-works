@@ -62,13 +62,12 @@ class Utils
 
     public static function equalsObject($obj1, $obj2)
     {
-        $props = get_object_vars($obj1);
-
-        if (count($props) !== count(get_object_vars($obj2))) {
+        # get_object_vars fails on objects with digit keys
+        if (count((array) $obj1) !== count((array) $obj2)) {
             return false;
         }
 
-        foreach ($props as $key => $value) {
+        foreach ($obj1 as $key => $value) {
             if (!isset($obj2->$key) || !static::equals($value, $obj2->$key)) {
                 return false;
             }

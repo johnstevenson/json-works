@@ -38,6 +38,30 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $this->assertEquals($value, $document->data);
     }
 
+    public function testObjectWithArrayPropertyNames()
+    {
+        $schema = '{
+            "type" : "object",
+            "patternProperties":
+            {
+                "^[0-9]*$": {"$ref": "#/definitions/alphanum"},
+                "^-{1,1}$": {"$ref": "#/definitions/alphanum"}
+            },
+            "definitions":
+            {
+                "alphanum": {
+                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
+                }
+            }
+        }';
+
+        $document = $this->getDocument($schema, null);
+        $path = '';
+        $value = json_decode('{"0": 1, "-": "value"}');
+        $this->assertTrue($document->addValue($path, $value));
+        $this->assertEquals($value, $document->data);
+    }
+
     public function testArrayNoSchema()
     {
         $document = $this->getDocument(null, null);

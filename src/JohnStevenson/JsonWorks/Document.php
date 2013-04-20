@@ -12,7 +12,11 @@ class Document
     private $workingData;
     private $throwError;
 
-    public function __construct($throwError = false)
+    /**
+    * @param mixed $throwError Throws exceptions if true
+    * @return Document
+    */
+    public function __construct($throwError = true)
     {
         $this->throwError = $throwError;
     }
@@ -38,7 +42,7 @@ class Document
 
         if (!$pointers) {
             # empty path, add value to root
-            if ($result = (is_object($value) || is_array($value)) && $this->checkData($value)) {
+            if ($result = (is_object($value) || is_array($value)) && $this->checkData($value, true)) {
                 $this->data = $value;
             } else {
                 $this->error = $this->error ?: 'Value must be an object or array';
@@ -98,7 +102,7 @@ class Document
             } elseif (is_object($this->element)) {
                 unset($this->element->$key);
             }
-         }
+        }
 
         return $result;
     }
@@ -106,7 +110,8 @@ class Document
     public function getValue($path, $default = null)
     {
         if (!$this->hasValue($path, $value)) {
-            $value = $default;        }
+            $value = $default;
+        }
 
         return $value;
     }
@@ -134,7 +139,7 @@ class Document
     public function tidy($order = false)
     {
         $this->data = Utils::dataPrune($this->data);
-        if ($order) {
+        if ($order && $this->schema) {
             $this->data = Utils::dataOrder($this->data, $this->schema->data);
         }
     }
@@ -179,7 +184,7 @@ class Document
             try {
                 $input = new Schema\Model($input);
             } catch (\RuntimeException $e) {
-                $this->error = 'Schema error'.$e->getMessage();
+                $this->error = 'Schema error: '.$e->getMessage();
             }
         }
 
@@ -187,7 +192,7 @@ class Document
             throw new \RuntimeException($this->error);
         }
 
-        return $input;
+        return $this->error ? null : $input;
     }
 
     protected function pushKey($value)

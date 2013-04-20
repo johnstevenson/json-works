@@ -277,7 +277,7 @@ class Constraints
 
     protected function validateMaxMin($data, $value, $isMax)
     {
-        $count = is_object($data) ? count(get_object_vars($data)) : count($data);
+        $count = count((array) $data);
 
         if ($isMax && $count > $value) {
             $error = 'has too many members, maximum %d';
@@ -292,7 +292,7 @@ class Constraints
 
     protected function validateObjectWork($data, $schema)
     {
-        $set = get_object_vars($data);
+        $set = (array) $data;
         $p = Utils::get($schema, 'properties', new \stdClass());
 
         foreach ($p as $key => $value) {
@@ -321,8 +321,6 @@ class Constraints
 
     protected function validateObjectChildren($data, $schema, $additional)
     {
-        $set = get_object_vars($data);
-
         if (true === $additional) {
             $additional = new \stdClass();
         }
@@ -330,7 +328,7 @@ class Constraints
         $p = Utils::get($schema, 'properties', new \stdClass());
         $pp = Utils::get($schema, 'patternProperties', new \stdClass());
 
-        foreach ($set as $key => $value) {
+        foreach ($data as $key => $value) {
 
             $child = array();
 

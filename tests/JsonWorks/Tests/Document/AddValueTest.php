@@ -128,6 +128,42 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $this->assertEquals(json_decode($expected), $document->data);
     }
 
+    public function testObjectWithArrayPropertyNames()
+    {
+        $schema = '{
+            "type": "object",
+            "properties": {
+                "prop1": {
+                    "type": "object",
+                    "patternProperties":
+                    {
+                        "^[0-9]*$": {"$ref": "#/definitions/alphanum"},
+                        "^-{1,1}$": {"$ref": "#/definitions/alphanum"}
+                    }
+                }
+            },
+            "definitions":
+            {
+                "alphanum": {
+                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
+                }
+            }
+        }';
+
+        $expected = '{
+            "prop1": {
+                "0": 1,
+                "-": "value"
+            }
+        }';
+
+        $document = $this->getDocument($schema, null);
+        $path = '/prop1';
+        $value = json_decode('{"0": 1, "-": "value"}');
+        $this->assertTrue($document->addValue($path, $value));
+        $this->assertEquals(json_decode($expected), $document->data);
+    }
+
     public function testBuildObjectInArray()
     {
         $schema = null;
