@@ -78,7 +78,7 @@ then delete it with:
 $document->deleteValue('/users/0');
 ```
 
-The `/path/to/value` notation shown above is [JSON Pointera][pointer] syntax, which identifies specific json elements by following a path from the root of the document. Each token in the path is prefixed with a `/` and points to a matching property-name for objects or a numeric index for arrays. Arrays also use the special `/-` token, which indicates that a value should be added to the end of the array.
+The `/path/to/value` notation shown above is [JSON Pointer][pointer] syntax, which identifies specific json elements by following a path from the root of the document. Each token in the path is prefixed with a `/` and points to a matching property-name for objects or a numeric index for arrays. Arrays also use the special `/-` token, which indicates that a value should be added to the end of the array.
 
 Json-Works builds json structures by using these references, but it can sometimes get it wrong. What if our object contains numeric property names: `"3": {"name": "Bloggs", "age": 42}`? What if we need to check that the value of `"age"` is always a number? This is where validation can be useful.
 
