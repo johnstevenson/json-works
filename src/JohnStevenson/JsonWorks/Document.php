@@ -10,28 +10,24 @@ class Document
     public $lastPushIndex;
     private $element;
     private $workingData;
+    private $throwError;
 
-    public function __construct($data = null, $schema = null)
+    public function __construct($throwError = false)
     {
-        if ($data) {
-            $this->loadData($data);
-        }
-
-        if ($schema) {
-            $this->loadSchema($schema);
-        }
+        $this->throwError = $throwError;
     }
 
     public function loadData($data)
     {
-        $this->data = $this->checkInput($data, true);
+        $this->data = $this->getInput($data, false);
         $this->workingData = null;
+        return empty($this->error);
     }
 
     public function loadSchema($schema)
     {
-        $schema = $this->checkInput($schema, false);
-        $this->schema = new Schema\Model($schema);
+        $this->schema = $this->getInput($schema, true);
+        return empty($this->error);
     }
 
     public function addValue($path, $value)
@@ -160,7 +156,7 @@ class Document
         return $this->checkData($this->data, $lax);
     }
 
-    protected function checkInput($input, $isData)
+    protected function getInput($input, $isSchema)
     {
         if (is_string($input)) {
 
@@ -172,13 +168,23 @@ class Document
         }
 
         if (is_array($input) || is_null($input)) {
-            $result = $isData;
+            $res = !$isSchema;
         } else {
-            $result = is_object($input);
+            $res = is_object($input);
         }
 
-        if (!$result) {
-            throw new \Exception('Invalid input');
+        $this->error = $res ? '' : 'Invalid input';
+
+        if (!$this->error && $isSchema) {
+            try {
+                $input = new Schema\Model($input);
+            } catch (\RuntimeException $e) {
+                $this->error = 'Schema error'.$e->getMessage();
+            }
+        }
+
+        if ($this->error && $this->throwError) {
+            throw new \RuntimeException($this->error);
         }
 
         return $input;
