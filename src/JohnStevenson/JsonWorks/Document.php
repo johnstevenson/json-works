@@ -10,27 +10,18 @@ class Document
     public $lastPushIndex;
     private $element;
     private $workingData;
-    private $throwError;
+    private $validator;
 
-    /**
-    * @param mixed $throwError Throws exceptions if true
-    * @return Document
-    */
-    public function __construct($throwError = true)
+    public function loadData($data, $noException = false)
     {
-        $this->throwError = $throwError;
-    }
-
-    public function loadData($data)
-    {
-        $this->data = $this->getInput($data, false);
+        $this->data = $this->getInput($data, false, $noException);
         $this->workingData = null;
         return empty($this->error);
     }
 
-    public function loadSchema($schema)
+    public function loadSchema($schema, $noException = false)
     {
-        $this->schema = $this->getInput($schema, true);
+        $this->schema = $this->getInput($schema, true, $noException);
         return empty($this->error);
     }
 
@@ -161,7 +152,7 @@ class Document
         return $this->checkData($this->data, $lax);
     }
 
-    protected function getInput($input, $isSchema)
+    protected function getInput($input, $isSchema, $noException)
     {
         if (is_string($input)) {
 
@@ -188,7 +179,7 @@ class Document
             }
         }
 
-        if ($this->error && $this->throwError) {
+        if ($this->error && !$noException) {
             throw new \RuntimeException($this->error);
         }
 
@@ -353,14 +344,15 @@ class Document
     protected function checkData($data, $lax = false)
     {
         if (!$this->schema) {
-            throw new \Exception('Schema has not been loaded');
+            return true;
         }
 
-        $this->error = null;
-        $validator = new Schema\Validator();
+        if (!$this->validator) {
+            $this->validator = new Schema\Validator();
+        }
 
-        if (!$result = $validator->check($data, $this->schema, $lax)) {
-            $this->error = $validator->error;
+        if (!$result = $this->validator->check($data, $this->schema, $lax)) {
+            $this->error = $this->validator->error;
         }
 
         return $result;

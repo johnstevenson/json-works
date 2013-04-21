@@ -29,7 +29,7 @@ class Base extends \PHPUnit_Framework_TestCase
         return $validator->check($data, $schema);
     }
 
-    public function getDocument($schema, $data, $throwError = false)
+    public function getDocument($schema, $data, $noException = false)
     {
 
         $schema = $schema ?: '{}';
@@ -48,9 +48,9 @@ class Base extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $document = new \JohnStevenson\JsonWorks\Document($throwError);
-        $document->loadData($data);
-        $document->loadSchema($schema);
+        $document = new \JohnStevenson\JsonWorks\Document();
+        $document->loadData($data, $noException);
+        $document->loadSchema($schema, $noException);
         return $document;
     }
 

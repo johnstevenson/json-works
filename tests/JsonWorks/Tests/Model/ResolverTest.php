@@ -73,7 +73,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-        $this->getDocument($schema, $data, true);
+        $this->getDocument($schema, $data);
 
     }
 
@@ -94,7 +94,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-        $this->getDocument($schema, $data, true);
+        $this->getDocument($schema, $data);
 
     }
 
@@ -115,7 +115,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-        $this->getDocument($schema, $data, true);
+        $this->getDocument($schema, $data);
     }
 
     public function testInArray()
@@ -170,7 +170,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-        $this->getDocument($schema, $data, true);
+        $this->getDocument($schema, $data);
     }
 
     public function testCompound()
@@ -249,6 +249,6 @@ class ResolverTest extends \JsonWorks\Tests\Base
         }';
 
         $data = null;
-        $this->getDocument($schema, $data, true);
+        $this->getDocument($schema, $data);
     }
 }
