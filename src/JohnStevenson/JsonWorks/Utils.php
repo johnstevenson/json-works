@@ -120,27 +120,6 @@ class Utils
         return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
     }
 
-    public static function pathEncodeData($data)
-    {
-        return static::dataCopy($data, array('\\'.get_called_class(), 'pathCallback'));
-    }
-
-    public static function pathCallback($data)
-    {
-        if (is_string($data->key())) {
-            $result = array();
-
-            while ($data->valid()) {
-                $key = static::pathEncodeKey($data->key());
-                $result[$key] = $data->current();
-                $data->next();
-            }
-            $data = new \RecursiveArrayIterator((object) $result);
-        }
-
-        return $data;
-    }
-
     public static function dataCopy($data, $callback = null)
     {
         if ($iterator = static::getIterator($data)) {
