@@ -71,4 +71,5 @@ class DataCopyTest extends \PHPUnit_Framework_TestCase
         $expected = (object) $arr;
         $this->assertEquals($expected, $arr2[1]->users[0]);
     }
+
 }

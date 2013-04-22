@@ -60,39 +60,6 @@ class Utils
         }
     }
 
-    public static function equalsObject($obj1, $obj2)
-    {
-        # get_object_vars fails on objects with digit keys
-        if (count((array) $obj1) !== count((array) $obj2)) {
-            return false;
-        }
-
-        foreach ($obj1 as $key => $value) {
-            if (!isset($obj2->$key) || !static::equals($value, $obj2->$key)) {
-                return false;
-            }
-         }
-
-        return true;
-    }
-
-    public static function equalsArray($arr1, $arr2)
-    {
-        $count = count($arr1);
-
-        if ($count !== count($arr2)) {
-            return false;
-        }
-
-        for ($i = 0; $i < $count; ++$i) {
-            if (!static::equals($arr1[$i], $arr2[$i])) {
-                return false;
-            }
-         }
-
-        return true;
-    }
-
     public static function uniqueArray($data, $check = false)
     {
         $out = array();
@@ -153,7 +120,7 @@ class Utils
         return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
     }
 
-    public static function pathDataEncode($data)
+    public static function pathEncodeData($data)
     {
         return static::dataCopy($data, array('\\'.get_called_class(), 'pathCallback'));
     }
@@ -317,6 +284,39 @@ class Utils
         return $result. $newLine;
     }
 
+    protected static function equalsObject($obj1, $obj2)
+    {
+        # get_object_vars fails on objects with digit keys
+        if (count((array) $obj1) !== count((array) $obj2)) {
+            return false;
+        }
+
+        foreach ($obj1 as $key => $value) {
+            if (!isset($obj2->$key) || !static::equals($value, $obj2->$key)) {
+                return false;
+            }
+         }
+
+        return true;
+    }
+
+    protected static function equalsArray($arr1, $arr2)
+    {
+        $count = count($arr1);
+
+        if ($count !== count($arr2)) {
+            return false;
+        }
+
+        for ($i = 0; $i < $count; ++$i) {
+            if (!static::equals($arr1[$i], $arr2[$i])) {
+                return false;
+            }
+         }
+
+        return true;
+    }
+
     protected static function iterCopy($data, $callback = null)
     {
         if ($callback) {
@@ -366,7 +366,7 @@ class Utils
         return $object ? (object) $result: $result;
     }
 
-    private static function getIterator($data) {
+    protected static function getIterator($data) {
         if (is_object($data) || is_array($data)) {
             return new \RecursiveArrayIterator($data);
         }
