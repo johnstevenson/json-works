@@ -63,13 +63,86 @@ class DataCopyTest extends \PHPUnit_Framework_TestCase
     public function testArrayDeepFromAssoc()
     {
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj1 = (object) array('users' => array($arr));
-        $arr1 = array(9, $obj1);
+        $obj = (object) array('users' => array($arr));
+        $arr1 = array(9, $obj);
 
         $arr2 = Utils::dataCopy($arr1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $arr2[1]->users[0]);
+    }
+
+    public function testObjectFromEmptyObject()
+    {
+        $obj = new \stdClass();
+        $result = Utils::dataCopy($obj);
+
+        $expected =  new \stdClass();
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testArrayFromEmptyArray()
+    {
+        $arr = array();
+        $result = Utils::dataCopy($arr);
+        $expected =  array();
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testClass()
+    {
+        $data = new \JohnStevenson\JsonWorks\Document();
+        $data->data = new \stdClass();
+        $data->lastError = 'none';
+        $data->schema = null;
+        $data->arr = array();
+        $data->arr2 = array(7);
+        $result = Utils::dataCopy($data);
+
+        if ($result) {
+
+        }
+    }
+
+    public function testArrayMixedToObject()
+    {
+        $arr = array('Bloggs', 'firstName' => 'Fred', 9);
+        $result = Utils::dataCopy($arr);
+
+        $expected = '{
+            "0": "Bloggs",
+            "firstName": "Fred",
+            "1": 9
+        }';
+
+        $this->assertEquals(json_decode($expected), $result);
+    }
+
+    public function testObjectWithEmptyElements()
+    {
+        $data = new \stdClass();
+        $data->prop1 = new \stdClass();
+        $data->prop2 = 'none';
+        $data->prop3 = null;
+        $data->prop4 = array();
+        $data->prop5 = array(7);
+        $data->prop6 = array('Bloggs', 'firstName' => 'Fred', 9);
+        $result = Utils::dataCopy($data);
+
+        $expected = '{
+            "prop1": {},
+            "prop2": "none",
+            "prop3": null,
+            "prop4": [],
+            "prop5": [7],
+            "prop6": {
+                "0": "Bloggs",
+                "firstName": "Fred",
+                "1": 9
+            }
+        }';
+
+        $this->assertEquals(json_decode($expected), $result);
     }
 
 }

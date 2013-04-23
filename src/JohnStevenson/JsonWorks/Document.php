@@ -6,7 +6,7 @@ class Document
 {
     public $data;
     public $schema;
-    public $error;
+    public $lastError;
     public $lastPushIndex;
     private $element;
     private $workingData;
@@ -14,19 +14,21 @@ class Document
 
     public function loadData($data, $noException = false)
     {
-        $this->data = $this->getInput($data, false, $noException);
+        $data = $this->getInput($data, false, $noException);
+        $this->data = $data ? Utils::dataCopy($data) : null;
         $this->workingData = null;
-        return empty($this->error);
+        return empty($this->lastError);
     }
 
     public function loadSchema($schema, $noException = false)
     {
         $this->schema = $this->getInput($schema, true, $noException);
-        return empty($this->error);
+        return empty($this->lastError);
     }
 
     public function addValue($path, $value)
     {
+        $this->lastError = null;
         $this->lastPushIndex = 0;
         $pointers = is_array($path) ? $path : Utils::pathDecode($path);
         $value = Utils::dataCopy($value);
@@ -36,7 +38,7 @@ class Document
             if ($result = (is_object($value) || is_array($value)) && $this->checkData($value, true)) {
                 $this->data = $value;
             } else {
-                $this->error = $this->error ?: 'Value must be an object or array';
+                $this->lastError = $this->lastError ?: 'Value must be an object or array';
             }
 
             return $result;
@@ -169,21 +171,21 @@ class Document
             $res = is_object($input);
         }
 
-        $this->error = $res ? '' : 'Invalid input';
+        $this->lastError = $res ? '' : 'Invalid input';
 
-        if (!$this->error && $isSchema) {
+        if (!$this->lastError && $isSchema) {
             try {
                 $input = new Schema\Model($input);
             } catch (\RuntimeException $e) {
-                $this->error = 'Schema error: '.$e->getMessage();
+                $this->lastError = 'Schema error: '.$e->getMessage();
             }
         }
 
-        if ($this->error && !$noException) {
-            throw new \RuntimeException($this->error);
+        if ($this->lastError && !$noException) {
+            throw new \RuntimeException($this->lastError);
         }
 
-        return $this->error ? null : $input;
+        return $this->lastError ? null : $input;
     }
 
     protected function pushKey($value)
@@ -225,7 +227,7 @@ class Document
                 if (is_array($this->element)) {
 
                     if (!$this->pushKey($key)) {
-                        $this->error = 'Invalid array key';
+                        $this->lastError = 'Invalid array key';
                         return;
                     }
 
@@ -257,7 +259,7 @@ class Document
                     }
 
                     if (!$arrayPush) {
-                        $this->error = 'Bad array index';
+                        $this->lastError = 'Bad array index';
                         return;
                     }
 
@@ -352,7 +354,7 @@ class Document
         }
 
         if (!$result = $this->validator->check($data, $this->schema, $lax)) {
-            $this->error = $this->validator->error;
+            $this->lastError = $this->validator->error;
         }
 
         return $result;

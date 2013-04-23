@@ -33,10 +33,9 @@ class Model
         return $schema;
     }
 
-    public function initCallback(\RecursiveArrayIterator $data)
+    public function initCallback($data)
     {
-        if ('$ref' === $data->key()) {
-            $ref = $data->current();
+        if ($ref = Utils::get($data, '$ref')) {
 
             if (is_string($ref) && 0 === strpos($ref, '#')) {
                 $this->references[$ref] = null;
@@ -48,11 +47,10 @@ class Model
         return $data;
     }
 
-    public function resolveCallback(\RecursiveArrayIterator $data)
+    public function resolveCallback($data)
     {
-        if ('$ref' === $data->key()) {
-            $schema = Utils::get($this->references, $data->current());
-            $data = new \RecursiveArrayIterator($schema);
+        if ($ref = Utils::get($data, '$ref')) {
+            $data = Utils::get($this->references, $ref);
         }
 
         return $data;

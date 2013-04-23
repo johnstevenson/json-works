@@ -122,20 +122,32 @@ class Utils
 
     public static function dataCopy($data, $callback = null)
     {
-        if ($iterator = static::getIterator($data)) {
-            $data = static::iterCopy($iterator, $callback);
+        if ($callback) {
+            $data = call_user_func_array($callback, array($data));
         }
 
-        return $data;
+        if (($object = is_object($data)) || is_array($data)) {
+
+            $result = array();
+
+            foreach ($data as $key => $value) {
+                $object = $object ?: is_string($key);
+                $result[$key] = static::dataCopy($value, $callback);
+            }
+
+            $result = $object ? (object) $result: $result;
+
+        } else {
+            $result = $data;
+        }
+
+        return $result;
     }
 
     public static function dataPrune($data)
     {
-        if ($iterator = static::getIterator($data)) {
-            $data = static::iterPrune($iterator, $props);
-        }
-
-        return $data;
+        $props = 0;
+        return  static::workPrune($data, $props);
     }
 
     public static function dataOrder($data, $schema)
@@ -296,58 +308,31 @@ class Utils
         return true;
     }
 
-    protected static function iterCopy($data, $callback = null)
+    protected static function workPrune($data, &$props)
     {
-        if ($callback) {
-            $data = call_user_func_array($callback, array($data));
-        }
+        if (($object = is_object($data)) || is_array($data)) {
 
-        $object = is_string($data->key());
-        $result = array();
+            $result = array();
+            $currentProps = $props;
 
-        while ($data->valid()) {
-
-            if ($data->hasChildren()) {
-                $result[$data->key()] = static::iterCopy($data->getChildren(), $callback);
-            } else {
-                $result[$data->key()] = $data->current();
-            }
-            $data->next();
-        }
-
-        return $object ? (object) $result: $result;
-    }
-
-    protected static function iterPrune($data, &$props)
-    {
-        $object = is_string($data->key());
-        $result = array();
-
-        while ($data->valid()) {
-
-            if ($data->hasChildren()) {
-                $currentProps = $props;
-                $value = static::iterPrune($data->getChildren(), $props);
+            foreach ($data as $key => $value) {
+                $object = $object ?: is_string($key);
+                $value = static::workPrune($value, $props);
 
                 if ($props > $currentProps) {
-                    $result[$data->key()] = $value;
+                    $result[$key] = $value;
                 }
                 $props = $currentProps;
-
-            } else {
-                $result[$data->key()] = $data->current();
             }
-            $data->next();
+
+            $props = count($result);
+            $result = $object ? (object) $result: $result;
+
+        } else {
+            ++$props;
+            $result = $data;
         }
 
-        $props = count($result);
-
-        return $object ? (object) $result: $result;
-    }
-
-    protected static function getIterator($data) {
-        if (is_object($data) || is_array($data)) {
-            return new \RecursiveArrayIterator($data);
-        }
-    }
+        return $result;
+     }
 }
