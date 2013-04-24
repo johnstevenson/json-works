@@ -45,7 +45,7 @@ which will give you the following json:
 You can query this value by calling:
 
 ```php
-$fred = $document->getValue('/path/to/nested/array/0');
+$person = $document->getValue('/path/to/nested/array/0');
 ```
 
 and update it with:
@@ -80,7 +80,7 @@ $document->deleteValue('/users/0');
 
 ### Validation
 
-Json-Works includes an implementation of [JSON Schema][schema], version 4. This allows you to validate your data. The following example schema describes a simple structure which is an array containing objects whose properties are all required and whose types are defined. 
+Json-Works includes an implementation of [JSON Schema][schema], version 4. This allows you to validate your data. The following example schema describes an array containing objects whose properties are all required and whose types are defined. 
 
 ```
 {
@@ -108,6 +108,7 @@ $result = $document->addValue('/0', array('firstName'=> 'Fred'));
 # true, required values are not checked when we are building
 
 # but are checked if we validate directly
+
 $result = $document->validate();
 # false - required lastName is missing
 ```
