@@ -390,7 +390,7 @@ class Constraints
         if (is_null($key)) {
             try {
                 $this->validate($data, $schema);
-            } catch (\RuntimeException $e) {
+            } catch (ValidationException $e) {
                 $result = false;
             }
         } else {
@@ -469,8 +469,8 @@ class Constraints
 
     protected function throwError($msg)
     {
-        $path = $this->path ?: '/';
+        $path = $this->path ?: '#';
         $error = sprintf("Property: %s. Error: %s", $path, $msg);
-        throw new \RuntimeException($error);
+        throw new ValidationException($error);
     }
 }

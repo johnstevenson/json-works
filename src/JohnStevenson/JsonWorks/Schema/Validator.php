@@ -14,7 +14,7 @@ class Validator
 
         try {
             $constraints->validate($data, $model->data);
-        } catch (\RuntimeException $e) {
+        } catch (ValidationException $e) {
             $this->error = $e->getMessage();
             $result = false;
         }
