@@ -187,10 +187,12 @@ class Utils
     */
     public static function dataToJson($data, $pretty)
     {
+        $newLine = $pretty ? chr(10) : null;
+
         if (version_compare(PHP_VERSION, '5.4', '>=')) {
             $prettyPrint = $pretty ? JSON_PRETTY_PRINT : 0;
             $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $prettyPrint;
-            return json_encode($data, $options);
+            return json_encode($data, $options).$newLine;
         }
 
         $json = json_encode($data);
@@ -203,7 +205,6 @@ class Utils
         $result = $string = '';
         $inString = $escaped = false;
         $level = 0;
-        $newLine = $pretty ? chr(10) : null;
         $space = $pretty ? chr(32) : null;
         $convert = function_exists('mb_convert_encoding');
 
