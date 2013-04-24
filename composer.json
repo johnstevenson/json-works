@@ -1,7 +1,7 @@
 {
 
   "name": "johnstevenson/json-works",
-  "description": "Create, edit and validate json",
+  "description": "Create, edit, query and validate json",
   "keywords": ["json", "schema"],
   "homepage": "http://github.com/johnstevenson/json-works",
   "type": "library",
