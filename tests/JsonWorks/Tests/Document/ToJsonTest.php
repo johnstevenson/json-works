@@ -6,9 +6,10 @@ use \JohnStevenson\JsonWorks\Utils;
 
 class ToJsonTest extends \JsonWorks\Tests\Base
 {
-    protected function getExpectedJson($expected)
+    protected function getFileExpected($test, $tabs = false)
     {
-        return json_encode(json_decode($expected));
+        $filename = __DIR__.'/Fixtures/'.$test.'.json';
+        return $this->getFileExpectedJson($filename, $tabs);
     }
 
     public function testNoData()
@@ -25,7 +26,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testPruneNoSchema()
+    public function testTidyNoSchema()
     {
         $schema = null;
 
@@ -49,7 +50,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testNoPruneSchema()
+    public function testNoTidySchema()
     {
         $schema = '{
             "required": ["prop2"]
@@ -71,7 +72,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testPruneSchemaFail()
+    public function testTidySchemaFail()
     {
         $schema = '{
             "required": ["prop2"]
@@ -90,7 +91,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $this->assertFalse($document->validate());
     }
 
-    public function testPruneNestedNoSchema()
+    public function testTidyNestedNoSchema()
     {
         $schema = null;
 
@@ -129,7 +130,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testNoPruneNestedSchema()
+    public function testNoTidyNestedSchema()
     {
         $schema = '{
             "properties": {
@@ -167,7 +168,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $this->assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testPruneNestedSchemaFail()
+    public function testTidyNestedSchemaFail()
     {
         $schema = '{
             "properties": {
@@ -200,4 +201,43 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document->tidy();
         $this->assertFalse($document->validate());
     }
+
+    public function testPretty()
+    {
+        $schema = null;
+
+        $data = '{
+            "prop1": "",
+            "prop2": {
+                "inner1": [
+                    {"lat": 50, "lng": 120},
+                    {"lat": 27, "lng": 3}
+                ],
+                "inner2": 2
+            },
+            "prop3": [],
+            "prop4": null,
+            "prop5": 5,
+            "prop6": {}
+        }';
+
+        $expected = $this->getFileExpected(__FUNCTION__);
+        $document = $this->getDocument($schema, $data);
+
+        $json = $document->toJson(true);
+        $this->assertEquals($expected, $json);
+    }
+
+    public function testPrettyTabs()
+    {
+        $schema = null;
+
+        $data = $this->getFileExpected('testPretty');
+        $expected = $this->getFileExpected('testPretty', true);
+        $document = $this->getDocument($schema, $data);
+
+        $json = $document->toJson(true, true);
+        $this->assertEquals($expected, $json);
+    }
+
 }

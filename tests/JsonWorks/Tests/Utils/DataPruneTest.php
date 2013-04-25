@@ -29,8 +29,11 @@ class DataPruneTest extends \JsonWorks\Tests\Base
             "prop4": null
         }';
 
-        $result = Utils::dataPrune(json_decode($data));
-        $this->assertEquals(json_decode($expected), $result);
+        $data = $this->fromJson($data);
+        $expected = $this->fromJson($expected);
+
+        $result = Utils::dataPrune($data);
+        $this->assertEquals($expected, $result);
     }
 
     public function testNested()
@@ -62,7 +65,10 @@ class DataPruneTest extends \JsonWorks\Tests\Base
             "prop4": null
         }';
 
-        $result = Utils::dataPrune(json_decode($data));
-        $this->assertEquals(json_decode($expected), $result);
+        $data = $this->fromJson($data);
+        $expected = $this->fromJson($expected);
+
+        $result = Utils::dataPrune($data);
+        $this->assertEquals($expected, $result);
     }
 }

@@ -190,16 +190,12 @@ class Utils
         $newLine = $pretty ? chr(10) : null;
 
         if (version_compare(PHP_VERSION, '5.4', '>=')) {
-            $prettyPrint = $pretty ? JSON_PRETTY_PRINT : 0;
-            $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $prettyPrint;
-            return json_encode($data, $options).$newLine;
+            $pprint = $pretty ? JSON_PRETTY_PRINT : 0;
+            $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $pprint;
+            return static::finalizeJson(json_encode($data, $options), $newLine);
         }
 
         $json = json_encode($data);
-
-        if (!$json || !$pretty) {
-            return $json;
-        }
 
         $len = strlen($json);
         $result = $string = '';
@@ -268,12 +264,7 @@ class Utils
             }
         }
 
-        # collapse empty {} and []
-        $result = preg_replace_callback('#(\{\s+\})|(\[\s+\])#', function($match) {
-            return $match[1] ? '{}' : '[]';
-        }, $result);
-
-        return $result. $newLine;
+        return static::finalizeJson($result, $newLine);
     }
 
     protected static function equalsObject($obj1, $obj2)
@@ -335,5 +326,19 @@ class Utils
         }
 
         return $result;
-     }
+    }
+
+    private static function finalizeJson($json, $newline)
+    {
+        if ($newline) {
+            # collapse empty {} and []
+            $json = preg_replace_callback('#(\{\s+\})|(\[\s+\])#', function($match) {
+                return $match[1] ? '{}' : '[]';
+            }, $json);
+
+            $json .= $newline;
+        }
+
+        return $json;
+    }
 }

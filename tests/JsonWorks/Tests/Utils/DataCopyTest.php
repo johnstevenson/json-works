@@ -4,7 +4,7 @@ namespace JsonWorks\Tests\Utils;
 
 use \JohnStevenson\JsonWorks\Utils;
 
-class DataCopyTest extends \PHPUnit_Framework_TestCase
+class DataCopyTest extends \JsonWorks\Tests\Base
 {
     public function testFromObject()
     {
@@ -89,21 +89,6 @@ class DataCopyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testClass()
-    {
-        $data = new \JohnStevenson\JsonWorks\Document();
-        $data->data = new \stdClass();
-        $data->lastError = 'none';
-        $data->schema = null;
-        $data->arr = array();
-        $data->arr2 = array(7);
-        $result = Utils::dataCopy($data);
-
-        if ($result) {
-
-        }
-    }
-
     public function testArrayMixedToObject()
     {
         $arr = array('Bloggs', 'firstName' => 'Fred', 9);
@@ -115,7 +100,8 @@ class DataCopyTest extends \PHPUnit_Framework_TestCase
             "1": 9
         }';
 
-        $this->assertEquals(json_decode($expected), $result);
+        $expected = $this->fromJson($expected);
+        $this->assertEquals($expected, $result);
     }
 
     public function testObjectWithEmptyElements()
@@ -142,7 +128,8 @@ class DataCopyTest extends \PHPUnit_Framework_TestCase
             }
         }';
 
-        $this->assertEquals(json_decode($expected), $result);
+        $expected = $this->fromJson($expected);
+        $this->assertEquals($expected, $result);
     }
 
 }

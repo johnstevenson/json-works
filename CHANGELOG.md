@@ -1,5 +1,5 @@
 ### Recent changes not in tagged release
-* Fixed newline bug in Utils:dataToJson
+* Fixed newline/format bugs in Utils:dataToJson and added tests
 * Added JohnStevenson\JsonWorks\Schema\ValidationException
 
 ## v1.0.0
