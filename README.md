@@ -34,7 +34,10 @@ which will give you the following json:
 		"to": {
 			"nested": {
 				"array": [
-					{"firstName": "Fred", "lastName": "Blogg"}
+					{
+                        "firstName": "Fred",
+                        "lastName": "Blogg"
+                    }
 				]
 			}
 		}
@@ -67,7 +70,10 @@ to end up with:
 ```
 {
 	"users": [
-		{"firstName": "Fred", "lastName": "Bloggs"}
+		{
+            "firstName": "Fred",
+            "lastName": "Bloggs"
+        }
 	]
 }
 ```
