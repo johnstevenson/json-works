@@ -156,29 +156,11 @@ class Document
 
     protected function getInput($input, $isSchema, $noException)
     {
-        if (is_string($input)) {
+        $this->lastError = null;
+        $input = $this->getInputWork($input, $isSchema);
 
-             if (preg_match('/^(\{|\[)/', $input, $match)) {
-                $input = json_decode($input);
-            } else {
-                $input = json_decode(@file_get_contents($input));
-            }
-        }
-
-        if (is_array($input) || is_null($input)) {
-            $res = !$isSchema;
-        } else {
-            $res = is_object($input);
-        }
-
-        $this->lastError = $res ? '' : 'Invalid input';
-
-        if (!$this->lastError && $isSchema) {
-            try {
-                $input = new Schema\Model($input);
-            } catch (\RuntimeException $e) {
-                $this->lastError = 'Schema error: '.$e->getMessage();
-            }
+        if (false === $input) {
+            $this->lastError = $this->lastError ?: 'Invalid input';
         }
 
         if ($this->lastError && !$noException) {
@@ -186,6 +168,42 @@ class Document
         }
 
         return $this->lastError ? null : $input;
+    }
+
+    protected function getInputWork($input, $isSchema)
+    {
+        if (is_string($input)) {
+
+            if (!preg_match('/^(\{|\[)/', $input)) {
+                $input = @file_get_contents($input);
+                if (false === $input) {
+                    $this->lastError = 'Unable to open file: '.$input;
+                    return false;
+                }
+            }
+
+            $input = json_decode($input);
+            if (json_last_error()) {
+                return false;
+            }
+        }
+
+        if (is_array($input) || is_null($input)) {
+            $result = !$isSchema;
+        } else {
+            $result = is_object($input);
+        }
+
+        if ($result && $isSchema) {
+            try {
+                $input = new Schema\Model($input);
+            } catch (\RuntimeException $e) {
+                $result = false;
+                $this->lastError = 'Schema error: '.$e->getMessage();
+            }
+        }
+
+        return $result ? $input : false;
     }
 
     protected function pushKey($value)
