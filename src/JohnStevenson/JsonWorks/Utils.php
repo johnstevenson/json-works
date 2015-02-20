@@ -25,6 +25,8 @@ class Utils
             $result = is_float($value) || is_integer($value);
         } elseif ('boolean' === $type) {
             $result = is_bool($value);
+        } elseif ('integer' === $type) {
+            $result = is_integer($value) || (is_float($value) && $value == round($value));
         } elseif (function_exists($func = 'is_'.$type)) {
             $result = call_user_func($func, $value);
         }
