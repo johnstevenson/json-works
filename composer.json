@@ -1,15 +1,19 @@
 {
 
-  "name": "johnstevenson/json-works",
+  "name": "aoberoi/json-works",
   "description": "Create, edit, query and validate json",
   "keywords": ["json", "schema"],
-  "homepage": "http://github.com/johnstevenson/json-works",
+  "homepage": "http://github.com/aoberoi/json-works",
   "type": "library",
   "license": "MIT",
   "authors": [
     {
       "name": "John Stevenson",
       "email": "john-stevenson@blueyonder.co.uk"
+    },
+    {
+      "name": "Ankur Oberoi",
+      "email": "aoberoi@gmail.com"
     }
   ],
 
