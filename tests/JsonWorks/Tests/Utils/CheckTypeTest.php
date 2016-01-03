@@ -42,7 +42,8 @@ class CheckTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(Utils::checkType('integer', $value));
     }
 
-    public function testIntegerArbitrarilyLarge() {
+    public function testIntegerArbitrarilyLarge()
+    {
         $value = PHP_INT_MAX + 100;
         $this->assertTrue(Utils::checkType('integer', $value));
     }
@@ -62,6 +63,12 @@ class CheckTypeTest extends \PHPUnit_Framework_TestCase
     public function testFloatNotInteger()
     {
         $value = 21.2;
+        $this->assertFalse(Utils::checkType('integer', $value));
+    }
+
+    public function testFloatNotArbitrarilyLargeInteger()
+    {
+        $value = PHP_INT_MAX + 100.625;
         $this->assertFalse(Utils::checkType('integer', $value));
     }
 
