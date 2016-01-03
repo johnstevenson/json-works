@@ -163,7 +163,7 @@ class EqualsTest extends \PHPUnit_Framework_TestCase
     public function testObjectTrue()
     {
         $var1 = (object) array('name' => 'value', 'other' => 'other');
-        $var2 = (object) array('other' => 'other', 'name' => 'value');;
+        $var2 = (object) array('other' => 'other', 'name' => 'value');
         $this->assertTrue(Utils::equals($var1, $var2));
     }
 

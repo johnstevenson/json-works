@@ -72,7 +72,7 @@ class Constraints
             $this->validateMaxMin($data, $schema->maxProperties, true);
         }
 
-       if (!$this->lax) {
+        if (!$this->lax) {
 
             # minProperties
             if (isset($schema->minProperties)) {
@@ -80,7 +80,7 @@ class Constraints
             }
 
             if (isset($schema->required)) {
-                 foreach ((array) $schema->required as $name) {
+                foreach ((array) $schema->required as $name) {
                     if (!isset($data->$name)) {
                         $this->throwError(sprintf("is missing required property '%s'", $name));
                     }
@@ -132,7 +132,7 @@ class Constraints
             if (count($data) > count($items)) {
                 $this->throwError('contains more elements than are allowed');
             }
-         }
+        }
 
         $this->validateArrayChildren($data, $items, $additional);
     }
@@ -237,8 +237,7 @@ class Constraints
 
     protected function validateNot($not, $data)
     {
-        if ($this->validateChild($data, $not))
-        {
+        if ($this->validateChild($data, $not)) {
             $this->throwError('must not validate against this schema');
         }
     }
@@ -306,7 +305,7 @@ class Constraints
 
         foreach ($setCopy as $key => $value) {
 
-             foreach ($pp as $regex => $val) {
+            foreach ($pp as $regex => $val) {
                 if ($this->match($regex, $key)) {
                     unset($set[$key]);
                     break;
@@ -346,7 +345,7 @@ class Constraints
                 $child[] = $additional;
             }
 
-            foreach($child as $subSchema) {
+            foreach ($child as $subSchema) {
                 $this->validateChild($value, $subSchema, $key);
             }
         }

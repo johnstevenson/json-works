@@ -72,5 +72,4 @@ class MoveValueTest extends \JsonWorks\Tests\Base
         $toPath = '/prop2/collection/-';
         $this->assertFalse($document->moveValue($fromPath, $toPath), 'Testing fail');
     }
-
 }

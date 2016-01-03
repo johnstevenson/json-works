@@ -48,4 +48,3 @@ class GetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, Utils::get($container, 'name'));
     }
 }
-

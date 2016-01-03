@@ -136,5 +136,5 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $expected = array(array($value));
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals($expected, $document->data);
-     }
+    }
 }

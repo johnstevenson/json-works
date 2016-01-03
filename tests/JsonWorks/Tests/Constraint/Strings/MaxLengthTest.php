@@ -34,4 +34,3 @@ class MaxLengthTest extends \JsonWorks\Tests\Base
         $this->assertFalse($this->validate($schema, $data));
     }
 }
-

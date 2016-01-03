@@ -28,7 +28,7 @@ class Model
                 $key = (int) $key;
             }
             $schema = Utils::get($schema, $key);
-         }
+        }
 
         return $schema;
     }

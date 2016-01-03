@@ -84,4 +84,3 @@ class CheckTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(Utils::checkType('object', $value));
     }
 }
-

@@ -141,7 +141,7 @@ class Document
     {
         $json = Utils::dataToJson($this->data, $pretty);
         if ($tabs && $pretty) {
-            $json = preg_replace_callback('/^( +)/m', function($m) {
+            $json = preg_replace_callback('/^( +)/m', function ($m) {
                 return str_repeat("\t", (int) strlen($m[1]) / 4);
             }, $json);
         }
@@ -208,7 +208,7 @@ class Document
 
     protected function pushKey($value)
     {
-       return (bool) preg_match('/^((-)|(0+))$/', $value);
+        return (bool) preg_match('/^((-)|(0+))$/', $value);
     }
 
     protected function arrayKey($value, &$index, $any = false)
@@ -263,8 +263,7 @@ class Document
                     if (!$this->workAddElement($pointers)) {
                         return;
                     }
-
-                 }
+                }
 
             } else {
                  # no more pointers. First check for array with final array key
@@ -341,9 +340,9 @@ class Document
             }
 
             array_shift($pointers);
-         }
+        }
 
-         return true;
+        return true;
     }
 
     protected function workMove($fromPath, $toPath, $delete)
@@ -355,7 +354,7 @@ class Document
                 if ($delete) {
                     $this->deleteValue($fromPath);
                 }
-             }
+            }
         }
 
         return $result;

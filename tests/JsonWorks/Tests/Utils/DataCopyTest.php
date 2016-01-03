@@ -131,5 +131,4 @@ class DataCopyTest extends \JsonWorks\Tests\Base
         $expected = $this->fromJson($expected);
         $this->assertEquals($expected, $result);
     }
-
 }

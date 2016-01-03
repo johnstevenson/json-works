@@ -39,7 +39,7 @@ class FormatTest extends \JsonWorks\Tests\Base
 
         $data = '2009-10-30 03:45:35.1-01:30';
         $this->assertTrue($this->validate($schema, $data), 'Testing: '.$data);
-     }
+    }
 
     public function testDateTimeInvalid()
     {
@@ -196,4 +196,3 @@ class FormatTest extends \JsonWorks\Tests\Base
         $this->assertFalse($this->validate($schema, $data), 'Testing: '.$data);
     }
 }
-

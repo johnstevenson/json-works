@@ -2,4 +2,6 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
-class ValidationException extends \Exception {}
+class ValidationException extends \Exception
+{
+}

@@ -16,6 +16,4 @@ class NotTest extends \JsonWorks\Tests\Base
         $data = true;
         $this->assertFalse($this->validate($schema, $data), 'Invalid');
     }
-
 }
-

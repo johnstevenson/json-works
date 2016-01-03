@@ -193,5 +193,4 @@ class LoadSchemaTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($result);
         $this->assertContains($expected, $document->lastError);
     }
-
 }

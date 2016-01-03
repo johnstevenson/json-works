@@ -66,4 +66,3 @@ class MinItemsTest extends \JsonWorks\Tests\Base
         $this->assertFalse($this->validate($schema, $data));
     }
 }
-

@@ -239,5 +239,4 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $json = $document->toJson(true, true);
         $this->assertEquals($expected, $json);
     }
-
 }

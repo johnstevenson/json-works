@@ -97,4 +97,3 @@ class UniqueItemsTest extends \JsonWorks\Tests\Base
         $this->assertTrue($this->validate($schema, $data));
     }
 }
-

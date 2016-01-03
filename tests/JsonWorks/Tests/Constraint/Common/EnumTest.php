@@ -29,6 +29,4 @@ class EnumTest extends \JsonWorks\Tests\Base
         $data = '{"name1": "value1"}';
         $this->assertFalse($this->validate($schema, $data), 'Invalid');
     }
-
 }
-

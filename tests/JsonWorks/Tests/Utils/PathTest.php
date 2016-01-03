@@ -81,5 +81,4 @@ class PathTest extends \PHPUnit_Framework_TestCase
         $expected = '/0';
         $this->assertEquals($expected, Utils::pathEncode($value));
     }
-
 }

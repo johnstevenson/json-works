@@ -198,5 +198,4 @@ class AddValueTest extends \JsonWorks\Tests\Base
 
         $this->assertEquals(json_decode($expected), $document->data);
     }
-
 }

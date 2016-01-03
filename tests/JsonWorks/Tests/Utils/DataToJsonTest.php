@@ -75,5 +75,4 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $result = Utils::dataToJson($data, true);
         $this->assertEquals($expected, $result);
     }
-
 }

@@ -230,7 +230,7 @@ class Utils
 
                 # unescape unicode
                 if ($convert) {
-                    $string = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function($match) {
+                    $string = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($match) {
                         return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
                     }, $string);
                 }
@@ -281,7 +281,7 @@ class Utils
             if (!isset($obj2->$key) || !static::equals($value, $obj2->$key)) {
                 return false;
             }
-         }
+        }
 
         return true;
     }
@@ -298,7 +298,7 @@ class Utils
             if (!static::equals($arr1[$i], $arr2[$i])) {
                 return false;
             }
-         }
+        }
 
         return true;
     }
@@ -335,7 +335,7 @@ class Utils
     {
         if ($newline) {
             # collapse empty {} and []
-            $json = preg_replace_callback('#(\{\s+\})|(\[\s+\])#', function($match) {
+            $json = preg_replace_callback('#(\{\s+\})|(\[\s+\])#', function ($match) {
                 return $match[1] ? '{}' : '[]';
             }, $json);
 

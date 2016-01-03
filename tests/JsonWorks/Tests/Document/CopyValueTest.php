@@ -73,5 +73,4 @@ class CopyValueTest extends \JsonWorks\Tests\Base
         $toPath = '/prop2/collection/-';
         $this->assertFalse($document->copyValue($fromPath, $toPath), 'Testing fail');
     }
-
 }

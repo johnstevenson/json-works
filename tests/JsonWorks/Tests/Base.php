@@ -83,7 +83,7 @@ class Base extends \PHPUnit_Framework_TestCase
         if ($tabs) {
             $data = file($filename, FILE_IGNORE_NEW_LINES);
             return $this->fileSpacesToTabs($data);
-         } else {
+        } else {
             return file_get_contents($filename);
         }
     }
@@ -92,8 +92,7 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         $space = str_repeat(chr(32), 4);
 
-        foreach($data as &$line)
-        {
+        foreach ($data as &$line) {
             $tabs = '';
 
             while (0 === strpos($line, $space)) {

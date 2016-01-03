@@ -116,4 +116,3 @@ class MethodsTest extends \JsonWorks\Tests\Base
         $this->assertFalse($result);
     }
 }
-
