@@ -1,0 +1,4 @@
+vendor/
+*.lock
+*phpunit.xml
+!phpunit.xml.dist
