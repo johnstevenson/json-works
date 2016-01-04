@@ -36,7 +36,7 @@ class LoadSchemaTest extends \PHPUnit_Framework_TestCase
 
     /**
     * @expectedException        RuntimeException
-    * @expectedExceptionMessage Invalid input
+    * @expectedExceptionMessage File is empty
     *
     */
     public function testFileEmptyFail()
@@ -53,7 +53,7 @@ class LoadSchemaTest extends \PHPUnit_Framework_TestCase
         $filename = $this->getFilename('testLoadEmpty');
 
         $result = $document->loadSchema($filename, true);
-        $expected = 'Invalid input';
+        $expected = 'File is empty';
 
         $this->assertFalse($result);
         $this->assertContains($expected, $document->lastError);

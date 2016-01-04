@@ -34,14 +34,17 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
         $this->assertContains($expected, $document->lastError);
     }
 
-    public function testFileEmptyOkay()
+    /**
+    * @expectedException        RuntimeException
+    * @expectedExceptionMessage File is empty
+    *
+    */
+    public function testFileEmptyFail()
     {
         $document = new \JohnStevenson\JsonWorks\Document();
         $filename = $this->getFilename('testLoadEmpty');
 
-        $result = $document->loadData($filename);
-        $this->assertTrue($result);
-        $this->assertEmpty($document->lastError);
+        $document->loadData($filename);
     }
 
     /**

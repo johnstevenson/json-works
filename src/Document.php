@@ -175,9 +175,15 @@ class Document
         if (is_string($input)) {
 
             if (!preg_match('/^(\{|\[)/', $input)) {
-                $input = @file_get_contents($input);
-                if (false === $input) {
-                    $this->lastError = 'Unable to open file: '.$input;
+                $filename = $input;
+
+                if (!$input = @file_get_contents($filename)) {
+                    if (false === $input) {
+                        $this->lastError = 'Unable to open file: '.$filename;
+                    } else {
+                        $this->lastError = 'File is empty: '.$filename;
+                    }
+
                     return false;
                 }
             }
