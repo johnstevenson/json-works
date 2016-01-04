@@ -26,7 +26,8 @@ class Utils
         } elseif ('boolean' === $type) {
             $result = is_bool($value);
         } elseif ('integer' === $type) {
-            // Large integers may be stored as a float (Issue:1)
+            // Large integers may be stored as a float (Issue:1). Note that data
+            // may have been truncated to fit a 64-bit PHP_MAX_INT
             $result = is_integer($value) || (is_float($value) && $value === floor($value));
         } elseif (function_exists($func = 'is_'.$type)) {
             $result = call_user_func($func, $value);
