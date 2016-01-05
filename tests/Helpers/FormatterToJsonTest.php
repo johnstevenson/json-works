@@ -1,11 +1,18 @@
 <?php
 
-namespace JsonWorks\Tests\Utils;
+namespace JsonWorks\Tests\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Data;
+use JohnStevenson\JsonWorks\Helpers\Formatter;
 
-class DataToJsonTest extends \JsonWorks\Tests\Base
+class FormatterToJsonTest extends \JsonWorks\Tests\Base
 {
+    protected $formatter;
+
+    protected function setUp()
+    {
+        $this->formatter = new Formatter();
+    }
+
     protected function getFileExpected($test)
     {
         $filename = __DIR__.'/Fixtures/'.$test.'.json';
@@ -17,7 +24,7 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $data = '';
         $expected = 'null';
 
-        $result = Data::toJson(json_decode($data), false);
+        $result = $this->formatter->toJson(json_decode($data), false);
         $this->assertEquals($expected, $result);
     }
 
@@ -30,7 +37,7 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $expected = '{"prop1":"path/to/somewhere"}';
 
         $data = $this->fromJson($data);
-        $result = Data::toJson($data, false);
+        $result = $this->formatter->toJson($data, false);
         $this->assertEquals($expected, $result);
 
     }
@@ -44,7 +51,7 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $expected = '{"prop1":"ƌ"}';
 
         $data = $this->fromJson($data);
-        $result = Data::toJson($data, false);
+        $result = $this->formatter->toJson($data, false);
         $this->assertEquals($expected, $result);
     }
 
@@ -68,7 +75,7 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $expected = $this->getFileExpected(__FUNCTION__);
 
         $data = $this->fromJson($data);
-        $result = Data::toJson($data, true);
+        $result = $this->formatter->toJson($data, true);
         $this->assertEquals($expected, $result);
     }
 }

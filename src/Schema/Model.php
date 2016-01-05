@@ -3,18 +3,25 @@
 namespace JohnStevenson\JsonWorks\Schema;
 
 use JohnStevenson\JsonWorks\Utils;
-use JohnStevenson\JsonWorks\Helpers\Path;
+use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Model
 {
     public $data;
+
     /**
     * @var array
     */
     protected $references = array();
 
+    /**
+    * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
+    */
+    protected $tokenizer;
+
     public function __construct($input)
     {
+        $this->tokenizer = new Tokenizer();
         $this->data = Utils::dataCopy((object) $input, array($this, 'initCallback'));
         $this->resolveReferences();
     }
@@ -62,7 +69,7 @@ class Model
         if (!empty($this->references)) {
 
             foreach (array_keys($this->references) as $ref) {
-                $keys = Path::decode($ref);
+                $keys = $this->tokenizer->decode($ref);
 
                 if ($schema = $this->find($this->data, $keys)) {
                     $this->references[$ref] = $schema;

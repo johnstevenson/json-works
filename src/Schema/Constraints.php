@@ -3,21 +3,26 @@
 namespace JohnStevenson\JsonWorks\Schema;
 
 use JohnStevenson\JsonWorks\Utils;
-use JohnStevenson\JsonWorks\Helpers\Path;
+use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Constraints
 {
+    /**
+    * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
+    */
+    protected $tokenizer;
     protected $path;
     protected $lax;
 
     public function __construct($lax)
     {
         $this->lax = $lax;
+        $this->tokenizer = new Tokenizer();
     }
 
     public function validate($data, $schema, $key = null)
     {
-        $this->path = Path::add($this->path, $key);
+        $this->path = $this->tokenizer->add($this->path, $key);
 
         $this->validateCommon($data, $schema);
         $type = gettype($data);

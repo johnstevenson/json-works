@@ -2,8 +2,8 @@
 
 namespace JohnStevenson\JsonWorks;
 
-use JohnStevenson\JsonWorks\Helpers\Data;
-use JohnStevenson\JsonWorks\Helpers\Path;
+use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Document
 {
@@ -11,9 +11,25 @@ class Document
     public $schema;
     public $lastError;
     public $lastPushIndex;
+
+    /**
+    * @var Helpers\Formatter
+    */
+    protected $formatter;
+
+    /**
+    * @var Helpers\Tokenizer
+    */
+    protected $tokenizer;
     private $element;
     private $workingData;
     private $validator;
+
+    public function __construct()
+    {
+        $this->formatter = new Formatter();
+        $this->tokenizer = new Tokenizer();
+    }
 
     public function loadData($data, $noException = false)
     {
@@ -33,7 +49,7 @@ class Document
     {
         $this->lastError = null;
         $this->lastPushIndex = 0;
-        $pointers = is_array($path) ? $path : Path::decode($path);
+        $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
         $value = Utils::dataCopy($value);
 
         if (empty($pointers)) {
@@ -83,7 +99,7 @@ class Document
 
     public function deleteValue($path)
     {
-        $pointers = is_array($path) ? $path : Path::decode($path);
+        $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
 
         if ($result = $this->hasValue($pointers, $dummy)) {
 
@@ -117,7 +133,7 @@ class Document
         $result = false;
         $value = null;
 
-        $pointers = is_array($path) ? $path : Path::decode($path);
+        $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
 
         if ($this->workGet($pointers, false)) {
             $value = Utils::dataCopy($this->element);
@@ -142,7 +158,7 @@ class Document
 
     public function toJson($pretty, $tabs = false)
     {
-        $json = Data::toJson($this->data, $pretty);
+        $json = $this->formatter->toJson($this->data, $pretty);
         if ($tabs && $pretty) {
             $json = preg_replace_callback('/^( +)/m', function ($m) {
                 return str_repeat("\t", (int) strlen($m[1]) / 4);

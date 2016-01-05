@@ -88,11 +88,6 @@ class Utils
         return $check ? true : $out;
     }
 
-    public static function pathEncodeKey($key)
-    {
-        return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
-    }
-
     public static function dataCopy($data, $callback = null)
     {
         if ($callback) {

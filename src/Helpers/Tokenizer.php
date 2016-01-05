@@ -11,20 +11,20 @@
 namespace JohnStevenson\JsonWorks\Helpers;
 
 /**
-* A static class containing methods for creating JSON Pointers
+* A class for creating and manipulating JSON Pointers
 */
-class Path
+class Tokenizer
 {
     /**
     * Adds a token to an existing JSON Pointer
     *
     * @param string $path The existing JSON Pointer
-    * @param string $key The token to add
+    * @param string $token The token to add
     * @return string The new JSON Pointer
     */
-    public static function add($path, $key)
+    public function add($path, $token)
     {
-        if (strlen($encoded = static::encodeKey($key))) {
+        if (strlen($encoded = $this->encodeToken($token))) {
             $encoded = '/'.$encoded;
         }
 
@@ -37,29 +37,29 @@ class Path
     * @param string $path The JSON Pointer to split
     * @return array The decoded tokens
     */
-    public static function decode($path)
+    public function decode($path)
     {
-        $keys = explode('/', $path);
-        array_shift($keys);
+        $tokens = explode('/', $path);
+        array_shift($tokens);
 
-        foreach ($keys as &$value) {
+        foreach ($tokens as &$value) {
             $value = str_replace('~0', '~', str_replace('~1', '/', $value));
         }
 
-        return $keys;
+        return $tokens;
     }
 
     /**
     * Creates a JSON Pointer from a string or an array of tokens
     *
-    * @param string|array $keys
+    * @param string|array $tokens
     * @return string The encoded JSON Pointer
     */
-    public static function encode($keys)
+    public function encode($tokens)
     {
         $result = '';
-        foreach ((array) $keys as $value) {
-            $result = static::add($result, $value);
+        foreach ((array) $tokens as $value) {
+            $result = $this->add($result, $value);
         }
 
         return $result;
@@ -68,11 +68,11 @@ class Path
     /**
     * Encodes a JSON Pointer token
     *
-    * @param string $key
+    * @param string $token
     * @return string The encoded JSON Pointer
     */
-    public static function encodeKey($key)
+    public function encodeToken($token)
     {
-        return str_replace('/', '~1', str_replace('~', '~0', strval($key)));
+        return str_replace('/', '~1', str_replace('~', '~0', strval($token)));
     }
 }

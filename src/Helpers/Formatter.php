@@ -11,9 +11,9 @@
 namespace JohnStevenson\JsonWorks\Helpers;
 
 /**
-* A static class for manipulating array, object or json data
+* A class for manipulating array, object or json data
 */
-class Data
+class Formatter
 {
     /**
     * Encodes data into JSON
@@ -22,7 +22,7 @@ class Data
     * @param boolean $pretty Format the output
     * @return string Encoded json
     */
-    public static function toJson($data, $pretty)
+    public function toJson($data, $pretty)
     {
         $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         $options |= $pretty ? JSON_PRETTY_PRINT : 0;
