@@ -1,7 +1,7 @@
 {
     "name": "johnstevenson/json-works",
     "description": "Create, edit, query and validate json",
-    "keywords": ["json", "schema"],
+    "keywords": ["json", "schema", "validator", "builder"],
     "homepage": "http://github.com/johnstevenson/json-works",
     "type": "library",
     "license": "MIT",
@@ -18,5 +18,9 @@
         "psr-4": {
             "JohnStevenson\\JsonWorks\\": "src/"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.*",
+        "squizlabs/php_codesniffer" : "2.*"
     }
 }
