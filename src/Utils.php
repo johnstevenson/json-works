@@ -75,7 +75,7 @@ class Utils
                 $out[] = $data[$i];
 
                 for ($j = $i + 1; $j < $count; ++$j) {
-                    if (Utils::equals($data[$i], $data[$j])) {
+                    if (static::equals($data[$i], $data[$j])) {
                         $equals[] = $j;
                         if ($check) {
                             return false;
@@ -168,6 +168,7 @@ class Utils
             $result = (object) array_merge($result, (array) $data);
 
         } elseif (is_array($data) && ($items = Utils::get($schema, 'items'))) {
+            $result = array();
             $objSchema = is_object($schema->items) ? $schema->items : null;
 
             foreach ($data as $item) {
@@ -332,7 +333,7 @@ class Utils
         return $result;
     }
 
-    private static function finalizeJson($json, $newline)
+    protected static function finalizeJson($json, $newline)
     {
         if ($newline) {
             # collapse empty {} and []

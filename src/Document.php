@@ -33,7 +33,7 @@ class Document
         $pointers = is_array($path) ? $path : Utils::pathDecode($path);
         $value = Utils::dataCopy($value);
 
-        if (!$pointers) {
+        if (empty($pointers)) {
             # empty path, add value to root
             if ($result = (is_object($value) || is_array($value)) && $this->checkData($value, true)) {
                 $this->data = $value;
@@ -163,7 +163,7 @@ class Document
             $this->lastError = $this->lastError ?: 'Invalid input';
         }
 
-        if ($this->lastError && !$noException) {
+        if ($this->lastError !== null && !$noException) {
             throw new \RuntimeException($this->lastError);
         }
 
@@ -238,27 +238,27 @@ class Document
 
         if (is_null($this->element)) {
             if (!$this->workAddElement($pointers)) {
-                return;
+                return false;
             }
         }
 
-        while ($pointers) {
+        while (!empty($pointers)) {
 
             $key = array_shift($pointers);
 
-            if ($pointers) {
+            if (!empty($pointers)) {
 
                 if (is_array($this->element)) {
 
                     if (!$this->pushKey($key)) {
                         $this->lastError = 'Invalid array key';
-                        return;
+                        return false;
                     }
 
                     $this->element[0] = null;
                     $this->element = &$this->element[0];
                     if (!$this->workAddElement($pointers)) {
-                        return;
+                        return false;
                     }
 
                 } else {
@@ -267,7 +267,7 @@ class Document
                     $this->element = &$this->element->$key;
 
                     if (!$this->workAddElement($pointers)) {
-                        return;
+                        return false;
                     }
                 }
 
@@ -283,7 +283,7 @@ class Document
 
                     if (!$arrayPush) {
                         $this->lastError = 'Bad array index';
-                        return;
+                        return false;
                     }
 
                 } else {

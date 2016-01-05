@@ -20,7 +20,7 @@ class Model
 
     public function find($schema, array $keys)
     {
-        while ($keys && $schema) {
+        while (!empty($keys) && $schema) {
             $type = gettype($schema);
             $key = array_shift($keys);
 
@@ -58,7 +58,7 @@ class Model
 
     private function resolveReferences()
     {
-        if ($this->references) {
+        if (!empty($this->references)) {
 
             foreach (array_keys($this->references) as $ref) {
                 $keys = Utils::pathDecode($ref);

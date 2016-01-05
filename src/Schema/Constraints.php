@@ -116,7 +116,7 @@ class Constraints
         }
 
         # uniqueItems
-        if ($value = Utils::get($schema, 'uniqueItems', false)) {
+        if (Utils::get($schema, 'uniqueItems', false)) {
             if (!Utils::uniqueArray($data, true)) {
                 $this->throwError('contains duplicate values');
             }
@@ -313,7 +313,7 @@ class Constraints
             }
         }
 
-        if ($set) {
+        if (!empty($set)) {
             $this->throwError('contains unspecified additional properties');
         }
     }
@@ -341,7 +341,7 @@ class Constraints
                 }
             }
 
-            if (!$child && $additional) {
+            if (empty($child) && $additional) {
                 $child[] = $additional;
             }
 
