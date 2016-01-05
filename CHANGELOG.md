@@ -1,5 +1,7 @@
 **Changes not added to tagged release**
 
+## v1.1.0
+[2016-01-05](https://github.com/johnstevenson/json-works/tree/v1.1.0)
 * Updated test version to php7 and fixed failing json-decoding test
 * Updated structure to use PSR4 autoloader
 

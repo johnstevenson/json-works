@@ -86,14 +86,14 @@ $document->deleteValue('/users/0');
 
 ### Validation
 
-Json-Works includes an implementation of [JSON Schema][schema], version 4. This allows you to validate your data. The following example schema describes an array containing objects whose properties are all required and whose types are defined. 
+Json-Works includes an implementation of [JSON Schema][schema], version 4. This allows you to validate your data. The following example schema describes an array containing objects whose properties are all required and whose types are defined.
 
 ```
 {
     "items": {
         "properties": {
             "firstName": {"type": "string"},
-			"lastName": {"type": "string"}				    
+			"lastName": {"type": "string"}
         },
         "required": ["firstName", "lastName"]
     }
@@ -118,21 +118,27 @@ $result = $document->addValue('/0', array('firstName'=> 'Fred'));
 $result = $document->validate();
 # false - required lastName is missing
 ```
+
 Without a schema, any value can be added anywhere.
 
 <a name="Installation"></a>
 ## Installation
-The easiest way is [through composer][composer]. Just create a `composer.json` file and run `php composer.phar install` to install it:
+This package is available via [Composer][composer] as `johnstevenson/json-works`.
+Either run the following command in your project directory:
+
+```
+composer require "johnstevenson/json-works=1.1.*"
+```
+
+or add the requirement to your `composer.json` file:
 
 ```
 {
-	"require": {
-		"johnstevenson/json-works": "1.0.*"
-	}
+    "require": {
+        "johnstevenson/json-works": "1.1.*"
+    }
 }
 ```
-
-Then include `require 'vendor/autoload.php'` somewhere in your bootstrap code. Alternatively, you can [download][download] and extract it then point a PSR-0 autoloader to the `src` directory.
 
 <a name="Usage"></a>
 ## Usage
