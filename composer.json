@@ -18,8 +18,5 @@
         "psr-4": {
             "JohnStevenson\\JsonWorks\\": "src/"
         }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "4.*"
     }
 }
