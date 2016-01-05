@@ -88,37 +88,6 @@ class Utils
         return $check ? true : $out;
     }
 
-    public static function pathAdd($path, $key)
-    {
-        if (strlen($encoded = static::pathEncodeKey($key))) {
-            $encoded = '/'.$encoded;
-        }
-
-        return $path.$encoded;
-    }
-
-    public static function pathDecode($path)
-    {
-        $keys = explode('/', $path);
-        array_shift($keys);
-
-        foreach ($keys as &$value) {
-            $value = str_replace('~0', '~', str_replace('~1', '/', $value));
-        }
-
-        return $keys;
-    }
-
-    public static function pathEncode($keys)
-    {
-        $result = '';
-        foreach ((array) $keys as $value) {
-            $result = static::pathAdd($result, $value);
-        }
-
-        return $result;
-    }
-
     public static function pathEncodeKey($key)
     {
         return str_replace('/', '~1', str_replace('~', '~0', strval($key)));

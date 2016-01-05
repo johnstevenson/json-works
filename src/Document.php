@@ -2,6 +2,8 @@
 
 namespace JohnStevenson\JsonWorks;
 
+use JohnStevenson\JsonWorks\Helpers\Path;
+
 class Document
 {
     public $data;
@@ -30,7 +32,7 @@ class Document
     {
         $this->lastError = null;
         $this->lastPushIndex = 0;
-        $pointers = is_array($path) ? $path : Utils::pathDecode($path);
+        $pointers = is_array($path) ? $path : Path::decode($path);
         $value = Utils::dataCopy($value);
 
         if (empty($pointers)) {
@@ -80,7 +82,7 @@ class Document
 
     public function deleteValue($path)
     {
-        $pointers = is_array($path) ? $path : Utils::pathDecode($path);
+        $pointers = is_array($path) ? $path : Path::decode($path);
 
         if ($result = $this->hasValue($pointers, $dummy)) {
 
@@ -114,7 +116,7 @@ class Document
         $result = false;
         $value = null;
 
-        $pointers = is_array($path) ? $path : Utils::pathDecode($path);
+        $pointers = is_array($path) ? $path : Path::decode($path);
 
         if ($this->workGet($pointers, false)) {
             $value = Utils::dataCopy($this->element);

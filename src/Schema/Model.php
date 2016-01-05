@@ -2,7 +2,8 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
-use \JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Helpers\Path;
 
 class Model
 {
@@ -61,7 +62,7 @@ class Model
         if (!empty($this->references)) {
 
             foreach (array_keys($this->references) as $ref) {
-                $keys = Utils::pathDecode($ref);
+                $keys = Path::decode($ref);
 
                 if ($schema = $this->find($this->data, $keys)) {
                     $this->references[$ref] = $schema;

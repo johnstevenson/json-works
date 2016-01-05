@@ -2,7 +2,8 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
-use \JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Helpers\Path;
 
 class Constraints
 {
@@ -16,7 +17,7 @@ class Constraints
 
     public function validate($data, $schema, $key = null)
     {
-        $this->path = Utils::pathAdd($this->path, $key);
+        $this->path = Path::add($this->path, $key);
 
         $this->validateCommon($data, $schema);
         $type = gettype($data);
