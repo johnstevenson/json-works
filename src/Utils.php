@@ -152,95 +152,6 @@ class Utils
         return $result;
     }
 
-    /**
-    * Encodes data into JSON
-    *
-    * @param mixed $data The data to be encoded
-    * @param boolean $pretty Format the output
-    * @return string Encoded json
-    */
-    public static function dataToJson($data, $pretty)
-    {
-        $newLine = $pretty ? chr(10) : null;
-
-        if (version_compare(PHP_VERSION, '5.4', '>=')) {
-            $pprint = $pretty ? JSON_PRETTY_PRINT : 0;
-            $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | $pprint;
-            return static::finalizeJson(json_encode($data, $options), $newLine);
-        }
-
-        $json = json_encode($data);
-
-        $len = strlen($json);
-        $result = $string = '';
-        $inString = $escaped = false;
-        $level = 0;
-        $space = $pretty ? chr(32) : null;
-        $convert = function_exists('mb_convert_encoding');
-
-        for ($i = 0; $i < $len; $i++) {
-            $char = $json[$i];
-
-            # are we inside a json string?
-            if ('"' === $char && !$escaped) {
-                $inString = !$inString;
-            }
-
-            if ($inString) {
-                $string .= $char;
-                $escaped = '\\' === $char ? !$escaped : false;
-
-                continue;
-
-            } elseif ($string) {
-                # end of the json string
-                $string .= $char;
-
-                # unescape slashes
-                $string = str_replace('\\/', '/', $string);
-
-                # unescape unicode
-                if ($convert) {
-                    $string = preg_replace_callback('/\\\\u([0-9a-f]{4})/i', function ($match) {
-                        return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-                    }, $string);
-                }
-
-                $result .= $string;
-                $string = '';
-
-                continue;
-            }
-
-            if (':' === $char) {
-                # add space after colon
-                $char .= $space;
-            } elseif (strpbrk($char, '}]')) {
-                # char is an end element, so add a newline
-                $result .= $newLine;
-                # decrease indent level
-                $level--;
-                $result .= str_repeat($space, $level * 4);
-            }
-
-            $result .= $char;
-
-            if (strpbrk($char, ',{[')) {
-                # char is a start element, so add a newline
-                $result .= $newLine;
-
-                # increase indent level if not a comma
-                if (',' !== $char) {
-                    $level++;
-                }
-
-                $result .= str_repeat($space, $level * 4);
-            }
-        }
-
-        return static::finalizeJson($result, $newLine);
-    }
-
     protected static function equalsObject($obj1, $obj2)
     {
         # get_object_vars fails on objects with digit keys
@@ -300,19 +211,5 @@ class Utils
         }
 
         return $result;
-    }
-
-    protected static function finalizeJson($json, $newline)
-    {
-        if ($newline) {
-            # collapse empty {} and []
-            $json = preg_replace_callback('#(\{\s+\})|(\[\s+\])#', function ($match) {
-                return $match[1] ? '{}' : '[]';
-            }, $json);
-
-            $json .= $newline;
-        }
-
-        return $json;
     }
 }

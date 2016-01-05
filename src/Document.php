@@ -2,6 +2,7 @@
 
 namespace JohnStevenson\JsonWorks;
 
+use JohnStevenson\JsonWorks\Helpers\Data;
 use JohnStevenson\JsonWorks\Helpers\Path;
 
 class Document
@@ -141,7 +142,7 @@ class Document
 
     public function toJson($pretty, $tabs = false)
     {
-        $json = Utils::dataToJson($this->data, $pretty);
+        $json = Data::toJson($this->data, $pretty);
         if ($tabs && $pretty) {
             $json = preg_replace_callback('/^( +)/m', function ($m) {
                 return str_repeat("\t", (int) strlen($m[1]) / 4);

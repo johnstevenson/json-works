@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Utils;
 
-use \JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Helpers\Data;
 
 class DataToJsonTest extends \JsonWorks\Tests\Base
 {
@@ -17,7 +17,7 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $data = '';
         $expected = 'null';
 
-        $result = Utils::dataToJson(json_decode($data), false);
+        $result = Data::toJson(json_decode($data), false);
         $this->assertEquals($expected, $result);
     }
 
@@ -30,17 +30,13 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $expected = '{"prop1":"path/to/somewhere"}';
 
         $data = $this->fromJson($data);
-        $result = Utils::dataToJson($data, false);
+        $result = Data::toJson($data, false);
         $this->assertEquals($expected, $result);
 
     }
 
     public function testEscapeUnicode()
     {
-        if (!function_exists('mb_convert_encoding') && version_compare(PHP_VERSION, '5.4', '<')) {
-            $this->markTestSkipped('Test requires the mbstring extension');
-        }
-
         $data = '{
             "prop1": "\\u018c"
         }';
@@ -48,7 +44,7 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $expected = '{"prop1":"ƌ"}';
 
         $data = $this->fromJson($data);
-        $result = Utils::dataToJson($data, false);
+        $result = Data::toJson($data, false);
         $this->assertEquals($expected, $result);
     }
 
@@ -72,7 +68,7 @@ class DataToJsonTest extends \JsonWorks\Tests\Base
         $expected = $this->getFileExpected(__FUNCTION__);
 
         $data = $this->fromJson($data);
-        $result = Utils::dataToJson($data, true);
+        $result = Data::toJson($data, true);
         $this->assertEquals($expected, $result);
     }
 }
