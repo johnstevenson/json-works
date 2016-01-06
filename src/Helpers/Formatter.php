@@ -15,29 +15,27 @@ namespace JohnStevenson\JsonWorks\Helpers;
 */
 class Formatter
 {
-    /**
-    * Encodes data into JSON
-    *
-    * @param mixed $data The data to be encoded
-    * @param boolean $pretty Format the output
-    * @return string Encoded json
-    */
-    public function toJson($data, $pretty)
+    public function copyData($data, $callback = null)
     {
-        $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
-        $options |= $pretty ? JSON_PRETTY_PRINT : 0;
-
-        $json = json_encode($data, $options);
-
-        if ($pretty) {
-            # collapse empty {} and []
-            $json = preg_replace_callback('#(\{\s+\})|(\[\s+\])#', function ($match) {
-                return $match[1] ? '{}' : '[]';
-            }, $json);
-
-            $json .= chr(10);
+        if ($callback) {
+            $data = call_user_func_array($callback, array($data));
         }
 
-        return $json;
+        if (($object = is_object($data)) || is_array($data)) {
+
+            $result = array();
+
+            foreach ($data as $key => $value) {
+                $object = $object ?: is_string($key);
+                $result[$key] = $this->copyData($value, $callback);
+            }
+
+            $result = $object ? (object) $result: $result;
+
+        } else {
+            $result = $data;
+        }
+
+        return $result;
     }
 }

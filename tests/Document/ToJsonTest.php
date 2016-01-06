@@ -6,10 +6,10 @@ use \JohnStevenson\JsonWorks\Utils;
 
 class ToJsonTest extends \JsonWorks\Tests\Base
 {
-    protected function getFileExpected($test, $tabs = false)
+    protected function getFileExpected($test)
     {
         $filename = __DIR__.'/Fixtures/'.$test.'.json';
-        return $this->getFileExpectedJson($filename, $tabs);
+        return $this->getFileExpectedJson($filename);
     }
 
     public function testNoData()
@@ -24,6 +24,38 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $json = $document->toJson(false);
         $this->assertTrue($document->validate());
         $this->assertEquals($this->getExpectedJson($expected), $json);
+    }
+
+    public function testPathWithSlash()
+    {
+        $schema = null;
+
+        $data = '{
+            "prop1": "path/to/somewhere"
+        }';
+
+        $expected = '{"prop1":"path/to/somewhere"}';
+
+        $document = $this->getDocument($schema, $data);
+
+        $json = $document->toJson(false);
+        $this->assertEquals($expected, $json);
+    }
+
+    public function testEscapeUnicode()
+    {
+        $schema = null;
+
+        $data = '{
+            "prop1": "\\u018c"
+        }';
+
+        $expected = '{"prop1":"ƌ"}';
+
+        $document = $this->getDocument($schema, $data);
+
+        $json = $document->toJson(false);
+        $this->assertEquals($expected, $json);
     }
 
     public function testTidyNoSchema()
@@ -225,18 +257,6 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $json = $document->toJson(true);
-        $this->assertEquals($expected, $json);
-    }
-
-    public function testPrettyTabs()
-    {
-        $schema = null;
-
-        $data = $this->getFileExpected('testPretty');
-        $expected = $this->getFileExpected('testPretty', true);
-        $document = $this->getDocument($schema, $data);
-
-        $json = $document->toJson(true, true);
         $this->assertEquals($expected, $json);
     }
 }

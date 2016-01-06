@@ -78,31 +78,8 @@ class Base extends \PHPUnit_Framework_TestCase
         return json_encode(json_decode($expected));
     }
 
-    protected function getFileExpectedJson($filename, $tabs = false)
+    protected function getFileExpectedJson($filename)
     {
-        if ($tabs) {
-            $data = file($filename, FILE_IGNORE_NEW_LINES);
-            return $this->fileSpacesToTabs($data);
-        } else {
-            return file_get_contents($filename);
-        }
-    }
-
-    protected function fileSpacesToTabs($data)
-    {
-        $space = str_repeat(chr(32), 4);
-
-        foreach ($data as &$line) {
-            $tabs = '';
-
-            while (0 === strpos($line, $space)) {
-                $line = substr($line, 4);
-                $tabs .= "\t";
-            }
-
-            $line = $tabs.$line;
-        }
-
-        return implode("\n", $data)."\n";
+        return file_get_contents($filename);
     }
 }

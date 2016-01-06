@@ -1,15 +1,22 @@
 <?php
 
-namespace JsonWorks\Tests\Utils;
+namespace JsonWorks\Tests\Helpers;
 
-use \JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Helpers\Formatter;
 
-class DataCopyTest extends \JsonWorks\Tests\Base
+class FormatterCopyDataTest extends \JsonWorks\Tests\Base
 {
+    protected $formatter;
+
+    protected function setUp()
+    {
+        $this->formatter = new Formatter();
+    }
+
     public function testFromObject()
     {
         $obj1 = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj2 = Utils::dataCopy($obj1);
+        $obj2 = $this->formatter->copyData($obj1);
 
         $obj1->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -19,7 +26,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
     public function testFromAssoc()
     {
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj = Utils::dataCopy($arr);
+        $obj = $this->formatter->copyData($arr);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj);
@@ -29,7 +36,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
     {
         $obj = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
         $obj1 = (object) array('users' => array($obj));
-        $obj2 = Utils::dataCopy($obj1);
+        $obj2 = $this->formatter->copyData($obj1);
 
         $obj1->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -41,7 +48,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
         $obj1 = (object) array('users' => array($arr));
 
-        $obj2 = Utils::dataCopy($obj1);
+        $obj2 = $this->formatter->copyData($obj1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj2->users[0]);
@@ -53,7 +60,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
         $obj1 = (object) array('users' => array($obj));
         $arr1 = array(9, $obj1);
 
-        $arr2 = Utils::dataCopy($arr1);
+        $arr2 = $this->formatter->copyData($arr1);
 
         $arr1[1]->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -66,7 +73,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
         $obj = (object) array('users' => array($arr));
         $arr1 = array(9, $obj);
 
-        $arr2 = Utils::dataCopy($arr1);
+        $arr2 = $this->formatter->copyData($arr1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $arr2[1]->users[0]);
@@ -75,7 +82,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
     public function testObjectFromEmptyObject()
     {
         $obj = new \stdClass();
-        $result = Utils::dataCopy($obj);
+        $result = $this->formatter->copyData($obj);
 
         $expected =  new \stdClass();
         $this->assertEquals($expected, $result);
@@ -84,7 +91,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
     public function testArrayFromEmptyArray()
     {
         $arr = array();
-        $result = Utils::dataCopy($arr);
+        $result = $this->formatter->copyData($arr);
         $expected =  array();
         $this->assertEquals($expected, $result);
     }
@@ -92,7 +99,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
     public function testArrayMixedToObject()
     {
         $arr = array('Bloggs', 'firstName' => 'Fred', 9);
-        $result = Utils::dataCopy($arr);
+        $result = $this->formatter->copyData($arr);
 
         $expected = '{
             "0": "Bloggs",
@@ -113,7 +120,7 @@ class DataCopyTest extends \JsonWorks\Tests\Base
         $data->prop4 = array();
         $data->prop5 = array(7);
         $data->prop6 = array('Bloggs', 'firstName' => 'Fred', 9);
-        $result = Utils::dataCopy($data);
+        $result = $this->formatter->copyData($data);
 
         $expected = '{
             "prop1": {},

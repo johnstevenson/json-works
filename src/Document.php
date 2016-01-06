@@ -34,7 +34,7 @@ class Document
     public function loadData($data, $noException = false)
     {
         $data = $this->getInput($data, false, $noException);
-        $this->data = $data ? Utils::dataCopy($data) : null;
+        $this->data = $data ? $this->formatter->copyData($data) : null;
         $this->workingData = null;
         return empty($this->lastError);
     }
@@ -50,7 +50,7 @@ class Document
         $this->lastError = null;
         $this->lastPushIndex = 0;
         $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
-        $value = Utils::dataCopy($value);
+        $value = $this->formatter->copyData($value);
 
         if (empty($pointers)) {
             # empty path, add value to root
@@ -68,7 +68,7 @@ class Document
             $this->workingData = null;
         } else {
             # data exists so copy it
-            $this->workingData = Utils::dataCopy($this->data);
+            $this->workingData = $this->formatter->copyData($this->data);
         }
 
         # create any new keys and get referenced element
@@ -136,7 +136,7 @@ class Document
         $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
 
         if ($this->workGet($pointers, false)) {
-            $value = Utils::dataCopy($this->element);
+            $value = $this->formatter->copyData($this->element);
             $result = true;
         }
 
@@ -158,14 +158,10 @@ class Document
 
     public function toJson($pretty, $tabs = false)
     {
-        $json = $this->formatter->toJson($this->data, $pretty);
-        if ($tabs && $pretty) {
-            $json = preg_replace_callback('/^( +)/m', function ($m) {
-                return str_repeat("\t", (int) strlen($m[1]) / 4);
-            }, $json);
-        }
+        $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+        $options |= $pretty ? JSON_PRETTY_PRINT : 0;
 
-        return $json;
+        return json_encode($this->data, $options);
     }
 
     public function validate($lax = false)
@@ -334,6 +330,8 @@ class Document
         } else {
             $this->element = &$this->data;
         }
+
+        //$this->element = &$dataSet;
 
         if (is_null($this->element)) {
             return false;

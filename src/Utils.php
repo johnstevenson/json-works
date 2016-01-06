@@ -88,30 +88,6 @@ class Utils
         return $check ? true : $out;
     }
 
-    public static function dataCopy($data, $callback = null)
-    {
-        if ($callback) {
-            $data = call_user_func_array($callback, array($data));
-        }
-
-        if (($object = is_object($data)) || is_array($data)) {
-
-            $result = array();
-
-            foreach ($data as $key => $value) {
-                $object = $object ?: is_string($key);
-                $result[$key] = static::dataCopy($value, $callback);
-            }
-
-            $result = $object ? (object) $result: $result;
-
-        } else {
-            $result = $data;
-        }
-
-        return $result;
-    }
-
     public static function dataPrune($data)
     {
         $props = 0;
