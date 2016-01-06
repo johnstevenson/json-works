@@ -1,18 +1,25 @@
 <?php
 
-namespace JsonWorks\Tests\Utils;
+namespace JsonWorks\Tests\Helpers;
 
-use \JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Helpers\FormatManager;
 
-class DataOrderTest extends \JsonWorks\Tests\Base
+class FormatterOrderDataTest extends \JsonWorks\Tests\Base
 {
+    protected $formatter;
+
+    protected function setUp()
+    {
+        $this->formatter = new FormatManager();
+    }
+
     public function testNoData()
     {
         $schema = '';
         $data = '';
         $expected = '';
 
-        $result = Utils::dataOrder(json_decode($data), $schema);
+        $result = $this->formatter->order(json_decode($data), $schema);
         $this->assertEquals(json_decode($expected), $result);
     }
 
@@ -38,7 +45,7 @@ class DataOrderTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->fromJson($expected);
 
-        $result = Utils::dataOrder($data, $schema);
+        $result = $this->formatter->order($data, $schema);
         $this->assertEquals($expected, $result);
     }
 
@@ -74,7 +81,7 @@ class DataOrderTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->fromJson($expected);
 
-        $result = Utils::dataOrder($data, $schema);
+        $result = $this->formatter->order($data, $schema);
         $this->assertEquals($expected, $result);
     }
 
@@ -125,7 +132,7 @@ class DataOrderTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->fromJson($expected);
 
-        $result = Utils::dataOrder($data, $schema);
+        $result = $this->formatter->order($data, $schema);
         $this->assertEquals($expected, $result);
     }
 
@@ -187,7 +194,7 @@ class DataOrderTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->fromJson($expected);
 
-        $result = Utils::dataOrder($data, $schema);
+        $result = $this->formatter->order($data, $schema);
         $this->assertEquals($expected, $result);
     }
 }

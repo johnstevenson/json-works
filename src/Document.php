@@ -2,7 +2,7 @@
 
 namespace JohnStevenson\JsonWorks;
 
-use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Helpers\FormatManager;
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Document
@@ -27,14 +27,14 @@ class Document
 
     public function __construct()
     {
-        $this->formatter = new Formatter();
+        $this->formatter = new FormatManager();
         $this->tokenizer = new Tokenizer();
     }
 
     public function loadData($data, $noException = false)
     {
         $data = $this->getInput($data, false, $noException);
-        $this->data = $data ? $this->formatter->copyData($data) : null;
+        $this->data = $data ? $this->formatter->copy($data) : null;
         $this->workingData = null;
         return empty($this->lastError);
     }
@@ -50,7 +50,7 @@ class Document
         $this->lastError = null;
         $this->lastPushIndex = 0;
         $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
-        $value = $this->formatter->copyData($value);
+        $value = $this->formatter->copy($value);
 
         if (empty($pointers)) {
             # empty path, add value to root
@@ -68,7 +68,7 @@ class Document
             $this->workingData = null;
         } else {
             # data exists so copy it
-            $this->workingData = $this->formatter->copyData($this->data);
+            $this->workingData = $this->formatter->copy($this->data);
         }
 
         # create any new keys and get referenced element
@@ -136,7 +136,7 @@ class Document
         $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
 
         if ($this->workGet($pointers, false)) {
-            $value = $this->formatter->copyData($this->element);
+            $value = $this->formatter->copy($this->element);
             $result = true;
         }
 
@@ -150,9 +150,10 @@ class Document
 
     public function tidy($order = false)
     {
-        $this->data = $this->formatter->pruneData($this->data);
+        $this->data = $this->formatter->prune($this->data);
+
         if ($order && $this->schema) {
-            $this->data = Utils::dataOrder($this->data, $this->schema->data);
+            $this->data = $this->formatter->order($this->data, $this->schema->data);
         }
     }
 

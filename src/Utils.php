@@ -88,35 +88,6 @@ class Utils
         return $check ? true : $out;
     }
 
-    public static function dataOrder($data, $schema)
-    {
-        if (is_object($data) && ($properties = Utils::get($schema, 'properties'))) {
-            $result = array();
-
-            foreach ($properties as $key => $value) {
-                if (isset($data->$key)) {
-                    $result[$key] = static::dataOrder($data->$key, $properties->$key);
-                    unset($data->$key);
-                }
-            }
-            $result = (object) array_merge($result, (array) $data);
-
-        } elseif (is_array($data) && ($items = Utils::get($schema, 'items'))) {
-            $result = array();
-            $objSchema = is_object($schema->items) ? $schema->items : null;
-
-            foreach ($data as $item) {
-                $itemSchema = $objSchema ?: (next($schema->items) ?: null);
-                $result[] = static::dataOrder($item, $itemSchema);
-            }
-
-        } else {
-            $result = $data;
-        }
-
-        return $result;
-    }
-
     protected static function equalsObject($obj1, $obj2)
     {
         # get_object_vars fails on objects with digit keys

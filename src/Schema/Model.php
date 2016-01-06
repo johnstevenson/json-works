@@ -3,7 +3,7 @@
 namespace JohnStevenson\JsonWorks\Schema;
 
 use JohnStevenson\JsonWorks\Utils;
-use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Helpers\FormatManager;
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Model
@@ -27,13 +27,10 @@ class Model
 
     public function __construct($input)
     {
-        $this->formatter = new Formatter();
+        $this->formatter = new FormatManager();
         $this->tokenizer = new Tokenizer();
 
-        $this->data = $this->formatter->copyData(
-            (object) $input,
-            array($this, 'initCallback')
-        );
+        $this->data = $this->formatter->copy((object) $input, array($this, 'initCallback'));
         $this->resolveReferences();
     }
 
@@ -93,10 +90,7 @@ class Model
                 $this->references[$ref] = $this->resolve($schema);
             }
 
-            $this->data = $this->formatter->copyData(
-                $this->data,
-                array($this, 'resolveCallback')
-            );
+            $this->data = $this->formatter->copy($this->data, array($this, 'resolveCallback'));
             $this->references = array();
         }
     }

@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Helpers\FormatManager;
 
 class FormatterCopyDataTest extends \JsonWorks\Tests\Base
 {
@@ -10,13 +10,13 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
 
     protected function setUp()
     {
-        $this->formatter = new Formatter();
+        $this->formatter = new FormatManager();
     }
 
     public function testFromObject()
     {
         $obj1 = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj2 = $this->formatter->copyData($obj1);
+        $obj2 = $this->formatter->copy($obj1);
 
         $obj1->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -26,7 +26,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
     public function testFromAssoc()
     {
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj = $this->formatter->copyData($arr);
+        $obj = $this->formatter->copy($arr);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj);
@@ -36,7 +36,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
     {
         $obj = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
         $obj1 = (object) array('users' => array($obj));
-        $obj2 = $this->formatter->copyData($obj1);
+        $obj2 = $this->formatter->copy($obj1);
 
         $obj1->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -48,7 +48,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
         $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
         $obj1 = (object) array('users' => array($arr));
 
-        $obj2 = $this->formatter->copyData($obj1);
+        $obj2 = $this->formatter->copy($obj1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $obj2->users[0]);
@@ -60,7 +60,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
         $obj1 = (object) array('users' => array($obj));
         $arr1 = array(9, $obj1);
 
-        $arr2 = $this->formatter->copyData($arr1);
+        $arr2 = $this->formatter->copy($arr1);
 
         $arr1[1]->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -73,7 +73,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
         $obj = (object) array('users' => array($arr));
         $arr1 = array(9, $obj);
 
-        $arr2 = $this->formatter->copyData($arr1);
+        $arr2 = $this->formatter->copy($arr1);
 
         $expected = (object) $arr;
         $this->assertEquals($expected, $arr2[1]->users[0]);
@@ -82,7 +82,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
     public function testObjectFromEmptyObject()
     {
         $obj = new \stdClass();
-        $result = $this->formatter->copyData($obj);
+        $result = $this->formatter->copy($obj);
 
         $expected =  new \stdClass();
         $this->assertEquals($expected, $result);
@@ -91,7 +91,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
     public function testArrayFromEmptyArray()
     {
         $arr = array();
-        $result = $this->formatter->copyData($arr);
+        $result = $this->formatter->copy($arr);
         $expected =  array();
         $this->assertEquals($expected, $result);
     }
@@ -99,7 +99,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
     public function testArrayMixedToObject()
     {
         $arr = array('Bloggs', 'firstName' => 'Fred', 9);
-        $result = $this->formatter->copyData($arr);
+        $result = $this->formatter->copy($arr);
 
         $expected = '{
             "0": "Bloggs",
@@ -120,7 +120,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
         $data->prop4 = array();
         $data->prop5 = array(7);
         $data->prop6 = array('Bloggs', 'firstName' => 'Fred', 9);
-        $result = $this->formatter->copyData($data);
+        $result = $this->formatter->copy($data);
 
         $expected = '{
             "prop1": {},
