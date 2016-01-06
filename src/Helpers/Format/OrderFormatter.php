@@ -10,8 +10,6 @@
 
 namespace JohnStevenson\JsonWorks\Helpers\Format;
 
-use JohnStevenson\JsonWorks\Utils;
-
 /**
 * A class to order elements and return an unreferenced copy of the data
 */
@@ -24,30 +22,58 @@ class OrderFormatter extends BaseFormatter
 
     protected function order($data, $schema)
     {
-        if (is_object($data) && ($properties = Utils::get($schema, 'properties'))) {
-            $result = array();
+        if ($this->isObjectWithSchema($data, $schema, $properties)) {
+            return $this->orderObject($data, $properties);
+        }
 
-            foreach ($properties as $key => $value) {
-                if (isset($data->$key)) {
-                    $result[$key] = $this->order($data->$key, $properties->$key);
-                    unset($data->$key);
-                }
-            }
-            $result = (object) array_merge($result, (array) $data);
+        if ($this->isArrayWithSchema($data, $schema)) {
+            return $this->orderArray($data, $schema);
+        }
 
-        } elseif (is_array($data) && ($items = Utils::get($schema, 'items'))) {
-            $result = array();
-            $objSchema = is_object($schema->items) ? $schema->items : null;
+        return $data;
+    }
 
-            foreach ($data as $item) {
-                $itemSchema = $objSchema ?: (next($schema->items) ?: null);
-                $result[] = $this->order($item, $itemSchema);
-            }
+    protected function isArrayWithSchema($data, $schema)
+    {
+        return is_array($data) && isset($schema->items);
+    }
 
-        } else {
-            $result = $data;
+    protected function isObjectWithSchema($data, $schema, &$properties)
+    {
+        $result = false;
+
+        if (is_object($data) && isset($schema->properties)) {
+            $properties = $schema->properties;
+            $result = true;
         }
 
         return $result;
+    }
+
+    protected function orderArray($data, $schema)
+    {
+        $result = array();
+        $objSchema = is_object($schema->items) ? $schema->items : null;
+
+        foreach ($data as $item) {
+            $itemSchema = $objSchema ?: (next($schema->items) ?: null);
+            $result[] = $this->order($item, $itemSchema);
+        }
+
+        return $result;
+    }
+
+    protected function orderObject($data, $properties)
+    {
+        $result = array();
+
+        foreach ($properties as $key => $value) {
+            if (isset($data->$key)) {
+                $result[$key] = $this->order($data->$key, $properties->$key);
+                unset($data->$key);
+            }
+        }
+
+        return (object) array_merge($result, (array) $data);
     }
 }

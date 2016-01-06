@@ -13,12 +13,12 @@ class Document
     public $lastPushIndex;
 
     /**
-    * @var Helpers\Formatter
+    * @var FormatManager
     */
     protected $formatter;
 
     /**
-    * @var Helpers\Tokenizer
+    * @var Tokenizer
     */
     protected $tokenizer;
     private $element;
