@@ -43,9 +43,9 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
 
         $schema = $this->getSchemaObject($schema);
         $data = $this->fromJson($data);
-        $expected = $this->fromJson($expected);
+        $expected = $this->getExpectedJson($expected);
 
-        $result = $this->formatter->order($data, $schema);
+        $result = json_encode($this->formatter->order($data, $schema));
         $this->assertEquals($expected, $result);
     }
 
@@ -79,9 +79,9 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
 
         $schema = $this->getSchemaObject($schema);
         $data = $this->fromJson($data);
-        $expected = $this->fromJson($expected);
+        $expected = $this->getExpectedJson($expected);
 
-        $result = $this->formatter->order($data, $schema);
+        $result = json_encode($this->formatter->order($data, $schema));
         $this->assertEquals($expected, $result);
     }
 
@@ -130,9 +130,9 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
 
         $schema = $this->getSchemaObject($schema);
         $data = $this->fromJson($data);
-        $expected = $this->fromJson($expected);
+        $expected = $this->getExpectedJson($expected);
 
-        $result = $this->formatter->order($data, $schema);
+        $result = json_encode($this->formatter->order($data, $schema));
         $this->assertEquals($expected, $result);
     }
 
@@ -192,9 +192,9 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
 
         $schema = $this->getSchemaObject($schema);
         $data = $this->fromJson($data);
-        $expected = $this->fromJson($expected);
+        $expected = $this->getExpectedJson($expected);
 
-        $result = $this->formatter->order($data, $schema);
+        $result = json_encode($this->formatter->order($data, $schema));
         $this->assertEquals($expected, $result);
     }
 }

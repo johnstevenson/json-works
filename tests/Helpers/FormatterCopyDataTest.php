@@ -84,7 +84,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
         $obj = new \stdClass();
         $result = $this->formatter->copy($obj);
 
-        $expected =  new \stdClass();
+        $expected = new \stdClass();
         $this->assertEquals($expected, $result);
     }
 
@@ -92,7 +92,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
     {
         $arr = array();
         $result = $this->formatter->copy($arr);
-        $expected =  array();
+        $expected = array();
         $this->assertEquals($expected, $result);
     }
 
