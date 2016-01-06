@@ -1,17 +1,24 @@
 <?php
 
-namespace JsonWorks\Tests\Utils;
+namespace JsonWorks\Tests\Helpers;
 
-use \JohnStevenson\JsonWorks\Utils;
+use JohnStevenson\JsonWorks\Helpers\Formatter;
 
-class DataPruneTest extends \JsonWorks\Tests\Base
+class FormatterPruneDataTest extends \JsonWorks\Tests\Base
 {
+    protected $formatter;
+
+    protected function setUp()
+    {
+        $this->formatter = new Formatter();
+    }
+
     public function testNoData()
     {
         $data = '';
         $expected = '';
 
-        $result = Utils::dataPrune(json_decode($data));
+        $result = $this->formatter->pruneData(json_decode($data));
         $this->assertEquals(json_decode($expected), $result);
     }
 
@@ -32,7 +39,7 @@ class DataPruneTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->fromJson($expected);
 
-        $result = Utils::dataPrune($data);
+        $result = $this->formatter->pruneData($data);
         $this->assertEquals($expected, $result);
     }
 
@@ -68,7 +75,7 @@ class DataPruneTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->fromJson($expected);
 
-        $result = Utils::dataPrune($data);
+        $result = $this->formatter->pruneData($data);
         $this->assertEquals($expected, $result);
     }
 }

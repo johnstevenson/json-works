@@ -150,7 +150,7 @@ class Document
 
     public function tidy($order = false)
     {
-        $this->data = Utils::dataPrune($this->data);
+        $this->data = $this->formatter->pruneData($this->data);
         if ($order && $this->schema) {
             $this->data = Utils::dataOrder($this->data, $this->schema->data);
         }

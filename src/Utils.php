@@ -88,12 +88,6 @@ class Utils
         return $check ? true : $out;
     }
 
-    public static function dataPrune($data)
-    {
-        $props = 0;
-        return  static::workPrune($data, $props);
-    }
-
     public static function dataOrder($data, $schema)
     {
         if (is_object($data) && ($properties = Utils::get($schema, 'properties'))) {
@@ -154,33 +148,5 @@ class Utils
         }
 
         return true;
-    }
-
-    protected static function workPrune($data, &$props)
-    {
-        if (($object = is_object($data)) || is_array($data)) {
-
-            $result = array();
-            $currentProps = $props;
-
-            foreach ($data as $key => $value) {
-                $object = $object ?: is_string($key);
-                $value = static::workPrune($value, $props);
-
-                if ($props > $currentProps) {
-                    $result[$key] = $value;
-                }
-                $props = $currentProps;
-            }
-
-            $props = count($result);
-            $result = $object ? (object) $result: $result;
-
-        } else {
-            ++$props;
-            $result = $data;
-        }
-
-        return $result;
     }
 }

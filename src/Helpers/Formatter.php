@@ -35,6 +35,13 @@ class Formatter
         return $data;
     }
 
+    public function pruneData($data)
+    {
+        $props = 0;
+
+        return $this->prune($data, $props);
+    }
+
     /**
     * Recursively copies an object or array
     *
@@ -65,5 +72,36 @@ class Formatter
     protected function isContainer($data, &$isObject)
     {
         return ($isObject = is_object($data)) || is_array($data);
+    }
+
+    protected function prune($data, &$props)
+    {
+        if ($this->isContainer($data, $isObject)) {
+            return $this->pruneContainer($data, $isObject, $props);
+        }
+
+        ++$props;
+
+        return $data;
+    }
+
+    protected function pruneContainer($data, $isObject, &$props)
+    {
+        $result = array();
+        $currentProps = $props;
+
+        foreach ($data as $key => $value) {
+            $isObject = $isObject ?: is_string($key);
+            $value = $this->prune($value, $props);
+
+            if ($props > $currentProps) {
+                $result[$key] = $value;
+            }
+            $props = $currentProps;
+        }
+
+        $props = count($result);
+
+        return $isObject ? (object) $result: $result;
     }
 }
