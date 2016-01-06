@@ -156,7 +156,7 @@ class Document
         }
     }
 
-    public function toJson($pretty, $tabs = false)
+    public function toJson($pretty)
     {
         $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         $options |= $pretty ? JSON_PRETTY_PRINT : 0;
