@@ -52,7 +52,9 @@ class OrderFormatter extends BaseFormatter
 
     protected function findObjectInArray(&$data, $key)
     {
-        for ($i = 0; $i < count($data); ++$i) {
+        $len = count($data);
+
+        for ($i = 0; $i < $len; ++$i) {
             $item = $data[$i];
 
             if (is_object($item) && property_exists($item, $key)) {
@@ -64,20 +66,21 @@ class OrderFormatter extends BaseFormatter
 
     protected function getArraySchema($items)
     {
-        $result = new \stdClass();
+        $result = array();
 
         foreach ($items as $item) {
             if ($properties = $this->objectWithSchema($item, $item)) {
-                $result->$key = $this->getFirstObject($properties, $key);
+                $result[$key] = $this->getFirstObject($properties, $key);
             }
         }
 
         return $result;
     }
 
-    protected function getFirstObject($item, &$key)
+    protected function getFirstObject($item, &$rootKey)
     {
         foreach ($item as $key => $value) {
+            $rootKey = $key;
             return $item->$key;
         }
     }
