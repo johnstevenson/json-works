@@ -41,14 +41,13 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
             "prop3": null
         }';
 
-        $schema = $this->getSchemaObject($schema);
+        $schema = $this->getSchema($schema);
         $data = $this->fromJson($data);
         $expected = $this->getExpectedJson($expected);
 
         $result = json_encode($this->formatter->order($data, $schema));
         $this->assertEquals($expected, $result);
     }
-
 
     public function testObjectSimple()
     {
@@ -77,7 +76,7 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
             "prop5": 5
         }';
 
-        $schema = $this->getSchemaObject($schema);
+        $schema = $this->getSchema($schema);
         $data = $this->fromJson($data);
         $expected = $this->getExpectedJson($expected);
 
@@ -89,46 +88,44 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
     {
         $schema = '{
             "items": {
-                "prop1": {},
-                "prop2": {},
-                "prop3": {},
-                "prop4": {}
+                "properties": {
+                    "prop1": {},
+                    "prop2": {},
+                    "prop3": {},
+                    "prop4": {}
+                }
             }
         }';
 
-        $data = '[
-            {
-                "prop4": null,
-                "prop2": {},
-                "prop1": "",
-                "prop3": []
-            },
-            {
-                "prop5": 5,
-                "prop1": "",
-                "prop4": null,
-                "prop3": [],
-                "prop2": {}
-            }
-        ]';
+        $data = '[{
+            "prop4": null,
+            "prop2": {},
+            "prop1": "",
+            "prop3": []
+        },
+        {
+            "prop5": 5,
+            "prop1": "",
+            "prop4": null,
+            "prop3": [],
+            "prop2": {}
+        }]';
 
-        $expected = '[
-            {
-                "prop1": "",
-                "prop2": {},
-                "prop3": [],
-                "prop4": null
-            },
-            {
-                "prop1": "",
-                "prop2": {},
-                "prop3": [],
-                "prop4": null,
-                "prop5": 5
-            }
-        ]';
+        $expected = '[{
+            "prop1": "",
+            "prop2": {},
+            "prop3": [],
+            "prop4": null
+        },
+        {
+            "prop1": "",
+            "prop2": {},
+            "prop3": [],
+            "prop4": null,
+            "prop5": 5
+        }]';
 
-        $schema = $this->getSchemaObject($schema);
+        $schema = $this->getSchema($schema);
         $data = $this->fromJson($data);
         $expected = $this->getExpectedJson($expected);
 
@@ -142,14 +139,31 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
             "properties": {
                 "prop1": {},
                 "prop2": {
-                    "inner1": {
-                        "items": {
-                            "$ref": "#/definitions/location"
+                    "properties": {
+                        "inner1": {
+                            "items": {
+                                "$ref": "#/definitions/location"
+                            }
+                        },
+                        "inner2": {}
+                    }
+                },
+                "prop3": {
+                    "items": [{
+                        "properties": {
+                            "name": {
+                                "$ref": "#/definitions/name"
+                            }
                         }
                     },
-                    "inner2": {}
+                    {
+                        "properties": {
+                            "location": {
+                                "$ref": "#/definitions/location"
+                            }
+                        }
+                    }]
                 },
-                "prop3": {},
                 "prop4": {}
             },
             "definitions": {
@@ -157,6 +171,12 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
                     "properties": {
                         "lat": {"type": "number"},
                         "lng": {"type": "number"}
+                    }
+                },
+                "name": {
+                    "properties": {
+                        "firstName": {"type": "string"},
+                        "lastName": {"type": "string"}
                     }
                 }
             }
@@ -173,7 +193,14 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
                 ]
             },
             "prop1": "",
-            "prop3": []
+            "prop3": [{
+                "location": {"lng": 120, "lat": 50}
+            },
+            {
+                "name": {"lastName": "Bloggs", "firstName": "Fred"}
+            },
+            5
+            ]
         }';
 
         $expected = '{
@@ -185,12 +212,19 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
                 ],
                 "inner2": 2
             },
-            "prop3": [],
+            "prop3": [{
+                "name": {"firstName": "Fred", "lastName": "Bloggs"}
+            },
+            {
+                "location": {"lat": 50, "lng": 120}
+            },
+            5
+            ],
             "prop4": null,
             "prop5": 5
         }';
 
-        $schema = $this->getSchemaObject($schema);
+        $schema = $this->getSchema($schema);
         $data = $this->fromJson($data);
         $expected = $this->getExpectedJson($expected);
 

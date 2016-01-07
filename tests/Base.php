@@ -43,6 +43,14 @@ class Base extends \PHPUnit_Framework_TestCase
         return $document;
     }
 
+    protected function getSchema($schema)
+    {
+        $schema = $this->getSchemaObject($schema);
+        $schema = new \JohnStevenson\JsonWorks\Schema\Model($schema);
+
+        return $schema->data;
+    }
+
     protected function callMethod($obj, $name, $args = array())
     {
         $class = new \ReflectionClass($obj);

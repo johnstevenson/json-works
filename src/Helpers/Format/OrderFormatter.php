@@ -17,47 +17,97 @@ class OrderFormatter extends BaseFormatter
 {
     public function run($data, $schema)
     {
-        return $this->order($data, $schema);
-    }
-
-    protected function order($data, $schema)
-    {
-        if ($this->isObjectWithSchema($data, $schema, $properties)) {
+        if ($properties = $this->objectWithSchema($data, $schema)) {
             return $this->orderObject($data, $properties);
         }
 
-        if ($this->isArrayWithSchema($data, $schema)) {
-            return $this->orderArray($data, $schema);
+        if ($items = $this->arrayWithSchema($data, $schema, $isObject)) {
+
+            if ($isObject) {
+                return $this->orderArraySingleSchema($data, $items);
+            }
+
+            return $this->orderArrayMultiSchema($data, $items);
         }
 
         return $data;
     }
 
-    protected function isArrayWithSchema($data, $schema)
+    protected function arrayWithSchema($data, $schema, &$isObject)
     {
-        return is_array($data) && isset($schema->items);
+        if (is_array($data) && isset($schema->items)) {
+
+            if ($this->isContainer($schema->items, $isObject)) {
+                return $schema->items;
+            }
+        }
     }
 
-    protected function isObjectWithSchema($data, $schema, &$properties)
+    protected function objectWithSchema($data, $schema)
     {
-        $result = false;
-
         if (is_object($data) && isset($schema->properties)) {
-            $properties = $schema->properties;
-            $result = true;
+            return $schema->properties;
+        }
+    }
+
+    protected function findObjectInArray(&$data, $key)
+    {
+        for ($i = 0; $i < count($data); ++$i) {
+            $item = $data[$i];
+
+            if (is_object($item) && property_exists($item, $key)) {
+                unset($data[$i]);
+                return $this->getFirstObject($item, $dummy);
+            }
+        }
+    }
+
+    protected function getArraySchema($items)
+    {
+        $result = new \stdClass();
+
+        foreach ($items as $item) {
+            if ($properties = $this->objectWithSchema($item, $item)) {
+                $result->$key = $this->getFirstObject($properties, $key);
+            }
         }
 
         return $result;
     }
 
-    protected function orderArray($data, $schema)
+    protected function getFirstObject($item, &$key)
+    {
+        foreach ($item as $key => $value) {
+            return $item->$key;
+        }
+    }
+
+    protected function orderArrayMultiSchema($data, $items)
     {
         $result = array();
-        $objSchema = is_object($schema->items) ? $schema->items : null;
+
+        $properties = $this->getArraySchema($items);
+
+        foreach ($properties as $key => $schema) {
+
+            if ($item = $this->findObjectInArray($data, $key)) {
+                $result[] = (object) array($key => $this->run($item, $schema));
+            }
+
+            if (empty($data)) {
+                break;
+            }
+        }
+
+        return array_merge($result, $data);
+    }
+
+    protected function orderArraySingleSchema($data, $schema)
+    {
+        $result = array();
 
         foreach ($data as $item) {
-            $itemSchema = $objSchema ?: (next($schema->items) ?: null);
-            $result[] = $this->order($item, $itemSchema);
+            $result[] = $this->run($item, $schema);
         }
 
         return $result;
@@ -67,9 +117,9 @@ class OrderFormatter extends BaseFormatter
     {
         $result = array();
 
-        foreach ($properties as $key => $value) {
-            if (isset($data->$key)) {
-                $result[$key] = $this->order($data->$key, $properties->$key);
+        foreach ($properties as $key => $schema) {
+            if (property_exists($data, $key)) {
+                $result[$key] = $this->run($data->$key, $schema);
                 unset($data->$key);
             }
         }
