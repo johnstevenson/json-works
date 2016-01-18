@@ -149,20 +149,9 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
                     }
                 },
                 "prop3": {
-                    "items": [{
-                        "properties": {
-                            "name": {
-                                "$ref": "#/definitions/name"
-                            }
-                        }
-                    },
-                    {
-                        "properties": {
-                            "location": {
-                                "$ref": "#/definitions/location"
-                            }
-                        }
-                    }]
+                    "items": {
+                        "$ref": "#/definitions/name"
+                    }
                 },
                 "prop4": {}
             },
@@ -193,13 +182,10 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
                 ]
             },
             "prop1": "",
-            "prop3": [{
-                "location": {"lng": 120, "lat": 50}
-            },
-            {
-                "name": {"lastName": "Bloggs", "firstName": "Fred"}
-            },
-            5
+            "prop3": [
+                {"lastName": "Bloggs", "firstName": "Fred"},
+                {"lastName": "Smith", "firstName": "John"},
+                5
             ]
         }';
 
@@ -212,13 +198,10 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
                 ],
                 "inner2": 2
             },
-            "prop3": [{
-                "name": {"firstName": "Fred", "lastName": "Bloggs"}
-            },
-            {
-                "location": {"lat": 50, "lng": 120}
-            },
-            5
+            "prop3": [
+                {"firstName": "Fred", "lastName": "Bloggs"},
+                {"firstName": "John", "lastName": "Smith"},
+                5
             ],
             "prop4": null,
             "prop5": 5

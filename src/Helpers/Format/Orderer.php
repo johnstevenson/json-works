@@ -10,67 +10,83 @@
 
 namespace JohnStevenson\JsonWorks\Helpers\Format;
 
-use stdClass;
-
 /**
-* A class to order elements and return an unreferenced copy of the data
+* A class to order elements based on their order in a schema
 */
-class Orderer extends BaseOrder
+class Orderer
 {
     /**
     * Reorders object properties using the schema order
     *
     * @internal
     * @param mixed $data
-    * @param stdClass $schema
+    * @param mixed $schema
     * @return mixed
     */
-    public function run($data, stdClass $schema)
+    public function run($data, $schema)
     {
         if ($properties = $this->objectWithSchema($data, $schema)) {
             return $this->orderObject($data, $properties);
         }
 
-        if ($items = $this->arrayWithSchema($data, $schema, $object)) {
-
-            if ($object) {
-                return $this->orderArraySingleSchema($data, $items);
-            }
-
-            return $this->orderArrayMultiSchema($data, $items);
+        if ($items = $this->arrayWithSchema($data, $schema)) {
+            return $this->orderArray($data, $items);
         }
 
         return $data;
     }
 
-    protected function orderArrayMultiSchema($data, $items)
+    /**
+    * Returns schema items if they are relevant and exist
+    *
+    * @param mixed $data
+    * @param mixed $schema
+    * @return null|stdClass
+    */
+    protected function arrayWithSchema($data, $schema)
     {
-        $result = [];
-
-        $properties = $this->getArraySchema($items);
-
-        foreach ($properties as $key => $schema) {
-
-            if ($item = $this->findPropertyInArray($data, $key)) {
-                $result[] = (object) array($key => $this->run($item, $schema));
-            }
-
-            if (empty($data)) {
-                break;
-            }
+        if (is_array($data)) {
+            return $this->getProperties($schema, 'items');
         }
-
-        return array_merge($result, $data);
     }
+
+    /**
+    * Returns schema properties if they are relevant and exist
+    *
+    * @param mixed $data
+    * @param mixed $schema
+    * @return mixed
+    */
+    protected function objectWithSchema($data, $schema)
+    {
+        if (is_object($data)) {
+            return $this->getProperties($schema, 'properties');
+        }
+    }
+
+    /**
+    * Returns a schema properties is valid
+    *
+    * @param mixed $schema
+    * @param string $key
+    * @return object|null
+    */
+    protected function getProperties($schema, $key)
+    {
+        if (isset($schema->$key)) {
+            return is_object($schema->$key) ? $schema->$key : null;
+        }
+    }
+
 
     /**
     * Orders an array using the schema items properties
     *
     * @param mixed $data
-    * @param stdClass $schema
+    * @param object $schema
     * @return mixed[]
     */
-    protected function orderArraySingleSchema($data, stdClass $schema)
+    protected function orderArray($data, $schema)
     {
         $result = [];
 
@@ -86,7 +102,7 @@ class Orderer extends BaseOrder
     *
     * @param mixed $data
     * @param object $properties
-    * @return stdClass
+    * @return object
     */
     protected function orderObject($data, $properties)
     {
