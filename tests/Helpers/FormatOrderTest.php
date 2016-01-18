@@ -4,7 +4,7 @@ namespace JsonWorks\Tests\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\FormatManager;
 
-class FormatterOrderDataTest extends \JsonWorks\Tests\Base
+class FormatOrderTest extends \JsonWorks\Tests\Base
 {
     protected $formatter;
 
@@ -15,7 +15,7 @@ class FormatterOrderDataTest extends \JsonWorks\Tests\Base
 
     public function testNoData()
     {
-        $schema = '';
+        $schema = $this->getSchema(null);
         $data = '';
         $expected = '';
 

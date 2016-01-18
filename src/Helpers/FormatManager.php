@@ -10,9 +10,10 @@
 
 namespace JohnStevenson\JsonWorks\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Format\CopyFormatter;
-use JohnStevenson\JsonWorks\Helpers\Format\OrderFormatter;
-use JohnStevenson\JsonWorks\Helpers\Format\PruneFormatter;
+use stdClass;
+use JohnStevenson\JsonWorks\Helpers\Format\Copier;
+use JohnStevenson\JsonWorks\Helpers\Format\Orderer;
+use JohnStevenson\JsonWorks\Helpers\Format\Pruner;
 
 /**
 * A class for manipulating array, object or json data
@@ -20,20 +21,24 @@ use JohnStevenson\JsonWorks\Helpers\Format\PruneFormatter;
 class FormatManager
 {
     /**
-    * @var CopyFormatter
+    * @var Copier
     */
     protected $copier;
 
+    /**
+    * @var Orderer
+    */
     protected $orderer;
 
     /**
-    * @var PruneFormatter
+    * @var Pruner
     */
     protected $pruner;
 
     /**
     * Returns an unreferenced copy of the data
     *
+    * @api
     * @param mixed $data
     * @param callable|null $callback Optional callback function
     * @return mixed
@@ -41,25 +46,42 @@ class FormatManager
     public function copy($data, $callback = null)
     {
         if (!$this->copier) {
-            $this->copier = new CopyFormatter();
+            $this->copier = new Copier();
         }
 
         return $this->copier->run($data, $callback);
     }
 
-    public function order($data, $schema)
+    /**
+    * Reorders object properties using the schema order
+    *
+    * @api
+    * @param mixed $data
+    * @param stdClass $schema
+    * @return mixed An unreferenced copy of the ordered data
+    */
+    public function order($data, stdClass $schema)
     {
         if (!$this->orderer) {
-            $this->orderer = new OrderFormatter();
+            $this->orderer = new Orderer();
         }
+
+        $data = $this->copy($data);
 
         return $this->orderer->run($data, $schema);
     }
 
+    /**
+    * Removes empty objects and arrays from the data
+    *
+    * @api
+    * @param mixed $data
+    * @return mixed An unreferenced copy of the pruned data
+    */
     public function prune($data)
     {
         if (!$this->pruner) {
-            $this->pruner = new PruneFormatter();
+            $this->pruner = new Pruner();
         }
 
         return $this->pruner->run($data);

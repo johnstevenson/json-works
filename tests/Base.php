@@ -51,7 +51,7 @@ class Base extends \PHPUnit_Framework_TestCase
         return $schema->data;
     }
 
-    protected function callMethod($obj, $name, $args = array())
+    protected function callMethod($obj, $name, $args = [])
     {
         $class = new \ReflectionClass($obj);
         $method = $class->getMethod($name);
@@ -62,10 +62,6 @@ class Base extends \PHPUnit_Framework_TestCase
     protected function getSchemaObject($schema)
     {
         $schema = $schema ?: '{}';
-
-        if (is_string($schema)) {
-            $schema = trim($schema);
-        }
 
         return $this->fromJson($schema);
     }

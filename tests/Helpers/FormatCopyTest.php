@@ -4,7 +4,7 @@ namespace JsonWorks\Tests\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\FormatManager;
 
-class FormatterCopyDataTest extends \JsonWorks\Tests\Base
+class FormatCopyTest extends \JsonWorks\Tests\Base
 {
     protected $formatter;
 
@@ -90,9 +90,9 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
 
     public function testArrayFromEmptyArray()
     {
-        $arr = array();
+        $arr = [];
         $result = $this->formatter->copy($arr);
-        $expected = array();
+        $expected = [];
         $this->assertEquals($expected, $result);
     }
 
@@ -117,7 +117,7 @@ class FormatterCopyDataTest extends \JsonWorks\Tests\Base
         $data->prop1 = new \stdClass();
         $data->prop2 = 'none';
         $data->prop3 = null;
-        $data->prop4 = array();
+        $data->prop4 = [];
         $data->prop5 = array(7);
         $data->prop6 = array('Bloggs', 'firstName' => 'Fred', 9);
         $result = $this->formatter->copy($data);

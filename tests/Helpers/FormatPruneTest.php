@@ -4,7 +4,7 @@ namespace JsonWorks\Tests\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\FormatManager;
 
-class FormatterPruneDataTest extends \JsonWorks\Tests\Base
+class FormatPruneTest extends \JsonWorks\Tests\Base
 {
     protected $formatter;
 

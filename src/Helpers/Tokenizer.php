@@ -18,6 +18,7 @@ class Tokenizer
     /**
     * Adds a token to an existing JSON Pointer
     *
+    * @api
     * @param string $path The existing JSON Pointer
     * @param string $token The token to add
     * @return string The new JSON Pointer
@@ -34,6 +35,7 @@ class Tokenizer
     /**
     * Splits a JSON Pointer into individual tokens
     *
+    * @api
     * @param string $path The JSON Pointer to split
     * @return array The decoded tokens
     */
@@ -52,6 +54,7 @@ class Tokenizer
     /**
     * Creates a JSON Pointer from a string or an array of tokens
     *
+    * @api
     * @param string|array $tokens
     * @return string The encoded JSON Pointer
     */
@@ -68,6 +71,7 @@ class Tokenizer
     /**
     * Encodes a JSON Pointer token
     *
+    * @api
     * @param string $token
     * @return string The encoded JSON Pointer
     */
