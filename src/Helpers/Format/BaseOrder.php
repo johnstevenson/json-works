@@ -40,7 +40,7 @@ class BaseOrder extends BaseFormat
     *
     * @param mixed $data
     * @param stdClass $schema
-    * @return null|stdClass
+    * @return mixed
     */
     protected function objectWithSchema($data, stdClass $schema)
     {
@@ -101,7 +101,7 @@ class BaseOrder extends BaseFormat
     * @param string $rootKey Set by the method
     * @return mixed
     */
-    protected function getFirstProperty(stdClass $item, &$rootKey)
+    protected function getFirstProperty($item, &$rootKey)
     {
         foreach ($item as $key => $value) {
             $rootKey = $key;

@@ -27,19 +27,33 @@ class BaseFormat
     */
     protected function isContainer($data, &$object)
     {
-        $result = ($object = is_object($data)) || is_array($data);
+        if ($object = is_object($data)) {
+            return true;
+        }
 
-        if ($result && !$object) {
+        if (is_array($data)) {
+            $object = $this->isAssociative($data);
+            return true;
+        }
 
-            foreach ($data as $key => $value) {
-                if ($key !== (int) $key) {
-                    $object = true;
-                    break;
-                }
+        return false;
+    }
+
+    /**
+    * Determines if an array is associative
+    *
+    * @param array $data
+    * @return bool
+    */
+    protected function isAssociative(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if ($key !== (int) $key) {
+                return true;
             }
         }
 
-        return $result;
+        return false;
     }
 
     /**

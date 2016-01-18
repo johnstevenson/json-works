@@ -85,10 +85,10 @@ class Orderer extends BaseOrder
     * Orders an object using the schema properties
     *
     * @param mixed $data
-    * @param stdClass $properties
+    * @param object $properties
     * @return stdClass
     */
-    protected function orderObject($data, stdClass $properties)
+    protected function orderObject($data, $properties)
     {
         $result = [];
 
