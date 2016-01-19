@@ -2,7 +2,8 @@
 
 namespace JohnStevenson\JsonWorks;
 
-use JohnStevenson\JsonWorks\Helpers\FormatManager;
+use JohnStevenson\JsonWorks\Helpers\Finder;
+use JohnStevenson\JsonWorks\Helpers\Formatter;
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Document
@@ -13,7 +14,12 @@ class Document
     public $lastPushIndex;
 
     /**
-    * @var FormatManager
+    * @var Finder
+    */
+    protected $finder;
+
+    /**
+    * @var Formatter
     */
     protected $formatter;
 
@@ -27,7 +33,8 @@ class Document
 
     public function __construct()
     {
-        $this->formatter = new FormatManager();
+        $this->finder = new Finder();
+        $this->formatter = new Formatter();
         $this->tokenizer = new Tokenizer();
     }
 
@@ -332,41 +339,9 @@ class Document
             $this->element = &$this->data;
         }
 
-        //$this->element = &$dataSet;
+        $this->element =& $this->finder->get($this->element, $pointers, $found);
 
-        if (is_null($this->element)) {
-            return false;
-        }
-
-        while ($pointers) {
-            $type = gettype($this->element);
-            $test = $pointers;
-            $key = array_shift($test);
-            $result = false;
-
-            if ('object' === $type) {
-
-                if ($result = property_exists($this->element, $key)) {
-                    $this->element = &$this->element->$key;
-                }
-
-            } elseif ('array' === $type) {
-
-                if ($result = $this->arrayKey($key, $index)) {
-                    if ($result = array_key_exists($index, $this->element)) {
-                        $this->element = &$this->element[$index];
-                    }
-                }
-            }
-
-            if (!$result) {
-                return false;
-            }
-
-            array_shift($pointers);
-        }
-
-        return true;
+        return $found;
     }
 
     protected function workMove($fromPath, $toPath, $delete)

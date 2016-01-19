@@ -18,7 +18,7 @@ use JohnStevenson\JsonWorks\Helpers\Format\Pruner;
 /**
 * A class for manipulating array, object or json data
 */
-class FormatManager
+class Formatter
 {
     /**
     * @var Copier

@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\FormatManager;
+use JohnStevenson\JsonWorks\Helpers\Formatter;
 
 class FormatCopyTest extends \JsonWorks\Tests\Base
 {
@@ -10,7 +10,7 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
 
     protected function setUp()
     {
-        $this->formatter = new FormatManager();
+        $this->formatter = new Formatter();
     }
 
     public function testFromObject()

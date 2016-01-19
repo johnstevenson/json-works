@@ -3,7 +3,7 @@
 namespace JohnStevenson\JsonWorks\Schema;
 
 use JohnStevenson\JsonWorks\Utils;
-use JohnStevenson\JsonWorks\Helpers\FormatManager;
+use JohnStevenson\JsonWorks\Helpers\Formatter;
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Model
@@ -27,7 +27,7 @@ class Model
 
     public function __construct($input)
     {
-        $this->formatter = new FormatManager();
+        $this->formatter = new Formatter();
         $this->tokenizer = new Tokenizer();
 
         $this->data = $this->formatter->copy((object) $input, array($this, 'initCallback'));

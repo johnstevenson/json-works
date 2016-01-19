@@ -41,7 +41,7 @@ class Orderer
     *
     * @param mixed $data
     * @param mixed $schema
-    * @return null|stdClass
+    * @return object|null
     */
     protected function arrayWithSchema($data, $schema)
     {
@@ -55,7 +55,7 @@ class Orderer
     *
     * @param mixed $data
     * @param mixed $schema
-    * @return mixed
+    * @return object|null
     */
     protected function objectWithSchema($data, $schema)
     {
@@ -65,7 +65,7 @@ class Orderer
     }
 
     /**
-    * Returns a schema properties is valid
+    * Returns schema properties if valid
     *
     * @param mixed $schema
     * @param string $key
