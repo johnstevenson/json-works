@@ -46,6 +46,23 @@ class Finder
     }
 
     /**
+    * Returns true if the token is a valid array key
+    *
+    * @param string $token
+    * @param mixed $index Set to an integer on success
+    */
+    public function isArrayKey($token, &$index)
+    {
+        $index = null;
+
+        if (preg_match('/^((0)|([1-9]\d*))$/', $token)) {
+            $index = (int) $token;
+        }
+
+        return $index !== null;
+    }
+
+    /**
     * Returns true if a token is found at the data root
     *
     * A reference to the value is placed in $this->element
@@ -99,22 +116,5 @@ class Finder
         }
 
         return $result;
-    }
-
-    /**
-    * Returns true if the token is a valid array key
-    *
-    * @param string $token
-    * @param mixed $index Set to an integer on success
-    */
-    protected function isArrayKey($token, &$index)
-    {
-        $index = null;
-
-        if (preg_match('/^0*\d+$/', $token)) {
-            $index = (int) $token;
-        }
-
-        return $index !== null;
     }
 }

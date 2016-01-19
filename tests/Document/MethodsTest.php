@@ -23,64 +23,24 @@ class MethodsTest extends \JsonWorks\Tests\Base
         $this->assertTrue($result);
     }
 
-    public function testPushKeyZerosTrue()
-    {
-        $value = '00000';
-        $result = $this->call('pushKey', array($value));
-        $this->assertTrue($result);
-    }
-
     public function testPushKeyFalse1()
     {
-        $value = '-000';
+        $value = '00000';
         $result = $this->call('pushKey', array($value));
         $this->assertFalse($result);
     }
 
     public function testPushKeyFalse2()
     {
-        $value = '9';
+        $value = '-000';
         $result = $this->call('pushKey', array($value));
         $this->assertFalse($result);
     }
 
-    public function testArrayKeyTrue()
+    public function testPushKeyFalse3()
     {
-        $value = '0008';
-        $index = null;
-        $result = $this->call('arrayKey', array($value, &$index, true));
-        $this->assertTrue($result);
-    }
-
-    public function testArrayKeyTrue1()
-    {
-        $value = '0';
-        $index = null;
-        $result = $this->call('arrayKey', array($value, &$index));
-        $this->assertTrue($result);
-    }
-
-    public function testArrayKeyTrue2()
-    {
-        $value = '0007';
-        $index = null;
-        $result = $this->call('arrayKey', array($value, &$index));
-        $this->assertTrue($result);
-    }
-
-    public function testArrayKeyFalse1()
-    {
-        $value = '-';
-        $index = null;
-        $result = $this->call('arrayKey', array($value, &$index));
-        $this->assertFalse($result);
-    }
-
-    public function testArrayKeyFalse2()
-    {
-        $value = 'prop';
-        $index = null;
-        $result = $this->call('arrayKey', array($value, &$index));
+        $value = '9';
+        $result = $this->call('pushKey', array($value));
         $this->assertFalse($result);
     }
 
@@ -88,7 +48,7 @@ class MethodsTest extends \JsonWorks\Tests\Base
     {
         $value = '-';
         $index = null;
-        $result = $this->call('arrayKey', array($value, &$index, true));
+        $result = $this->call('arrayKey', array($value, &$index));
         $this->assertTrue($result);
     }
 
@@ -96,7 +56,7 @@ class MethodsTest extends \JsonWorks\Tests\Base
     {
         $value = '67';
         $index = null;
-        $result = $this->call('arrayKey', array($value, &$index, true));
+        $result = $this->call('arrayKey', array($value, &$index));
         $this->assertTrue($result);
     }
 
@@ -104,7 +64,7 @@ class MethodsTest extends \JsonWorks\Tests\Base
     {
         $value = '-7';
         $index = null;
-        $result = $this->call('arrayKey', array($value, &$index, true));
+        $result = $this->call('arrayKey', array($value, &$index));
         $this->assertFalse($result);
     }
 
@@ -112,7 +72,7 @@ class MethodsTest extends \JsonWorks\Tests\Base
     {
         $value = 'prop';
         $index = null;
-        $result = $this->call('arrayKey', array($value, &$index, true));
+        $result = $this->call('arrayKey', array($value, &$index));
         $this->assertFalse($result);
     }
 }

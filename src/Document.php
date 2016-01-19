@@ -68,13 +68,7 @@ class Document
             return $result;
         }
 
-        if (is_null($this->data)) {
-            # data not initiated
-            $this->workingData = null;
-        } else {
-            # data exists so copy it
-            $this->workingData = $this->formatter->copy($this->data);
-        }
+        $this->workingData = $this->formatter->copy($this->data);
 
         # create any new keys and get referenced element
         if (!$this->workAdd($pointers, $arrayPush, $addKey)) {
@@ -235,20 +229,17 @@ class Document
 
     protected function pushKey($value)
     {
-        return (bool) preg_match('/^((-)|(0+))$/', $value);
+        return (bool) preg_match('/^((-)|(0))$/', $value);
     }
 
-    protected function arrayKey($value, &$index, $any = false)
+    protected function arrayKey($value, &$index)
     {
-        $index = null;
-
-        if ($any && '-' === $value) {
+        if ($value === '-') {
             $index = '-';
-        } elseif (preg_match('/^0*\d+$/', $value)) {
-            $index = (int) $value;
+            return true;
         }
 
-        return null !== $index;
+        return $this->finder->isArrayKey($value, $index);
     }
 
     protected function workAdd($pointers, &$arrayPush, &$addKey)
@@ -297,7 +288,7 @@ class Document
 
                 if (is_array($this->element)) {
 
-                    if ($this->arrayKey($key, $index, true)) {
+                    if ($this->arrayKey($key, $index)) {
                         $index = is_int($index) ? $index : count($this->element);
                         $arrayPush = $index === count($this->element);
                     }
