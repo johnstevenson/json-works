@@ -21,7 +21,6 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $value = 4;
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals(json_decode($expected), $document->data);
-        $this->assertEquals(3, $document->lastPushIndex);
     }
 
     public function testNewArrayValueIndex()
@@ -60,7 +59,6 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $value = 2;
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals(json_decode($expected), $document->data);
-        $this->assertEquals(0, $document->lastPushIndex);
     }
 
     public function testNewValue()
@@ -186,13 +184,11 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $value = array('firstName' => 'John');
         $this->assertTrue($document->addValue($path, $value));
 
-        $base = '/collection/'.$document->lastPushIndex;
-
-        $path = $base.'/lastName';
+        $path = '/collection/1/lastName';
         $value = 'Smith';
         $this->assertTrue($document->addValue($path, $value));
 
-        $path = $base.'/age';
+        $path = '/collection/1/age';
         $value = 24;
         $this->assertTrue($document->addValue($path, $value));
 

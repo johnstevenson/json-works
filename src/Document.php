@@ -11,7 +11,6 @@ class Document
     public $data;
     public $schema;
     public $lastError;
-    public $lastPushIndex;
 
     /**
     * @var Finder
@@ -55,7 +54,6 @@ class Document
     public function addValue($path, $value)
     {
         $this->lastError = null;
-        $this->lastPushIndex = 0;
         $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
         $value = $this->formatter->copy($value);
 
@@ -85,7 +83,7 @@ class Document
 
         # finally add passed-in value to referenced element
         if ($arrayPush) {
-            $this->lastPushIndex = array_push($this->element, $value) - 1;
+            array_push($this->element, $value);
         } elseif (null !== $addKey) {
             $this->element->$addKey = $value;
         } else {
