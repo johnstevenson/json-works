@@ -23,6 +23,7 @@ class Finder
     /**
     * Searches for and returns a reference to an element
     *
+    * @api
     * @param mixed $data
     * @param array $tokens Set to last known token on failure
     * @param bool $found Set by method
@@ -48,6 +49,7 @@ class Finder
     /**
     * Returns true if the token is a valid array key
     *
+    * @api
     * @param string $token
     * @param mixed $index Set to an integer on success
     */
@@ -63,7 +65,7 @@ class Finder
     }
 
     /**
-    * Returns true if a token is found at the data root
+    * Returns true if a token is found at the current data root
     *
     * A reference to the value is placed in $this->element
     *

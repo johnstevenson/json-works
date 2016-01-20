@@ -74,7 +74,7 @@ class GetValueTest extends \JsonWorks\Tests\Base
 
         $document = $this->getDocument($schema, $data);
 
-        # success tests
+        // success tests
         $path = '/prop1/firstName';
         $expected = 'Fred';
         $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
@@ -94,7 +94,7 @@ class GetValueTest extends \JsonWorks\Tests\Base
         $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
         $this->assertEquals($expected, $value);
 
-        # fail tests
+        // fail tests
         $path = '/prop1/lastName';
         $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
         $this->assertNull($value);
@@ -106,6 +106,5 @@ class GetValueTest extends \JsonWorks\Tests\Base
         $path = '/prop2/collection/3/0/firstName';
         $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
         $this->assertNull($value);
-
     }
 }

@@ -2,6 +2,7 @@
 
 namespace JohnStevenson\JsonWorks;
 
+use JohnStevenson\JsonWorks\Helpers\Builder;
 use JohnStevenson\JsonWorks\Helpers\Finder;
 use JohnStevenson\JsonWorks\Helpers\Formatter;
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
@@ -11,6 +12,11 @@ class Document
     public $data;
     public $schema;
     public $lastError;
+
+    /**
+    * @var Builder
+    */
+    protected $builder;
 
     /**
     * @var Finder
@@ -26,12 +32,14 @@ class Document
     * @var Tokenizer
     */
     protected $tokenizer;
+
     private $element;
     private $workingData;
     private $validator;
 
     public function __construct()
     {
+        $this->builder = new Builder();
         $this->finder = new Finder();
         $this->formatter = new Formatter();
         $this->tokenizer = new Tokenizer();
@@ -54,38 +62,12 @@ class Document
     public function addValue($path, $value)
     {
         $this->lastError = null;
-        $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
         $value = $this->formatter->copy($value);
 
-        if (empty($pointers)) {
-            # empty path, add value to root
-            if ($result = (is_object($value) || is_array($value)) && $this->checkData($value, true)) {
-                $this->data = $value;
-            } else {
-                $this->lastError = $this->lastError ?: 'Value must be an object or array';
-            }
-
-            return $result;
-        }
-
-        $this->workingData = $this->formatter->copy($this->data);
-
-        # create any new keys and get referenced element
-        if (!$this->workAdd($pointers, $arrayPush, $addKey)) {
-            return false;
-        }
-
-        # finally add passed-in value to referenced element
-        if ($arrayPush) {
-            array_push($this->element, $value);
-        } elseif (null !== $addKey) {
-            $this->element->$addKey = $value;
+        if ($result = $this->builder->add($this->data, $path, $value)) {
+            $this->data = $this->builder->getData();
         } else {
-            $this->element = $value;
-        }
-
-        if ($result = $this->checkData($this->workingData, true)) {
-            $this->data = $this->workingData;
+            $this->lastError = $this->builder->getError();
         }
 
         return $result;
@@ -98,12 +80,13 @@ class Document
 
     public function deleteValue($path)
     {
-        $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
+        if ($result = $this->hasValue($path, $dummy)) {
 
-        if ($result = $this->hasValue($pointers, $dummy)) {
-
+            $pointers = $this->tokenizer->decode($path);
             $key = array_pop($pointers);
-            $this->hasValue($pointers, $dummy);
+            $path = $this->tokenizer->encode($pointers);
+
+            $this->hasValue($path, $dummy);
 
             if (0 === strlen($key)) {
                 $this->loadData(null);
@@ -132,7 +115,7 @@ class Document
         $result = false;
         $value = null;
 
-        $pointers = is_array($path) ? $path : $this->tokenizer->decode($path);
+        $pointers = $this->tokenizer->decode($path);
 
         if ($this->workGet($pointers, false)) {
             $value = $this->formatter->copy($this->element);
@@ -225,99 +208,6 @@ class Document
         }
 
         return $result ? $input : false;
-    }
-
-    protected function pushKey($value)
-    {
-        return (bool) preg_match('/^((-)|(0))$/', $value);
-    }
-
-    protected function arrayKey($value, &$index)
-    {
-        if ($value === '-') {
-            $index = '-';
-            return true;
-        }
-
-        return $this->finder->isArrayKey($value, $index);
-    }
-
-    protected function workAdd($pointers, &$arrayPush, &$addKey)
-    {
-        $this->workGet($pointers, true);
-        $arrayPush = false;
-        $addKey  = null;
-
-        if (is_null($this->element)) {
-            if (!$this->workAddElement($pointers)) {
-                return false;
-            }
-        }
-
-        while (!empty($pointers)) {
-
-            $key = array_shift($pointers);
-
-            if (!empty($pointers)) {
-
-                if (is_array($this->element)) {
-
-                    if (!$this->pushKey($key)) {
-                        $this->lastError = 'Invalid array key';
-                        return false;
-                    }
-
-                    $this->element[0] = null;
-                    $this->element = &$this->element[0];
-                    if (!$this->workAddElement($pointers)) {
-                        return false;
-                    }
-
-                } else {
-
-                    $this->element->$key = null;
-                    $this->element = &$this->element->$key;
-
-                    if (!$this->workAddElement($pointers)) {
-                        return false;
-                    }
-                }
-
-            } else {
-                 # no more pointers. First check for array with final array key
-
-                if (is_array($this->element)) {
-
-                    if ($this->arrayKey($key, $index)) {
-                        $index = is_int($index) ? $index : count($this->element);
-                        $arrayPush = $index === count($this->element);
-                    }
-
-                    if (!$arrayPush) {
-                        $this->lastError = 'Bad array index';
-                        return false;
-                    }
-
-                } else {
-                    $addKey = $key;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    protected function workAddElement($pointers)
-    {
-        $arrayFirst = $this->pushKey($pointers[0]);
-        $this->element = $arrayFirst ? array() : new \stdClass();
-
-        if (!$result = $this->checkData($this->workingData, true)) {
-            $this->element = !$arrayFirst ? array() : new \stdClass();
-            $result = $this->checkData($this->workingData, true);
-        }
-
-        return $result;
     }
 
     protected function workGet(&$pointers, $forEdit)

@@ -126,40 +126,62 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $this->assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testObjectWithArrayPropertyNames()
+    public function testObjectWithNumericKey()
     {
-        $schema = '{
-            "type": "object",
-            "properties": {
-                "prop1": {
-                    "type": "object",
-                    "patternProperties":
-                    {
-                        "^[0-9]*$": {"$ref": "#/definitions/alphanum"},
-                        "^-{1,1}$": {"$ref": "#/definitions/alphanum"}
-                    }
-                }
-            },
-            "definitions":
-            {
-                "alphanum": {
-                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
-                }
-            }
+        $schema = null;
+
+        $expectedArray = '{
+            "prop1": ["myValue"]
         }';
 
-        $expected = '{
-            "prop1": {
-                "0": 1,
-                "-": "value"
-            }
+        $expectedObject = '{
+            "prop1": {"0": "myValue"}
         }';
 
-        $document = $this->getDocument($schema, null);
-        $path = '/prop1';
-        $value = json_decode('{"0": 1, "-": "value"}');
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals(json_decode($expected), $document->data);
+        $path = '/prop1/0';
+        $value = 'myValue';
+
+        $document = $this->getDocument(null, null);
+
+        $msg = 'Testing that an array is created';
+        $this->assertTrue($document->addValue($path, $value), $msg);
+        $this->assertEquals(json_decode($expectedArray), $document->data, $msg);
+
+        $data = '{"prop1": {}}';
+        $document = $this->getDocument($schema, $data);
+
+        $msg = 'Testing that the value is added to the object';
+        $this->assertTrue($document->addValue($path, $value), $msg);
+        $this->assertEquals(json_decode($expectedObject), $document->data, $msg);
+    }
+
+    public function testObjectWithPushKey()
+    {
+        $schema = null;
+
+        $expectedArray = '{
+            "prop1": ["myValue"]
+        }';
+
+        $expectedObject = '{
+            "prop1": {"-": "myValue"}
+        }';
+
+        $path = '/prop1/-';
+        $value = 'myValue';
+
+        $document = $this->getDocument(null, null);
+
+        $msg = 'Testing that an array is created';
+        $this->assertTrue($document->addValue($path, $value), $msg);
+        $this->assertEquals(json_decode($expectedArray), $document->data, $msg);
+
+        $data = '{"prop1": {}}';
+        $document = $this->getDocument($schema, $data);
+
+        $msg = 'Testing that the value is added to the object';
+        $this->assertTrue($document->addValue($path, $value), $msg);
+        $this->assertEquals(json_decode($expectedObject), $document->data, $msg);
     }
 
     public function testBuildObjectInArray()
@@ -181,7 +203,7 @@ class AddValueTest extends \JsonWorks\Tests\Base
 
         $document = $this->getDocument($schema, $data);
         $path = '/collection/-';
-        $value = array('firstName' => 'John');
+        $value = ['firstName' => 'John'];
         $this->assertTrue($document->addValue($path, $value));
 
         $path = '/collection/1/lastName';

@@ -4,12 +4,11 @@ namespace JsonWorks\Tests\Document;
 
 class AddValueRootTest extends \JsonWorks\Tests\Base
 {
-
     public function testObjectNoSchema()
     {
         $document = $this->getDocument(null, null);
         $path = '';
-        $value = (object) array('prop1' => 1, 'prop2' => 'value');
+        $value = (object) ['prop1' => 1, 'prop2' => 'value'];
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals($value, $document->data);
     }
@@ -33,31 +32,7 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
 
         $document = $this->getDocument($schema, null);
         $path = '';
-        $value = (object) array('prop1' => 1, 'prop2' => 'value');
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($value, $document->data);
-    }
-
-    public function testObjectWithArrayPropertyNames()
-    {
-        $schema = '{
-            "type" : "object",
-            "patternProperties":
-            {
-                "^[0-9]*$": {"$ref": "#/definitions/alphanum"},
-                "^-{1,1}$": {"$ref": "#/definitions/alphanum"}
-            },
-            "definitions":
-            {
-                "alphanum": {
-                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
-                }
-            }
-        }';
-
-        $document = $this->getDocument($schema, null);
-        $path = '';
-        $value = json_decode('{"0": 1, "-": "value"}');
+        $value = (object) ['prop1' => 1, 'prop2' => 'value'];
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals($value, $document->data);
     }
@@ -66,7 +41,7 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
     {
         $document = $this->getDocument(null, null);
         $path = '';
-        $value = array(1, 'value');
+        $value = [1, 'value'];
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals($value, $document->data);
     }
@@ -83,7 +58,7 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
 
         $document = $this->getDocument($schema, null);
         $path = '';
-        $value = array(1, 'value');
+        $value = [1, 'value'];
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals($value, $document->data);
     }
@@ -113,7 +88,7 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/-';
         $value = 1;
-        $expected = array($value);
+        $expected = [$value];
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals($expected, $document->data);
     }
@@ -133,7 +108,7 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/-/-';
         $value = 1;
-        $expected = array(array($value));
+        $expected = [[$value]];
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals($expected, $document->data);
     }

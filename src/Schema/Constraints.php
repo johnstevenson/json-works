@@ -22,6 +22,14 @@ class Constraints
 
     public function validate($data, $schema, $key = null)
     {
+        if (is_null($schema)) {
+            throw new \RuntimeException('Schema is null');
+        }
+
+        if (0 === count(get_object_vars($schema))) {
+            return;
+        }
+
         $this->path = $this->tokenizer->add($this->path, $key);
 
         $this->validateCommon($data, $schema);

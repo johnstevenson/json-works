@@ -19,29 +19,29 @@ class Tokenizer
     * Adds a token to an existing JSON Pointer
     *
     * @api
-    * @param string $path The existing JSON Pointer
+    * @param string $pointer The existing JSON Pointer
     * @param string $token The token to add
     * @return string The new JSON Pointer
     */
-    public function add($path, $token)
+    public function add($pointer, $token)
     {
         if (strlen($encoded = $this->encodeToken($token))) {
             $encoded = '/'.$encoded;
         }
 
-        return $path.$encoded;
+        return $pointer.$encoded;
     }
 
     /**
     * Splits a JSON Pointer into individual tokens
     *
     * @api
-    * @param string $path The JSON Pointer to split
+    * @param string $pointer The JSON Pointer to split
     * @return array The decoded tokens
     */
-    public function decode($path)
+    public function decode($pointer)
     {
-        $tokens = explode('/', $path);
+        $tokens = explode('/', $pointer);
         array_shift($tokens);
 
         foreach ($tokens as &$value) {

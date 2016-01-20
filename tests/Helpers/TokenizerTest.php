@@ -13,25 +13,47 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         $this->tokenizer = new Tokenizer();
     }
 
-    public function testAddToPath()
+    public function testAddPlain()
     {
-        $path = '/key1';
-        $value = 'key2';
-        $expected = '/key1/key2';
+        $path = '/prop1';
+        $value = 'prop2';
+        $expected = '/prop1/prop2';
         $this->assertEquals($expected, $this->tokenizer->add($path, $value));
-
     }
 
-    public function testAddToPathEmpty()
+    public function testAddWithSlash()
+    {
+        $path = '/prop1';
+        $value = 'name/with/slash';
+        $expected = '/prop1/name~1with~1slash';
+        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+    }
+
+    public function testAddWithTilde()
+    {
+        $path = '/prop1';
+        $value = 'name~with~tilde';
+        $expected = '/prop1/name~0with~0tilde';
+        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+    }
+
+    public function testAddWithSlashAndTilde()
+    {
+        $path = '/prop1';
+        $value = 'name/with/slash~and~tilde';
+        $expected = '/prop1/name~1with~1slash~0and~0tilde';
+        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+    }
+
+    public function testAddPathEmpty()
     {
         $path = '';
-        $value = 'key1';
-        $expected = '/key1';
+        $value = 'prop1';
+        $expected = '/prop1';
         $this->assertEquals($expected, $this->tokenizer->add($path, $value));
-
     }
 
-    public function testAddToPathEmptyWithEmpty()
+    public function testAddPathEmptyWithEmpty()
     {
         $path = '';
         $value = '';
@@ -39,7 +61,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testAddToPathEmptyWithZero()
+    public function testAddPathEmptyWithZero()
     {
         $path = '';
         $value = '0';
@@ -49,8 +71,8 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDecodePathPlain()
     {
-        $value = '/key1/key2/key3';
-        $expected = array('key1', 'key2', 'key3');
+        $value = '/prop1/prop2/prop3';
+        $expected = array('prop1', 'prop2', 'prop3');
         $this->assertEquals($expected, $this->tokenizer->decode($value));
     }
 
