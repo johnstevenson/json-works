@@ -93,7 +93,7 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $this->assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testReplaceValue()
+    public function testReplaceObjectValue()
     {
         $schema = null;
 
@@ -103,6 +103,39 @@ class AddValueTest extends \JsonWorks\Tests\Base
                     "inner2": {
                         "prop1": "string",
                         "prop2": false
+                    }
+                }
+            }
+        }';
+
+        $expected = '{
+            "prop1": {
+                "inner1": {
+                    "inner2": {
+                        "prop1": "string",
+                        "prop2": true
+                    }
+                }
+            }
+        }';
+
+        $document = $this->getDocument($schema, $data);
+        $path = '/prop1/inner1/inner2/prop2';
+        $value = true;
+        $this->assertTrue($document->addValue($path, $value));
+        $this->assertEquals(json_decode($expected), $document->data);
+    }
+
+    public function testReplaceObjectNullValue()
+    {
+        $schema = null;
+
+        $data = '{
+            "prop1": {
+                "inner1": {
+                    "inner2": {
+                        "prop1": "string",
+                        "prop2": null
                     }
                 }
             }

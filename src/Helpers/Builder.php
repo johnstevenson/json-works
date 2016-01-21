@@ -64,26 +64,28 @@ class Builder
         $this->tokenizer = new Tokenizer();
     }
 
-    public function add($data, $pointer, $value)
+    public function add(&$data, $path, $value)
     {
-        $this->init($data, $pointer);
+        $this->init($data, $path);
 
         if (empty($this->tokens)) {
-            return $this->addToRoot($value);
+            $result = $this->checkRoot($value);
+        } else {
+            $result = $this->addElements();
         }
 
-        if (!$this->addElements()) {
-            return false;
+        if ($result) {
+            $this->addToData($value);
         }
 
-        $this->addToData($value);
+        $data = $this->data;
 
-        return true;
+        return $result;
     }
 
-    public function getData()
+    public function remove(&$data, $path)
     {
-        return $this->data;
+
     }
 
     public function getError()
@@ -91,26 +93,24 @@ class Builder
         return $this->error;
     }
 
-    protected function init($data, $pointer)
+    protected function init($data, $path)
     {
         $this->data = $data;
         $this->element =& $this->data;
-        $this->tokens = $this->tokenizer->decode($pointer);
+        $this->tokens = $this->tokenizer->decode($path);
         $this->error = '';
         $this->newProperty = '';
         $this->arrayPush = false;
     }
 
-    protected function addToRoot($value)
+    protected function checkRoot($value)
     {
-        if (!(is_object($value) || is_array($value))) {
-            $this->error = 'Value must be an object or array';
-            return false;
+        if (is_object($value) || is_array($value)) {
+            return true;
         }
 
-        $this->data = $value;
-
-        return true;
+        $this->error = 'Value must be an object or array';
+        return false;
     }
 
     protected function addToData($value)
@@ -129,7 +129,7 @@ class Builder
     {
         $this->element =& $this->finder->get($this->element, $this->tokens, $found);
 
-        if (is_null($this->element)) {
+        if (is_null($this->element) && !empty($this->tokens)) {
             $this->addContainer($this->tokens[0]);
         }
 

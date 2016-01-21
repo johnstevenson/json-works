@@ -61,9 +61,7 @@ class Document
         $this->lastError = null;
         $value = $this->formatter->copy($value);
 
-        if ($result = $this->builder->add($this->data, $path, $value)) {
-            $this->data = $this->builder->getData();
-        } else {
+        if (!$result = $this->builder->add($this->data, $path, $value)) {
             $this->lastError = $this->builder->getError();
         }
 
@@ -85,8 +83,7 @@ class Document
             if (0 === strlen($lastKey)) {
                 $this->data = null;
             } elseif (is_array($parent)) {
-                $key = (int) $lastKey;
-                array_splice($parent, $lastKey, 1);
+                array_splice($parent, (int) $lastKey, 1);
             } elseif (is_object($parent)) {
                 unset($parent->$lastKey);
             }
