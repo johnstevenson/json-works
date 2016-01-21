@@ -72,6 +72,7 @@ class Builder
         $parent =& $this->finder->getParent($path, $data, $found, $lastKey);
 
         if ($found) {
+
             if (0 === strlen($lastKey)) {
                 $data = null;
             } elseif (is_array($parent)) {

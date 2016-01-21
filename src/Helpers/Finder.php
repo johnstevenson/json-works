@@ -43,7 +43,7 @@ class Finder
     }
 
     /**
-    * Returns true if an element if found
+    * Returns true if an element is found
     *
     * @param string $path
     * @param mixed $data
@@ -127,19 +127,26 @@ class Finder
         return $index !== null;
     }
 
+    /**
+    * Searches through the data
+    *
+    * @param array $tokens Set and reduced by method
+    * @param bool $found Set by method
+    */
     protected function search(&$tokens, &$found)
     {
         while (!empty($tokens)) {
             $token = $tokens[0];
 
+            if (count($tokens) === 1) {
+                $this->parent =& $this->element;
+                $this->lastKey = $token;
+            }
+
             if (!$found = $this->findContainer($token)) {
                 break;
             }
 
-            if (count($tokens) === 2) {
-                $this->parent =& $this->element;
-                $this->lastKey = $tokens[1];
-            }
             array_shift($tokens);
         }
     }
