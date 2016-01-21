@@ -4,7 +4,6 @@ namespace JohnStevenson\JsonWorks;
 
 use JohnStevenson\JsonWorks\Helpers\Builder;
 use JohnStevenson\JsonWorks\Helpers\Finder;
-use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class Document extends BaseDocument
 {
@@ -18,18 +17,11 @@ class Document extends BaseDocument
     */
     protected $finder;
 
-    /**
-    * @var Tokenizer
-    */
-    protected $tokenizer;
-
     public function __construct()
     {
         parent::__construct();
-
         $this->builder = new Builder();
         $this->finder = new Finder();
-        $this->tokenizer = new Tokenizer();
     }
 
     public function addValue($path, $value)
