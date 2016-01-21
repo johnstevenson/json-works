@@ -21,6 +21,16 @@ class Finder
     protected $element;
 
     /**
+    * @var mixed
+    */
+    protected $parent;
+
+    /**
+    * @var string
+    */
+    protected $lastKey;
+
+    /**
     * Searches for and returns a reference to an element
     *
     * @api
@@ -32,18 +42,27 @@ class Finder
     public function &get(&$data, &$tokens, &$found)
     {
         $this->element =& $data;
+        $found = empty($tokens);
 
-        while (!empty($tokens)) {
-            $token = $tokens[0];
-
-            if (!$found = $this->find($token)) {
-                break;
-            }
-
-            array_shift($tokens);
+        if (!$found) {
+            $this->find($tokens, $found);
         }
 
         return $this->element;
+    }
+
+    public function &getParent(&$data, &$tokens, &$found, &$lastKey)
+    {
+        $this->parent =& $data;
+        $this->lastKey = '';
+
+        $this->get($data, $tokens, $found);
+
+        if ($found) {
+            $lastKey = $this->lastKey;
+        }
+
+        return $this->parent;
     }
 
     /**
@@ -64,6 +83,23 @@ class Finder
         return $index !== null;
     }
 
+    protected function find(&$tokens, &$found)
+    {
+        while (!empty($tokens)) {
+            $token = $tokens[0];
+
+            if (!$found = $this->findContainer($token)) {
+                break;
+            }
+
+            if (count($tokens) === 2) {
+                $this->parent =& $this->element;
+                $this->lastKey = $tokens[1];
+            }
+            array_shift($tokens);
+        }
+    }
+
     /**
     * Returns true if a token is found at the current data root
     *
@@ -72,7 +108,7 @@ class Finder
     * @param string $token
     * @return bool
     */
-    protected function find($token)
+    protected function findContainer($token)
     {
         $found = false;
         $type = gettype($this->element);

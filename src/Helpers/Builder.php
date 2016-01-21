@@ -58,11 +58,6 @@ class Builder
     */
     protected $arrayPush;
 
-    /**
-    * Constructor
-    *
-    * @param callback $checkCallback
-    */
     public function __construct()
     {
         $this->finder = new Finder();

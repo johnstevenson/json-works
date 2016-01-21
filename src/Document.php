@@ -33,8 +33,6 @@ class Document
     */
     protected $tokenizer;
 
-    private $element;
-    private $workingData;
     private $validator;
 
     public function __construct()
@@ -49,7 +47,6 @@ class Document
     {
         $data = $this->getInput($data, false, $noException);
         $this->data = $data ? $this->formatter->copy($data) : null;
-        $this->workingData = null;
         return empty($this->lastError);
     }
 
@@ -80,25 +77,22 @@ class Document
 
     public function deleteValue($path)
     {
-        if ($result = $this->hasValue($path, $dummy)) {
+        $tokens = $this->tokenizer->decode($path);
 
-            $pointers = $this->tokenizer->decode($path);
-            $key = array_pop($pointers);
-            $path = $this->tokenizer->encode($pointers);
+        $parent =& $this->finder->getParent($this->data, $tokens, $found, $lastKey);
 
-            $this->hasValue($path, $dummy);
-
-            if (0 === strlen($key)) {
-                $this->loadData(null);
-            } elseif (is_array($this->element)) {
-                $key = (int) $key;
-                array_splice($this->element, $key, 1);
-            } elseif (is_object($this->element)) {
-                unset($this->element->$key);
+        if ($found) {
+            if (0 === strlen($lastKey)) {
+                $this->data = null;
+            } elseif (is_array($parent)) {
+                $key = (int) $lastKey;
+                array_splice($parent, $lastKey, 1);
+            } elseif (is_object($parent)) {
+                unset($parent->$lastKey);
             }
         }
 
-        return $result;
+        return $found;
     }
 
     public function getValue($path, $default = null)
@@ -112,17 +106,16 @@ class Document
 
     public function hasValue($path, &$value)
     {
-        $result = false;
+        $tokens = $this->tokenizer->decode($path);
         $value = null;
 
-        $pointers = $this->tokenizer->decode($path);
+        $element =& $this->finder->get($this->data, $tokens, $found);
 
-        if ($this->workGet($pointers, false)) {
-            $value = $this->formatter->copy($this->element);
-            $result = true;
+        if ($found) {
+            $value = $this->formatter->copy($element);
         }
 
-        return $result;
+        return $found;
     }
 
     public function moveValue($fromPath, $toPath)
@@ -208,19 +201,6 @@ class Document
         }
 
         return $result ? $input : false;
-    }
-
-    protected function workGet(&$pointers, $forEdit)
-    {
-        if ($forEdit) {
-            $this->element = &$this->workingData;
-        } else {
-            $this->element = &$this->data;
-        }
-
-        $this->element =& $this->finder->get($this->element, $pointers, $found);
-
-        return $found;
     }
 
     protected function workMove($fromPath, $toPath, $delete)
