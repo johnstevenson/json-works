@@ -51,21 +51,7 @@ class Document extends BaseDocument
 
     public function deleteValue($path)
     {
-        $tokens = $this->tokenizer->decode($path);
-
-        $parent =& $this->finder->getParent($this->data, $tokens, $found, $lastKey);
-
-        if ($found) {
-            if (0 === strlen($lastKey)) {
-                $this->data = null;
-            } elseif (is_array($parent)) {
-                array_splice($parent, (int) $lastKey, 1);
-            } elseif (is_object($parent)) {
-                unset($parent->$lastKey);
-            }
-        }
-
-        return $found;
+        return $this->builder->remove($this->data, $path);
     }
 
     public function getValue($path, $default = null)
@@ -79,16 +65,13 @@ class Document extends BaseDocument
 
     public function hasValue($path, &$value)
     {
-        $tokens = $this->tokenizer->decode($path);
         $value = null;
 
-        $element =& $this->finder->get($this->data, $tokens, $found);
-
-        if ($found) {
+        if ($result = $this->finder->find($path, $this->data, $element)) {
             $value = $this->formatter->copy($element);
         }
 
-        return $found;
+        return $result;
     }
 
     public function moveValue($fromPath, $toPath)

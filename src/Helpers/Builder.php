@@ -68,24 +68,40 @@ class Builder
     {
         $this->init($data, $path);
 
+        /*
         if (empty($this->tokens)) {
             $result = $this->checkRoot($value);
         } else {
             $result = $this->addElements();
         }
+        */
 
-        if ($result) {
-            $this->addToData($value);
+        if (!$this->addElements()) {
+            return false;
         }
 
-        $data = $this->data;
+        if ($result = $this->addToData($value)) {
+            $data = $this->data;
+        }
 
         return $result;
     }
 
     public function remove(&$data, $path)
     {
+        $parent =& $this->finder->getParent($path, $data, $found, $lastKey);
 
+        if ($found) {
+            if (0 === strlen($lastKey)) {
+                $data = null;
+            } elseif (is_array($parent)) {
+                array_splice($parent, (int) $lastKey, 1);
+            } elseif (is_object($parent)) {
+                unset($parent->$lastKey);
+            }
+        }
+
+        return $found;
     }
 
     public function getError()
@@ -113,6 +129,18 @@ class Builder
         return false;
     }
 
+    protected function addToRoot($value)
+    {
+        if (!(is_object($value) || is_array($value))) {
+            $this->error = 'Value must be an object or array';
+            return false;
+        }
+
+        $this->element = $value;
+
+        return true;
+    }
+
     protected function addToData($value)
     {
         if ($this->arrayPush) {
@@ -120,9 +148,13 @@ class Builder
         } elseif (strlen($this->newProperty)) {
             $key = $this->newProperty;
             $this->element->$key = $value;
+        } elseif ($this->data === $this->element) {
+            return $this->addToRoot($value);
         } else {
             $this->element = $value;
         }
+
+        return true;
     }
 
     protected function addElements()

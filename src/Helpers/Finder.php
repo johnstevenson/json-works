@@ -10,11 +10,18 @@
 
 namespace JohnStevenson\JsonWorks\Helpers;
 
+use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+
 /**
 * A class for finding a value using JSON Pointers
 */
 class Finder
 {
+    /**
+    * @var Tokenizer
+    */
+    protected $tokenizer;
+
     /**
     * @var mixed
     */
@@ -29,6 +36,31 @@ class Finder
     * @var string
     */
     protected $lastKey;
+
+    public function __construct()
+    {
+        $this->tokenizer = new Tokenizer();
+    }
+
+    /**
+    * Returns true if an element if found
+    *
+    * @param string $path
+    * @param mixed $data
+    * @param mixed $element Set by method if found
+    * @return bool
+    */
+    public function find($path, $data, &$element)
+    {
+        $tokens = $this->tokenizer->decode($path);
+        $this->get($data, $tokens, $found);
+
+        if ($found) {
+            $element = $this->element;
+        }
+
+        return $found;
+    }
 
     /**
     * Searches for and returns a reference to an element
@@ -45,14 +77,25 @@ class Finder
         $found = empty($tokens);
 
         if (!$found) {
-            $this->find($tokens, $found);
+            $this->search($tokens, $found);
         }
 
         return $this->element;
     }
 
-    public function &getParent(&$data, &$tokens, &$found, &$lastKey)
+    /**
+    * Searches for and returns a reference to a parent element
+    *
+    * @api
+    * @param string $path
+    * @param mixed $data
+    * @param bool $found Set by method
+    * @param mixed $lastKey Set by method
+    * @return mixed A reference to the parent element
+    */
+    public function &getParent($path, &$data, &$found, &$lastKey)
     {
+        $tokens = $this->tokenizer->decode($path);
         $this->parent =& $data;
         $this->lastKey = '';
 
@@ -83,7 +126,7 @@ class Finder
         return $index !== null;
     }
 
-    protected function find(&$tokens, &$found)
+    protected function search(&$tokens, &$found)
     {
         while (!empty($tokens)) {
             $token = $tokens[0];
