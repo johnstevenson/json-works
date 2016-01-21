@@ -11,7 +11,6 @@
 namespace JohnStevenson\JsonWorks\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\Finder;
-use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 /**
 * A class for building json
@@ -24,11 +23,6 @@ class Builder
     protected $finder;
 
     /**
-    * @var Tokenizer
-    */
-    protected $tokenizer;
-
-    /**
     * @var object|array|null
     */
     protected $data;
@@ -37,11 +31,6 @@ class Builder
     * @var mixed
     */
     protected $element;
-
-    /**
-    * @var array
-    */
-    protected $tokens;
 
     /**
     * @var string
@@ -61,22 +50,13 @@ class Builder
     public function __construct()
     {
         $this->finder = new Finder();
-        $this->tokenizer = new Tokenizer();
     }
 
     public function add(&$data, $path, $value)
     {
-        $this->init($data, $path);
+        $this->initAdd($data);
 
-        /*
-        if (empty($this->tokens)) {
-            $result = $this->checkRoot($value);
-        } else {
-            $result = $this->addElements();
-        }
-        */
-
-        if (!$this->addElements()) {
+        if (!$this->addElements($path)) {
             return false;
         }
 
@@ -109,24 +89,13 @@ class Builder
         return $this->error;
     }
 
-    protected function init($data, $path)
+    protected function initAdd($data)
     {
         $this->data = $data;
         $this->element =& $this->data;
-        $this->tokens = $this->tokenizer->decode($path);
         $this->error = '';
         $this->newProperty = '';
         $this->arrayPush = false;
-    }
-
-    protected function checkRoot($value)
-    {
-        if (is_object($value) || is_array($value)) {
-            return true;
-        }
-
-        $this->error = 'Value must be an object or array';
-        return false;
     }
 
     protected function addToRoot($value)
@@ -157,19 +126,19 @@ class Builder
         return true;
     }
 
-    protected function addElements()
+    protected function addElements($path)
     {
-        $this->element =& $this->finder->get($this->element, $this->tokens, $found);
+        $this->element =& $this->finder->get($path, $this->element, $tokens, $found);
 
-        if (is_null($this->element) && !empty($this->tokens)) {
-            $this->addContainer($this->tokens[0]);
+        if (is_null($this->element) && !empty($tokens)) {
+            $this->addContainer($tokens[0]);
         }
 
-        while (!empty($this->tokens)) {
+        while (!empty($tokens)) {
 
-            $key = array_shift($this->tokens);
+            $key = array_shift($tokens);
 
-            if (!empty($this->tokens)) {
+            if (!empty($tokens)) {
 
                 if (is_array($this->element)) {
 
@@ -180,13 +149,13 @@ class Builder
 
                     $this->element[0] = null;
                     $this->element = &$this->element[0];
-                    $this->addContainer($this->tokens[0]);
+                    $this->addContainer($tokens[0]);
 
                 } else {
 
                     $this->element->$key = null;
                     $this->element = &$this->element->$key;
-                    $this->addContainer($this->tokens[0]);
+                    $this->addContainer($tokens[0]);
                 }
 
             } else {

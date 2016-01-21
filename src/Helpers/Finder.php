@@ -52,8 +52,7 @@ class Finder
     */
     public function find($path, $data, &$element)
     {
-        $tokens = $this->tokenizer->decode($path);
-        $this->get($data, $tokens, $found);
+        $this->get($path, $data, $tokens, $found);
 
         if ($found) {
             $element = $this->element;
@@ -66,14 +65,17 @@ class Finder
     * Searches for and returns a reference to an element
     *
     * @api
+    * @param string $path
     * @param mixed $data
-    * @param array $tokens Set to last known token on failure
+    * @param array $tokens Set to last known tokens on failure
     * @param bool $found Set by method
     * @return mixed A reference to the found element
     */
-    public function &get(&$data, &$tokens, &$found)
+    public function &get($path, &$data, &$tokens, &$found)
     {
         $this->element =& $data;
+
+        $tokens = $this->tokenizer->decode($path);
         $found = empty($tokens);
 
         if (!$found) {
@@ -95,11 +97,10 @@ class Finder
     */
     public function &getParent($path, &$data, &$found, &$lastKey)
     {
-        $tokens = $this->tokenizer->decode($path);
         $this->parent =& $data;
         $this->lastKey = '';
 
-        $this->get($data, $tokens, $found);
+        $this->get($path, $data, $tokens, $found);
 
         if ($found) {
             $lastKey = $this->lastKey;
