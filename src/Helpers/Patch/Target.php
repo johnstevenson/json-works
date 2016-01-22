@@ -67,4 +67,16 @@ class Target
         $this->tokens = $tokens;
         $this->found = empty($this->tokens);
     }
+
+    public function setArray(array $array, $index)
+    {
+        $this->arrayKey = $index;
+        $this->type = $index < count($array) ? self::TYPE_ARRAYKEY : self::TYPE_PUSH;
+    }
+
+    public function setObject($key)
+    {
+        $this->type = self::TYPE_PROPKEY;
+        $this->propKey = $key;
+    }
 }

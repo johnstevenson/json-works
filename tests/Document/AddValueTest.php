@@ -42,6 +42,34 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $this->assertEquals(json_decode($expected), $document->data);
     }
 
+    public function testNewArrayValueIndexInvalid1()
+    {
+        $schema = null;
+
+        $data = '{
+            "collection": []
+        }';
+
+        $document = $this->getDocument($schema, $data);
+        $path = '/collection/prop1/-';
+        $value = 4;
+        $this->assertFalse($document->addValue($path, $value));
+    }
+
+    public function testNewArrayValueIndexInvalid2()
+    {
+        $schema = null;
+
+        $data = '{
+            "collection": [1, [1, 2, 3], 2, 3]
+        }';
+
+        $document = $this->getDocument($schema, $data);
+        $path = '/collection/1/4';
+        $value = 4;
+        $this->assertFalse($document->addValue($path, $value));
+    }
+
     public function testReplaceArrayValue()
     {
         $schema = null;

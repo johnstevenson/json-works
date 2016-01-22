@@ -76,24 +76,30 @@ class Builder
 
     protected function setTarget(Target &$target, $key)
     {
-        // We have created the element, so it will either be an array or object
         if (is_array($this->element)) {
-            $target->type = Target::TYPE_PUSH;
+
+            if (!$this->checkArrayKey($this->element, $key, $index)) {
+                throw new InvalidArgumentException(sprintf('Invalid array key: /%s', $key));
+            }
+
+            $target->setArray($this->element, $index);
+
         } else {
-            $target->type = Target::TYPE_PROPKEY;
-            $target->propKey = $key;
+            $target->setObject($key);
         }
     }
 
-    protected function isPushKey($value)
+    protected function isPushKey($key)
     {
-        return (bool) preg_match('/^((-)|(0))$/', $value);
+        return (bool) preg_match('/^((-)|(0))$/', $key);
     }
 
-    protected function isArrayKey($value, &$index)
+    protected function checkArrayKey($array, $key, &$index)
     {
-        if ($result = preg_match('/^(?:(-)|(0)|([1-9]\d*))$/', $value, $matches)) {
-            $index = count($matches) > 2 ? (int) $value : $value;
+        if ($result = preg_match('/^(?:(-)|(0)|([1-9]\d*))$/', $key, $matches)) {
+            $count = count($array);
+            $index = count($matches) > 2 ? (int) $key : $count;
+            $result = $index <= $count;
         }
 
         return (bool) $result;
