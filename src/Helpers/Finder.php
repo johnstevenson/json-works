@@ -11,6 +11,7 @@
 namespace JohnStevenson\JsonWorks\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
 /**
 * A class for finding a value using JSON Pointers
@@ -27,16 +28,6 @@ class Finder
     */
     protected $element;
 
-    /**
-    * @var mixed
-    */
-    protected $parent;
-
-    /**
-    * @var string
-    */
-    protected $lastKey;
-
     public function __construct()
     {
         $this->tokenizer = new Tokenizer();
@@ -52,13 +43,14 @@ class Finder
     */
     public function find($path, $data, &$element)
     {
-        $this->get($path, $data, $tokens, $found);
+        $target = new Target();
+        $this->get($path, $data, $target);
 
-        if ($found) {
+        if ($target->found) {
             $element = $this->element;
         }
 
-        return $found;
+        return $target->found;
     }
 
     /**
@@ -67,46 +59,20 @@ class Finder
     * @api
     * @param string $path
     * @param mixed $data
-    * @param array $tokens Set to last known tokens on failure
-    * @param bool $found Set by method
+    * @param Target $target Modified by method
     * @return mixed A reference to the found element
     */
-    public function &get($path, &$data, &$tokens, &$found)
+    public function &get($path, &$data, Target &$target)
     {
         $this->element =& $data;
 
-        $tokens = $this->tokenizer->decode($path);
-        $found = empty($tokens);
+        $target->setTokens($this->tokenizer->decode($path));
 
-        if (!$found) {
-            $this->search($tokens, $found);
+        if (!$target->found) {
+            $this->search($target);
         }
 
         return $this->element;
-    }
-
-    /**
-    * Searches for and returns a reference to a parent element
-    *
-    * @api
-    * @param string $path
-    * @param mixed $data
-    * @param bool $found Set by method
-    * @param mixed $lastKey Set by method
-    * @return mixed A reference to the parent element
-    */
-    public function &getParent($path, &$data, &$found, &$lastKey)
-    {
-        $this->parent =& $data;
-        $this->lastKey = '';
-
-        $this->get($path, $data, $tokens, $found);
-
-        if ($found) {
-            $lastKey = $this->lastKey;
-        }
-
-        return $this->parent;
     }
 
     /**
@@ -128,24 +94,23 @@ class Finder
     /**
     * Searches through the data
     *
-    * @param array $tokens Set and reduced by method
-    * @param bool $found Set by method
+    * @param Target $target Modified by method
     */
-    protected function search(&$tokens, &$found)
+    protected function search(Target &$target)
     {
-        while (!empty($tokens)) {
-            $token = $tokens[0];
+        while (!empty($target->tokens)) {
+            $token = $target->tokens[0];
 
-            if (count($tokens) === 1) {
-                $this->parent =& $this->element;
-                $this->lastKey = $token;
+            if (count($target->tokens) === 1) {
+                $target->parent =& $this->element;
+                $target->lastKey = $token;
             }
 
-            if (!$found = $this->findContainer($token)) {
+            if (!$target->found = $this->findContainer($token)) {
                 break;
             }
 
-            array_shift($tokens);
+            array_shift($target->tokens);
         }
     }
 

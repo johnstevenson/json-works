@@ -10,6 +10,7 @@
 
 namespace JohnStevenson\JsonWorks\Helpers\Patch;
 
+use InvalidArgumentException;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
 class Builder
@@ -19,15 +20,15 @@ class Builder
     */
     protected $element;
 
-    public function &add($tokens, &$data, Target &$target)
+    public function &add(&$data, Target &$target)
     {
         $this->element =& $data;
 
-        if (is_null($this->element) && !empty($tokens)) {
-            $this->addContainer($tokens[0]);
+        if (is_null($this->element) && !empty($target->tokens)) {
+            $this->addContainer($target->tokens[0]);
         }
 
-        $this->processTokens($tokens, $target);
+        $this->processTokens($target->tokens, $target);
 
         return $this->element;
     }
@@ -58,7 +59,7 @@ class Builder
         if (is_array($this->element)) {
 
             if (!$this->isPushKey($key)) {
-                $this->throwError('Invalid array key');
+                throw new InvalidArgumentException(sprintf('Invalid array key: /%s', $key));
             }
 
             $this->element[0] = null;
@@ -96,10 +97,5 @@ class Builder
         }
 
         return (bool) $result;
-    }
-
-    protected function throwError($msg)
-    {
-        throw new BuildException($msg);
     }
 }

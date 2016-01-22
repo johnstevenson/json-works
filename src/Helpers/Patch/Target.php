@@ -18,6 +18,11 @@ class Target
     const TYPE_PUSH = 3;
 
     /**
+    * @var bool
+    */
+    public $found;
+
+    /**
     * @var integer
     */
     public $type;
@@ -32,10 +37,34 @@ class Target
     */
     public $propKey;
 
+    /**
+    * @var array
+    */
+    public $tokens;
+
+    /**
+    * @var string
+    */
+    public $lastKey;
+
+    /**
+    * @var mixed
+    */
+    public $parent;
+
     public function __construct()
     {
+        $this->found = false;
         $this->type = self::TYPE_SCALAR;
         $this->arrayKey = 0;
         $this->propKey = '';
+        $this->tokens = [];
+        $this->lastKey = '';
+    }
+
+    public function setTokens($tokens)
+    {
+        $this->tokens = $tokens;
+        $this->found = empty($this->tokens);
     }
 }

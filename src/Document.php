@@ -8,11 +8,6 @@ use JohnStevenson\JsonWorks\Helpers\Finder;
 class Document extends BaseDocument
 {
     /**
-    * @var Helpers\Patcher
-    */
-    protected $patcher;
-
-    /**
     * @var Helpers\Finder
     */
     protected $finder;
@@ -20,7 +15,6 @@ class Document extends BaseDocument
     public function __construct()
     {
         parent::__construct();
-        $this->patcher = new Patcher();
         $this->finder = new Finder();
     }
 
@@ -28,9 +22,10 @@ class Document extends BaseDocument
     {
         $this->lastError = null;
         $value = $this->formatter->copy($value);
+        $patcher = new Patcher();
 
-        if (!$result = $this->patcher->add($this->data, $path, $value)) {
-            $this->lastError = $this->patcher->getError();
+        if (!$result = $patcher->add($this->data, $path, $value)) {
+            $this->lastError = $patcher->getError();
         }
 
         return $result;
@@ -43,7 +38,9 @@ class Document extends BaseDocument
 
     public function deleteValue($path)
     {
-        return $this->patcher->remove($this->data, $path);
+        $patcher = new Patcher();
+
+        return $patcher->remove($this->data, $path);
     }
 
     public function getValue($path, $default = null)
