@@ -10,7 +10,7 @@ php:
   - hhvm
 
 before_script:
-  - composer config -g github-oauth.github.com GITHUB_OAUTH
+  - composer config -g github-oauth.github.com "$GITHUB_OAUTH"
   - composer install -n
 
 script:
