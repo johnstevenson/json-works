@@ -118,13 +118,11 @@ class Finder
     */
     public function isArrayKey($token, &$index)
     {
-        $index = null;
-
-        if (preg_match('/^((0)|([1-9]\d*))$/', $token)) {
+        if ($result = preg_match('/^((0)|([1-9]\d*))$/', $token)) {
             $index = (int) $token;
         }
 
-        return $index !== null;
+        return (bool) $result;
     }
 
     /**
