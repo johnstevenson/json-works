@@ -2,25 +2,25 @@
 
 namespace JohnStevenson\JsonWorks;
 
-use JohnStevenson\JsonWorks\Helpers\Builder;
+use JohnStevenson\JsonWorks\Helpers\Patcher;
 use JohnStevenson\JsonWorks\Helpers\Finder;
 
 class Document extends BaseDocument
 {
     /**
-    * @var Builder
+    * @var Helpers\Patcher
     */
-    protected $builder;
+    protected $patcher;
 
     /**
-    * @var Finder
+    * @var Helpers\Finder
     */
     protected $finder;
 
     public function __construct()
     {
         parent::__construct();
-        $this->builder = new Builder();
+        $this->patcher = new Patcher();
         $this->finder = new Finder();
     }
 
@@ -29,8 +29,8 @@ class Document extends BaseDocument
         $this->lastError = null;
         $value = $this->formatter->copy($value);
 
-        if (!$result = $this->builder->add($this->data, $path, $value)) {
-            $this->lastError = $this->builder->getError();
+        if (!$result = $this->patcher->add($this->data, $path, $value)) {
+            $this->lastError = $this->patcher->getError();
         }
 
         return $result;
@@ -43,7 +43,7 @@ class Document extends BaseDocument
 
     public function deleteValue($path)
     {
-        return $this->builder->remove($this->data, $path);
+        return $this->patcher->remove($this->data, $path);
     }
 
     public function getValue($path, $default = null)

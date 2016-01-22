@@ -16,12 +16,12 @@ class Model
     protected $references = array();
 
     /**
-    * @var Formatter
+    * @var \JohnStevenson\JsonWorks\Helpers\Formatter
     */
     protected $formatter;
 
     /**
-    * @var Tokenizer
+    * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
     */
     protected $tokenizer;
 

@@ -21,17 +21,17 @@ use JohnStevenson\JsonWorks\Helpers\Format\Pruner;
 class Formatter
 {
     /**
-    * @var Copier
+    * @var Format\Copier
     */
     protected $copier;
 
     /**
-    * @var Orderer
+    * @var Format\Orderer
     */
     protected $orderer;
 
     /**
-    * @var Pruner
+    * @var Format\Pruner
     */
     protected $pruner;
 

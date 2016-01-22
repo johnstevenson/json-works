@@ -1,7 +1,7 @@
 <?php
-namespace JsonWorks\Tests\Document;
+namespace JsonWorks\Tests\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Builder;
+use JohnStevenson\JsonWorks\Helpers\Patch\Builder;
 
 class MethodsTest extends \JsonWorks\Tests\Base
 {

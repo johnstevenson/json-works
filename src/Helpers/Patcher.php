@@ -11,16 +11,29 @@
 namespace JohnStevenson\JsonWorks\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\Finder;
+use JohnStevenson\JsonWorks\Helpers\Patch\Builder;
+use JohnStevenson\JsonWorks\Helpers\Patch\BuildException;
+use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
 /**
 * A class for building json
 */
-class Builder
+class Patcher
 {
+    /**
+    * @var Patch\Builder
+    */
+    protected $builder;
+
     /**
     * @var Finder
     */
     protected $finder;
+
+    /**
+    * @var Patch\Target
+    */
+    protected $target;
 
     /**
     * @var object|array|null
@@ -49,6 +62,7 @@ class Builder
 
     public function __construct()
     {
+        $this->builder = new Builder();
         $this->finder = new Finder();
     }
 
@@ -56,7 +70,7 @@ class Builder
     {
         $this->initAdd($data);
 
-        if (!$this->addElements($path)) {
+        if (!$this->findElement($path)) {
             return false;
         }
 
@@ -77,7 +91,7 @@ class Builder
                 $data = null;
             } elseif (is_array($parent)) {
                 array_splice($parent, (int) $lastKey, 1);
-            } elseif (is_object($parent)) {
+            } else {
                 unset($parent->$lastKey);
             }
         }
@@ -94,7 +108,9 @@ class Builder
     {
         $this->data = $data;
         $this->element =& $this->data;
+        $this->target = new Target();
         $this->error = '';
+
         $this->newProperty = '';
         $this->arrayPush = false;
     }
@@ -113,11 +129,10 @@ class Builder
 
     protected function addToData($value)
     {
-        if ($this->arrayPush) {
+        if ($this->target->type === Target::TYPE_PUSH) {
             array_push($this->element, $value);
-        } elseif (strlen($this->newProperty)) {
-            $key = $this->newProperty;
-            $this->element->$key = $value;
+        } elseif ($this->target->type === Target::TYPE_PROPKEY) {
+            $this->element->{$this->target->propKey} = $value;
         } elseif ($this->data === $this->element) {
             return $this->addToRoot($value);
         } else {
@@ -127,80 +142,23 @@ class Builder
         return true;
     }
 
-    protected function addElements($path)
+    protected function findElement($path)
     {
         $this->element =& $this->finder->get($path, $this->element, $tokens, $found);
 
-        if (is_null($this->element) && !empty($tokens)) {
-            $this->addContainer($tokens[0]);
-        }
-
-        while (!empty($tokens)) {
-
-            $key = array_shift($tokens);
-
-            if (!empty($tokens)) {
-
-                if (is_array($this->element)) {
-
-                    if (!$this->isPushKey($key)) {
-                        $this->error = 'Invalid array key';
-                        return false;
-                    }
-
-                    $this->element[0] = null;
-                    $this->element = &$this->element[0];
-                    $this->addContainer($tokens[0]);
-
-                } else {
-
-                    $this->element->$key = null;
-                    $this->element = &$this->element->$key;
-                    $this->addContainer($tokens[0]);
-                }
-
-            } else {
-                 # no more pointers. First check for array with final array key
-
-                if (is_array($this->element)) {
-
-                    if ($this->isArrayKey($key, $index)) {
-                        $index = is_int($index) ? $index : count($this->element);
-                        $this->arrayPush = $index === count($this->element);
-                    }
-
-                    if (!$this->arrayPush) {
-                        $this->error = 'Bad array index';
-                        return false;
-                    }
-
-                } else {
-                    $this->newProperty = $key;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    protected function addContainer($token)
-    {
-        $isArray = $this->isPushKey($token);
-        $this->element = $isArray ? [] : new \stdClass();
-    }
-
-    protected function isPushKey($value)
-    {
-        return (bool) preg_match('/^((-)|(0))$/', $value);
-    }
-
-    protected function isArrayKey($value, &$index)
-    {
-        if ($value === '-') {
-            $index = '-';
+        if ($found) {
             return true;
         }
 
-        return $this->finder->isArrayKey($value, $index);
+        $result = true;
+
+        try {
+            $this->element =& $this->builder->add($tokens, $this->element, $this->target);
+        } catch (BuildException $e) {
+            $this->error = $e->getMessage();
+            $result = false;
+        }
+
+        return $result;
     }
 }

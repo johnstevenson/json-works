@@ -13,12 +13,12 @@ class BaseDocument
     public $lastError;
 
     /**
-    * @var Formatter
+    * @var Helpers\Formatter
     */
     protected $formatter;
 
     /**
-    * @var Validator
+    * @var Schema\Validator
     */
     protected $validator;
 
