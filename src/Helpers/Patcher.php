@@ -50,16 +50,6 @@ class Patcher
     */
     protected $error;
 
-    /**
-    * @var string
-    */
-    protected $newProperty;
-
-    /**
-    * @var bool
-    */
-    protected $arrayPush;
-
     public function __construct()
     {
         $this->builder = new Builder();
@@ -110,9 +100,6 @@ class Patcher
         $this->element =& $this->data;
         $this->target = new Target();
         $this->error = '';
-
-        $this->newProperty = '';
-        $this->arrayPush = false;
     }
 
     protected function addToRoot($value)

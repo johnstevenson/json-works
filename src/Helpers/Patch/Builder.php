@@ -23,17 +23,17 @@ class Builder
     {
         $this->element =& $data;
 
-        $this->addElements($tokens, $target);
-
-        return $this->element;
-    }
-
-    protected function addElements($tokens, Target &$target)
-    {
         if (is_null($this->element) && !empty($tokens)) {
             $this->addContainer($tokens[0]);
         }
 
+        $this->processTokens($tokens, $target);
+
+        return $this->element;
+    }
+
+    protected function processTokens($tokens, Target &$target)
+    {
         while (!empty($tokens)) {
 
             $key = array_shift($tokens);
@@ -42,6 +42,7 @@ class Builder
                 $this->createElement($tokens, $key);
 
             } else {
+                // No tokens left so set target type from the key
                 $this->setTarget($target, $key);
             }
         }
@@ -49,8 +50,7 @@ class Builder
 
     protected function addContainer($token)
     {
-        $isArray = $this->isPushKey($token);
-        $this->element = $isArray ? [] : new \stdClass();
+        $this->element = $this->isPushKey($token) ? [] : new \stdClass();
     }
 
     protected function createElement($tokens, $key)
@@ -75,20 +75,9 @@ class Builder
 
     protected function setTarget(Target &$target, $key)
     {
+        // We have created the element, so it will either be an array or object
         if (is_array($this->element)) {
-
-            if ($this->isArrayKey($key, $index)) {
-                $index = is_int($index) ? $index : count($this->element);
-
-                if ($index === count($this->element)) {
-                    $target->type = Target::TYPE_PUSH;
-                }
-            }
-
-            if ($target->type !== Target::TYPE_PUSH) {
-                $this->throwError('Bad array index');
-            }
-
+            $target->type = Target::TYPE_PUSH;
         } else {
             $target->type = Target::TYPE_PROPKEY;
             $target->propKey = $key;
