@@ -39,45 +39,10 @@ class Builder
             $key = array_shift($tokens);
 
             if (!empty($tokens)) {
-
-                if (is_array($this->element)) {
-
-                    if (!$this->isPushKey($key)) {
-                        $this->throwError('Invalid array key');
-                    }
-
-                    $this->element[0] = null;
-                    $this->element = &$this->element[0];
-                    $this->addContainer($tokens[0]);
-
-                } else {
-
-                    $this->element->$key = null;
-                    $this->element = &$this->element->$key;
-                    $this->addContainer($tokens[0]);
-                }
+                $this->createElement($tokens, $key);
 
             } else {
-                 # no more pointers. First check for array with final array key
-
-                if (is_array($this->element)) {
-
-                    if ($this->isArrayKey($key, $index)) {
-                        $index = is_int($index) ? $index : count($this->element);
-
-                        if ($index === count($this->element)) {
-                            $target->type = Target::TYPE_PUSH;
-                        }
-                    }
-
-                    if ($target->type !== Target::TYPE_PUSH) {
-                        $this->throwError('Bad array index');
-                    }
-
-                } else {
-                    $target->type = Target::TYPE_PROPKEY;
-                    $target->propKey = $key;
-                }
+                $this->setTarget($target, $key);
             }
         }
     }
@@ -86,6 +51,48 @@ class Builder
     {
         $isArray = $this->isPushKey($token);
         $this->element = $isArray ? [] : new \stdClass();
+    }
+
+    protected function createElement($tokens, $key)
+    {
+        if (is_array($this->element)) {
+
+            if (!$this->isPushKey($key)) {
+                $this->throwError('Invalid array key');
+            }
+
+            $this->element[0] = null;
+            $this->element = &$this->element[0];
+            $this->addContainer($tokens[0]);
+
+        } else {
+
+            $this->element->$key = null;
+            $this->element = &$this->element->$key;
+            $this->addContainer($tokens[0]);
+        }
+    }
+
+    protected function setTarget(Target &$target, $key)
+    {
+        if (is_array($this->element)) {
+
+            if ($this->isArrayKey($key, $index)) {
+                $index = is_int($index) ? $index : count($this->element);
+
+                if ($index === count($this->element)) {
+                    $target->type = Target::TYPE_PUSH;
+                }
+            }
+
+            if ($target->type !== Target::TYPE_PUSH) {
+                $this->throwError('Bad array index');
+            }
+
+        } else {
+            $target->type = Target::TYPE_PROPKEY;
+            $target->propKey = $key;
+        }
     }
 
     protected function isPushKey($value)
