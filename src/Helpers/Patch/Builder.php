@@ -28,19 +28,19 @@ class Builder
             $this->addContainer($target->tokens[0]);
         }
 
-        $this->processTokens($target->tokens, $target);
+        $this->processTokens($target);
 
         return $this->element;
     }
 
-    protected function processTokens($tokens, Target &$target)
+    protected function processTokens(Target &$target)
     {
-        while (!empty($tokens)) {
+        while (!empty($target->tokens)) {
 
-            $key = array_shift($tokens);
+            $key = array_shift($target->tokens);
 
-            if (!empty($tokens)) {
-                $this->createElement($tokens, $key);
+            if (!empty($target->tokens)) {
+                $this->createElement($key, $target->tokens[0]);
 
             } else {
                 // No tokens left so set target type from the key
@@ -54,23 +54,23 @@ class Builder
         $this->element = $this->isPushKey($token) ? [] : new \stdClass();
     }
 
-    protected function createElement($tokens, $key)
+    protected function createElement($key, $containerKey)
     {
         if (is_array($this->element)) {
 
             if (!$this->isPushKey($key)) {
-                throw new InvalidArgumentException(sprintf('Invalid array key: /%s', $key));
+                throw new InvalidArgumentException('Invalid array key');
             }
 
             $this->element[0] = null;
             $this->element = &$this->element[0];
-            $this->addContainer($tokens[0]);
+            $this->addContainer($containerKey);
 
         } else {
 
             $this->element->$key = null;
             $this->element = &$this->element->$key;
-            $this->addContainer($tokens[0]);
+            $this->addContainer($containerKey);
         }
     }
 
@@ -79,10 +79,10 @@ class Builder
         if (is_array($this->element)) {
 
             if (!$this->checkArrayKey($this->element, $key, $index)) {
-                throw new InvalidArgumentException(sprintf('Invalid array key: /%s', $key));
+                throw new InvalidArgumentException('Invalid array key');
             }
 
-            $target->setArray($this->element, $index);
+            $target->setArray($index);
 
         } else {
             $target->setObject($key);
@@ -94,12 +94,16 @@ class Builder
         return (bool) preg_match('/^((-)|(0))$/', $key);
     }
 
-    protected function checkArrayKey($array, $key, &$index)
+    protected function checkArrayKey(array $array, $key, &$index)
     {
         if ($result = preg_match('/^(?:(-)|(0)|([1-9]\d*))$/', $key, $matches)) {
-            $count = count($array);
-            $index = count($matches) > 2 ? (int) $key : $count;
-            $result = $index <= $count;
+
+            if ($key === '-') {
+                $index = count($array);
+            } else {
+                $index = (int) $key;
+                $result = $index <= count($array);
+            }
         }
 
         return (bool) $result;

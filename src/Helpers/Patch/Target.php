@@ -10,12 +10,13 @@
 
 namespace JohnStevenson\JsonWorks\Helpers\Patch;
 
+use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+
 class Target
 {
-    const TYPE_SCALAR = 0;
-    const TYPE_PROPKEY = 1;
-    const TYPE_ARRAYKEY = 2;
-    const TYPE_PUSH = 3;
+    const TYPE_VALUE = 0;
+    const TYPE_OBJECT = 1;
+    const TYPE_ARRAY = 2;
 
     /**
     * @var bool
@@ -28,14 +29,9 @@ class Target
     public $type;
 
     /**
-    * @var integer
+    * @var string|integer
     */
-    public $arrayKey;
-
-    /**
-    * @var string
-    */
-    public $propKey;
+    public $key;
 
     /**
     * @var array
@@ -43,40 +39,36 @@ class Target
     public $tokens;
 
     /**
-    * @var string
-    */
-    public $lastKey;
-
-    /**
     * @var mixed
     */
     public $parent;
 
-    public function __construct()
-    {
-        $this->found = false;
-        $this->type = self::TYPE_SCALAR;
-        $this->arrayKey = 0;
-        $this->propKey = '';
-        $this->tokens = [];
-        $this->lastKey = '';
-    }
+    /**
+    * @var string
+    */
+    public $childKey;
 
-    public function setTokens($tokens)
+    public function __construct($path)
     {
-        $this->tokens = $tokens;
+        $tokenizer = new Tokenizer();
+
+        $this->tokens = $tokenizer->decode($path);
         $this->found = empty($this->tokens);
+
+        $this->type = self::TYPE_VALUE;
+        $this->key = '';
+        $this->childKey = '';
     }
 
-    public function setArray(array $array, $index)
+    public function setArray($index)
     {
-        $this->arrayKey = $index;
-        $this->type = $index < count($array) ? self::TYPE_ARRAYKEY : self::TYPE_PUSH;
+        $this->type = self::TYPE_ARRAY;
+        $this->key = (int) $index;
     }
 
     public function setObject($key)
     {
-        $this->type = self::TYPE_PROPKEY;
-        $this->propKey = $key;
+        $this->type = self::TYPE_OBJECT;
+        $this->key = $key;
     }
 }

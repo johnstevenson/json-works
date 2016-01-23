@@ -70,20 +70,20 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $this->assertFalse($document->addValue($path, $value));
     }
 
-    public function testReplaceArrayValue()
+    public function testReplaceArrayValueInserts()
     {
         $schema = null;
 
         $data = '{
-            "collection": [1, [1, 2, 3], 2, 3]
+            "collection": [0, 1, 2, 3]
         }';
 
         $expected = '{
-            "collection": [1, [1, 2, 2], 2, 3]
+            "collection": [0, 1, 2, 2, 3]
         }';
 
         $document = $this->getDocument($schema, $data);
-        $path = '/collection/1/2';
+        $path = '/collection/2';
         $value = 2;
         $this->assertTrue($document->addValue($path, $value));
         $this->assertEquals(json_decode($expected), $document->data);

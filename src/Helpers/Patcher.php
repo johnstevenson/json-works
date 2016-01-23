@@ -45,17 +45,24 @@ class Patcher
     */
     protected $error;
 
-    public function __construct()
+    /**
+    * @var bool
+    */
+    protected $jsonPatch;
+
+    public function __construct($jsonPatch = false)
     {
+        $this->jsonPatch = $jsonPatch;
         $this->builder = new Builder();
         $this->finder = new Finder();
     }
 
     public function add(&$data, $path, $value)
     {
-        $target = $this->init($data);
+        $target = $this->init($data, $path);
 
-        if (!$this->findElement($path, $target)) {
+        if (!$this->getElement($target)) {
+            $this->error .= sprintf(': [%s]', $path);
             return false;
         }
 
@@ -68,17 +75,17 @@ class Patcher
 
     public function remove(&$data, $path)
     {
-        $target = $this->init(null);
-        $this->finder->get($path, $data, $target);
+        $target = $this->init(null, $path);
+        $this->finder->get($data, $target);
 
         if ($target->found) {
 
-            if (0 === strlen($target->lastKey)) {
+            if (0 === strlen($target->childKey)) {
                 $data = null;
             } elseif (is_array($target->parent)) {
-                array_splice($target->parent, (int) $target->lastKey, 1);
+                array_splice($target->parent, (int) $target->childKey, 1);
             } else {
-                unset($target->parent->{$target->lastKey});
+                unset($target->parent->{$target->childKey});
             }
         }
 
@@ -90,13 +97,13 @@ class Patcher
         return $this->error;
     }
 
-    protected function init($data = null)
+    protected function init($data, $path)
     {
         $this->data = $data;
         $this->element =& $this->data;
         $this->error = '';
 
-        return new Target();
+        return new Target($path);
     }
 
     protected function addToRoot($value)
@@ -113,10 +120,10 @@ class Patcher
 
     protected function addToData($value, Target $target)
     {
-        if ($target->type === Target::TYPE_PUSH) {
-            array_push($this->element, $value);
-        } elseif ($target->type === Target::TYPE_PROPKEY) {
-            $this->element->{$target->propKey} = $value;
+        if ($target->type === Target::TYPE_ARRAY) {
+            array_splice($this->element, $target->key, 0, [$value]);
+        } elseif ($target->type === Target::TYPE_OBJECT) {
+            $this->element->{$target->key} = $value;
         } elseif ($this->data === $this->element) {
             return $this->addToRoot($value);
         } else {
@@ -126,17 +133,34 @@ class Patcher
         return true;
     }
 
-    protected function findElement($path, Target &$target)
+    protected function getElement(Target &$target)
     {
-        $this->element =& $this->finder->get($path, $this->element, $target);
+        $this->element =& $this->finder->get($this->element, $target);
 
         if ($target->found) {
+
+            if (is_array($target->parent)) {
+                $target->setArray($target->childKey);
+                $this->element =& $target->parent;
+            }
+
             return true;
         }
 
+        if ($this->jsonPatch) {
+            $this->error = 'Path not found';
+            return false;
+        }
+
+        return $this->buildElement($target);
+    }
+
+    protected function buildElement(Target &$target)
+    {
+        $result = true;
+
         try {
             $this->element =& $this->builder->add($this->element, $target);
-            $result = true;
         } catch (InvalidArgumentException $e) {
             $this->error = $e->getMessage();
             $result = false;

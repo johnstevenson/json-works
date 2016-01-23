@@ -74,7 +74,11 @@ class ToJsonTest extends \JsonWorks\Tests\Base
             "prop4": null
         }';
 
-        $document = $this->getDocument($schema, $data);
+        // Do not use getDocument, so we have a null schema for test coverage
+        $document = new \JohnStevenson\JsonWorks\Document();
+        $document->loadData($data);
+
+
         $document->tidy();
 
         $json = $document->toJson(false);
@@ -118,7 +122,8 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         }';
 
         $document = $this->getDocument($schema, $data);
-        $document->tidy();
+        // Set order to true for test coverage
+        $document->tidy(true);
 
         $this->assertFalse($document->validate());
     }

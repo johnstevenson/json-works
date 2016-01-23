@@ -18,20 +18,11 @@ use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 */
 class Finder
 {
-    /**
-    * @var Tokenizer
-    */
-    protected $tokenizer;
 
     /**
     * @var mixed
     */
     protected $element;
-
-    public function __construct()
-    {
-        $this->tokenizer = new Tokenizer();
-    }
 
     /**
     * Returns true if an element is found
@@ -43,8 +34,8 @@ class Finder
     */
     public function find($path, $data, &$element)
     {
-        $target = new Target();
-        $this->get($path, $data, $target);
+        $target = new Target($path);
+        $this->get($data, $target);
 
         if ($target->found) {
             $element = $this->element;
@@ -57,19 +48,16 @@ class Finder
     * Searches for and returns a reference to an element
     *
     * @api
-    * @param string $path
     * @param mixed $data
     * @param Target $target Modified by method
     * @return mixed A reference to the found element
     */
-    public function &get($path, &$data, Target &$target)
+    public function &get(&$data, Target &$target)
     {
         $this->element =& $data;
 
-        $target->setTokens($this->tokenizer->decode($path));
-
         if (!$target->found) {
-            $this->search($target);
+            $target->found = $this->search($target);
         }
 
         return $this->element;
@@ -92,26 +80,31 @@ class Finder
     }
 
     /**
-    * Searches through the data
+    * Returns true if the element is found
     *
     * @param Target $target Modified by method
+    * @return bool
     */
     protected function search(Target &$target)
     {
+        // Tokens is guaranteed not empty
         while (!empty($target->tokens)) {
             $token = $target->tokens[0];
 
             if (count($target->tokens) === 1) {
                 $target->parent =& $this->element;
-                $target->lastKey = $token;
+                $target->childKey = $token;
+                //$target->setParent($this->element, $token);
             }
 
-            if (!$target->found = $this->findContainer($token)) {
-                break;
+            if (!$this->findContainer($token)) {
+                return false;
             }
 
             array_shift($target->tokens);
         }
+
+        return true;
     }
 
     /**
