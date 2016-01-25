@@ -62,7 +62,6 @@ class Patcher
         $target = $this->init($data, $path);
 
         if (!$this->getElement($target)) {
-            $this->error .= sprintf(': [%s]', $path);
             return false;
         }
 
@@ -75,7 +74,7 @@ class Patcher
 
     public function remove(&$data, $path)
     {
-        $target = $this->init(null, $path);
+        $target = $this->init($data, $path);
         $this->finder->get($data, $target);
 
         if ($target->found) {
@@ -92,6 +91,24 @@ class Patcher
         return $target->found;
     }
 
+    /**
+    * Replaces an element if found
+    *
+    * @param mixed $data
+    * @param string $path
+    * @param mixed $value
+    * @return bool If the element was replaced
+    */
+    public function replace(&$data, $path, $value)
+    {
+        $target = $this->init($data, $path);
+        $this->element =& $this->finder->get($data, $target);
+
+        $result = $target->found && $this->addToData($value, $target);
+
+        return $result;
+    }
+
     public function getError()
     {
         return $this->error;
@@ -101,9 +118,8 @@ class Patcher
     {
         $this->data = $data;
         $this->element =& $this->data;
-        $this->error = '';
 
-        return new Target($path);
+        return new Target($path, $this->error);
     }
 
     protected function addToRoot($value)
@@ -133,7 +149,7 @@ class Patcher
         return true;
     }
 
-    protected function getElement(Target &$target)
+    protected function getElement(Target $target)
     {
         $this->element =& $this->finder->get($this->element, $target);
 
@@ -147,15 +163,15 @@ class Patcher
             return true;
         }
 
-        if ($this->jsonPatch) {
-            $this->error = 'Path not found';
+        if ($target->errorCode !== Error::ERR_NOT_FOUND ||
+            ($this->jsonPatch && count($target->tokens) > 1)) {
             return false;
         }
 
         return $this->buildElement($target);
     }
 
-    protected function buildElement(Target &$target)
+    protected function buildElement(Target $target)
     {
         $result = true;
 

@@ -86,4 +86,21 @@ class Base extends \PHPUnit_Framework_TestCase
     {
         return file_get_contents($filename);
     }
+
+    protected function sameRef(&$var1, &$var2)
+    {
+        if ($var1 !== $var2) {
+            return false;
+        }
+        // backup $var1
+        $tmp = $var1;
+
+        $var1 = !$var1;
+        $result = $var1 === $var2;
+
+        // restore $var1
+        $var1 = $tmp;
+
+        return $result;
+    }
 }

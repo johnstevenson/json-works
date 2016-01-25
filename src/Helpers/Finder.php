@@ -10,7 +10,7 @@
 
 namespace JohnStevenson\JsonWorks\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
 /**
@@ -18,6 +18,10 @@ use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 */
 class Finder
 {
+    /**
+    * @var Patch\Target
+    */
+    protected $target;
 
     /**
     * @var mixed
@@ -27,6 +31,7 @@ class Finder
     /**
     * Returns true if an element is found
     *
+    * @api
     * @param string $path
     * @param mixed $data
     * @param mixed $element Set by method if found
@@ -34,7 +39,7 @@ class Finder
     */
     public function find($path, $data, &$element)
     {
-        $target = new Target($path);
+        $target = new Target($path, $dummy);
         $this->get($data, $target);
 
         if ($target->found) {
@@ -52,31 +57,17 @@ class Finder
     * @param Target $target Modified by method
     * @return mixed A reference to the found element
     */
-    public function &get(&$data, Target &$target)
+    public function &get(&$data, Target $target)
     {
         $this->element =& $data;
+        $this->target =& $target;
 
-        if (!$target->found) {
-            $target->found = $this->search($target);
+        if (!empty($this->target->tokens)) {
+            $found = $this->search($this->target->tokens);
+            $this->target->setFound($found);
         }
 
         return $this->element;
-    }
-
-    /**
-    * Returns true if the token is a valid array key
-    *
-    * @api
-    * @param string $token
-    * @param mixed $index Set to an integer on success
-    */
-    public function isArrayKey($token, &$index)
-    {
-        if ($result = preg_match('/^((0)|([1-9]\d*))$/', $token)) {
-            $index = (int) $token;
-        }
-
-        return (bool) $result;
     }
 
     /**
@@ -85,23 +76,22 @@ class Finder
     * @param Target $target Modified by method
     * @return bool
     */
-    protected function search(Target &$target)
+    protected function search(array &$tokens)
     {
-        // Tokens is guaranteed not empty
-        while (!empty($target->tokens)) {
-            $token = $target->tokens[0];
+        // tokens is guaranteed not empty
+        while (!empty($tokens)) {
+            $token = $tokens[0];
 
-            if (count($target->tokens) === 1) {
-                $target->parent =& $this->element;
-                $target->childKey = $token;
-                //$target->setParent($this->element, $token);
+            if (count($tokens) === 1) {
+                $this->target->parent =& $this->element;
+                $this->target->childKey = $token;
             }
 
             if (!$this->findContainer($token)) {
                 return false;
             }
 
-            array_shift($target->tokens);
+            array_shift($tokens);
         }
 
         return true;
@@ -118,11 +108,10 @@ class Finder
     protected function findContainer($token)
     {
         $found = false;
-        $type = gettype($this->element);
 
-        if ('object' === $type) {
+        if (is_object($this->element)) {
             $found = $this->findObject($token);
-        } elseif ('array' === $type) {
+        } elseif (is_array($this->element)) {
             $found = $this->findArray($token);
         }
 
@@ -138,10 +127,13 @@ class Finder
     */
     protected function findArray($token)
     {
-        if ($result = $this->isArrayKey($token, $index)) {
-            if ($result = array_key_exists($index, $this->element)) {
-                $this->element = &$this->element[$index];
-            }
+        if (!$this->isArrayKey($token, $index)) {
+            $this->target->setError(Error::ERR_KEY_INVALID);
+            return false;
+        }
+
+        if ($result = array_key_exists($index, $this->element)) {
+            $this->element = &$this->element[$index];
         }
 
         return $result;
@@ -161,5 +153,21 @@ class Finder
         }
 
         return $result;
+    }
+
+    /**
+    * Returns true if the token is a valid array key
+    *
+    * @api
+    * @param string $token
+    * @param mixed $index Set to an integer on success
+    */
+    protected function isArrayKey($token, &$index)
+    {
+        if ($result = preg_match('/^((0)|([1-9]\d*))$/', $token)) {
+            $index = (int) $token;
+        }
+
+        return (bool) $result;
     }
 }

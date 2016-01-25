@@ -1,14 +1,24 @@
 <?php
-namespace JsonWorks\Tests\Helpers;
+namespace JsonWorks\Tests\Helpers\Builder;
 
 use JohnStevenson\JsonWorks\Helpers\Patch\Builder;
+use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
 class MethodsTest extends \JsonWorks\Tests\Base
 {
+    protected $builder;
+
+    protected function setUp()
+    {
+        $this->builder = new Builder();
+        $target = new Target('', $dummy);
+        $data = null;
+        $this->builder->add($data, $target);
+    }
+
     protected function call($name, $args)
     {
-        $builder = new Builder();
-        return $this->callMethod($builder, $name, $args);
+        return $this->callMethod($this->builder, $name, $args);
     }
 
     public function testPushKeyDashTrue()
@@ -49,10 +59,19 @@ class MethodsTest extends \JsonWorks\Tests\Base
     public function testArrayKeyTrue1()
     {
         $value = '-';
-        $array = [];
+        $array = [1, 2, 3];
         $index = null;
-        $result = $this->call('checkArrayKey', [$array, $value, &$index]);
+        $expected = count($array);
+
+        try {
+            $this->call('checkArrayKey', [$array, $value, &$index]);
+            $result = true;
+        } catch (\InvalidArgumentException $e) {
+            $result = false;
+        }
+
         $this->assertTrue($result);
+        $this->assertEquals($expected, $index);
     }
 
     public function testArrayKeyTrue2()
@@ -60,8 +79,17 @@ class MethodsTest extends \JsonWorks\Tests\Base
         $value = '67';
         $array = array_fill(0, 68, 1);
         $index = null;
-        $result = $this->call('checkArrayKey', [$array, $value, &$index]);
+        $expected = (int) $value;
+
+        try {
+            $this->call('checkArrayKey', [$array, $value, &$index]);
+            $result = true;
+        } catch (\InvalidArgumentException $e) {
+            $result = false;
+        }
+
         $this->assertTrue($result);
+        $this->assertEquals($expected, $index);
     }
 
     public function testArrayKeyFalse1()
@@ -69,8 +97,9 @@ class MethodsTest extends \JsonWorks\Tests\Base
         $value = '-7';
         $array = [];
         $index = null;
-        $result = $this->call('checkArrayKey', [$array, $value, &$index]);
-        $this->assertFalse($result);
+
+        $this->setExpectedException('InvalidArgumentException');
+        $this->call('checkArrayKey', [$array, $value, &$index]);
     }
 
     public function testArrayKeyFalse2()
@@ -78,7 +107,8 @@ class MethodsTest extends \JsonWorks\Tests\Base
         $value = 'prop';
         $array = [];
         $index = null;
-        $result = $this->call('checkArrayKey', [$array, $value, &$index]);
-        $this->assertFalse($result);
+
+        $this->setExpectedException('InvalidArgumentException');
+        $this->call('checkArrayKey', [$array, $value, &$index]);
     }
 }

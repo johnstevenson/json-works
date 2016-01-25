@@ -11,47 +11,54 @@
 namespace JohnStevenson\JsonWorks\Helpers\Patch;
 
 use InvalidArgumentException;
+use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
 class Builder
 {
     /**
+    * @var Target
+    */
+    protected $target;
+
+    /**
     * @var mixed
     */
     protected $element;
 
-    public function &add(&$data, Target &$target)
+    public function &add(&$data, Target $target)
     {
         $this->element =& $data;
+        $this->target =& $target;
 
-        if (is_null($this->element) && !empty($target->tokens)) {
-            $this->addContainer($target->tokens[0]);
+        if (is_null($this->element) && !empty($this->target->tokens)) {
+            $this->addContainer($this->target->tokens[0]);
         }
 
-        $this->processTokens($target);
+        $this->processTokens($this->target->tokens);
 
         return $this->element;
     }
 
-    protected function processTokens(Target &$target)
+    protected function processTokens(array &$tokens)
     {
-        while (!empty($target->tokens)) {
+        while (!empty($tokens)) {
 
-            $key = array_shift($target->tokens);
+            $key = array_shift($tokens);
 
-            if (!empty($target->tokens)) {
-                $this->createElement($key, $target->tokens[0]);
+            if (!empty($tokens)) {
+                $this->createElement($key, $tokens[0]);
 
             } else {
                 // No tokens left so set target type from the key
-                $this->setTarget($target, $key);
+                $this->setTarget($key);
             }
         }
     }
 
-    protected function addContainer($token)
+    protected function addContainer($key)
     {
-        $this->element = $this->isPushKey($token) ? [] : new \stdClass();
+        $this->element = $this->isPushKey($key) ? [] : new \stdClass();
     }
 
     protected function createElement($key, $containerKey)
@@ -59,7 +66,8 @@ class Builder
         if (is_array($this->element)) {
 
             if (!$this->isPushKey($key)) {
-                throw new InvalidArgumentException('Invalid array key');
+                $this->target->setError(Error::ERR_KEY_INVALID);
+                throw new InvalidArgumentException($this->target->error);
             }
 
             $this->element[0] = null;
@@ -74,18 +82,14 @@ class Builder
         }
     }
 
-    protected function setTarget(Target &$target, $key)
+    protected function setTarget($key)
     {
         if (is_array($this->element)) {
 
-            if (!$this->checkArrayKey($this->element, $key, $index)) {
-                throw new InvalidArgumentException('Invalid array key');
-            }
-
-            $target->setArray($index);
-
+            $this->checkArrayKey($this->element, $key, $index);
+            $this->target->setArray($index);
         } else {
-            $target->setObject($key);
+            $this->target->setObject($key);
         }
     }
 
@@ -106,6 +110,9 @@ class Builder
             }
         }
 
-        return (bool) $result;
+        if (!$result) {
+            $this->target->setError(Error::ERR_KEY_INVALID);
+            throw new InvalidArgumentException($this->target->error);
+        }
     }
 }
