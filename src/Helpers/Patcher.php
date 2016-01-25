@@ -59,9 +59,7 @@ class Patcher
 
     public function add(&$data, $path, $value)
     {
-        $target = $this->init($data, $path);
-
-        if (!$this->getElement($target)) {
+        if (!$this->getElement($data, $path, $value, $target)) {
             return false;
         }
 
@@ -74,10 +72,7 @@ class Patcher
 
     public function remove(&$data, $path)
     {
-        $target = $this->init($data, $path);
-        $this->finder->get($data, $target);
-
-        if ($target->found) {
+        if ($result = $this->find($data, $path, $target)) {
 
             if (0 === strlen($target->childKey)) {
                 $data = null;
@@ -88,7 +83,7 @@ class Patcher
             }
         }
 
-        return $target->found;
+        return $result;
     }
 
     /**
@@ -101,10 +96,9 @@ class Patcher
     */
     public function replace(&$data, $path, $value)
     {
-        $target = $this->init($data, $path);
-        $this->element =& $this->finder->get($data, $target);
-
-        $result = $target->found && $this->addToData($value, $target);
+        if ($result = $this->find($data, $path, $target)) {
+            $result = $this->addToData($value, $target);
+        }
 
         return $result;
     }
@@ -114,12 +108,27 @@ class Patcher
         return $this->error;
     }
 
-    protected function init($data, $path)
+    protected function find(&$data, $path, &$target, $add = false)
     {
+        // We won't need these assignments when we have refactored
+        // the builder to return a value to add to the found element
         $this->data = $data;
         $this->element =& $this->data;
 
-        return new Target($path, $this->error);
+        $target = new Target($path, $this->error);
+
+        if ($target->errorCode) {
+            return false;
+        }
+
+        if ($add) {
+            $this->element =& $this->finder->get($this->element, $target);
+        } else {
+            $this->element =& $this->finder->get($data, $target);
+        }
+
+
+        return $target->found;
     }
 
     protected function addToRoot($value)
@@ -149,11 +158,9 @@ class Patcher
         return true;
     }
 
-    protected function getElement(Target $target)
+    protected function getElement(&$data, $path, &$value, &$target)
     {
-        $this->element =& $this->finder->get($this->element, $target);
-
-        if ($target->found) {
+        if ($result = $this->find($data, $path, $target, true)) {
 
             if (is_array($target->parent)) {
                 $target->setArray($target->childKey);
@@ -163,8 +170,7 @@ class Patcher
             return true;
         }
 
-        if ($target->errorCode !== Error::ERR_NOT_FOUND ||
-            ($this->jsonPatch && count($target->tokens) > 1)) {
+        if ($this->jsonPatch && count($target->tokens) > 1) {
             return false;
         }
 
