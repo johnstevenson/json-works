@@ -31,6 +31,12 @@ class Builder
     */
     protected $element;
 
+    /**
+    * Constructor
+    *
+    * @param Target $target
+    * @param mixed $value
+    */
     public function make(Target $target, $value)
     {
         $this->data = $target->element;
@@ -48,6 +54,9 @@ class Builder
         return $this->data;
     }
 
+    /**
+    * Initializes the data    *
+    */
     protected function initData()
     {
         if (!empty($this->target->tokens)) {
@@ -57,7 +66,7 @@ class Builder
             if (is_null($this->data)) {
                 // 1st pass: creating a root container
                 // 2nd pass: recursing
-                $this->addContainer($key);
+                $this->createContainer($key);
             } else {
                 $this->setTarget($key);
                 $this->data = null;
@@ -67,14 +76,20 @@ class Builder
         }
     }
 
-    protected function processTokens(array &$tokens, $value)
+    /**
+    * Builds new elements from the remaining tokens
+    *
+    * @param array $tokens
+    * @param mixed $value The value to add to the final element
+    */
+    protected function processTokens(array $tokens, $value)
     {
         while (!empty($tokens)) {
 
             $key = array_shift($tokens);
 
             if (!empty($tokens)) {
-                $this->createElement($key, $tokens[0]);
+                $this->addElement($key, $tokens[0]);
 
             } else {
                 // No tokens left so set the value
@@ -83,32 +98,42 @@ class Builder
         }
     }
 
-    protected function addContainer($key)
+    /**
+    * Creates a new object or array
+    *
+    * @param string $key
+    */
+    protected function createContainer($key)
     {
         $this->element = $this->isPushKey($key) ? [] : new \stdClass();
     }
 
-    protected function createElement($key, $containerKey)
+    /**
+    * Adds a new container member to an object or array
+    *
+    * @param string $key
+    * @param string $containerKey
+    */
+    protected function addElement($key, $containerKey)
     {
         if (is_array($this->element)) {
-
-            if (!$this->isPushKey($key)) {
-                $this->target->setError(Error::ERR_PATH_KEY);
-                throw new InvalidArgumentException($this->target->error);
-            }
-
             $this->element[0] = null;
-            $this->element = &$this->element[0];
-            $this->addContainer($containerKey);
+            $this->element =& $this->element[0];
+
 
         } else {
-
             $this->element->$key = null;
-            $this->element = &$this->element->$key;
-            $this->addContainer($containerKey);
+            $this->element =& $this->element->$key;
         }
+
+        $this->createContainer($containerKey);
     }
 
+    /**
+    * Sets external target data for incorporating the data
+    *
+    * @param string $key
+    */
     protected function setTarget($key)
     {
         if (is_array($this->data)) {
@@ -120,6 +145,12 @@ class Builder
         }
     }
 
+    /**
+    * Sets an array item or an object property
+    *
+    * @param string $key
+    * @param mixed $value
+    */
     protected function setValue($key, $value)
     {
         if (is_array($this->element)) {
@@ -131,11 +162,25 @@ class Builder
         }
     }
 
+    /**
+    * Checks if a key indicates an array push
+    *
+    * @param string $key
+    * @return bool
+    */
     protected function isPushKey($key)
     {
         return (bool) preg_match('/^((-)|(0))$/', $key);
     }
 
+    /**
+    * Checks if an array key is valid and sets its index
+    *
+    * @param array $array
+    * @param string $key
+    * @param integer $index Set by method
+    * @throws InvalidArgumentException
+    */
     protected function checkArrayKey(array $array, $key, &$index)
     {
         if ($result = preg_match('/^(?:(-)|(0)|([1-9]\d*))$/', $key, $matches)) {
