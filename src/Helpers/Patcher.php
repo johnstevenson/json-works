@@ -40,6 +40,14 @@ class Patcher
     */
     protected $jsonPatch;
 
+    /**
+    * Constructor
+    *
+    * If jsonPatch is set, elements will only be added to the root or an
+    * existing element. See RFC 6902 (http://tools.ietf.org/html/rfc6902)
+    *
+    * @param mixed $jsonPatch
+    */
     public function __construct($jsonPatch = false)
     {
         $this->jsonPatch = $jsonPatch;
@@ -47,6 +55,14 @@ class Patcher
         $this->finder = new Finder();
     }
 
+    /**
+    * Adds an element to the data
+    *
+    * @param mixed $data
+    * @param string $path
+    * @param mixed $value
+    * @return bool If the value was added
+    */
     public function add(&$data, $path, $value)
     {
         if ($result = $this->getElement($data, $path, $value, $target)) {
@@ -56,6 +72,13 @@ class Patcher
         return $result;
     }
 
+    /**
+    * Removes an element if found
+    *
+    * @param mixed $data
+    * @param string $path
+    * @return bool If the data was removed
+    */
     public function remove(&$data, $path)
     {
         if ($result = $this->find($data, $path, $target)) {
@@ -94,6 +117,12 @@ class Patcher
         return $this->error;
     }
 
+    /**
+    * Adds or modifies the data
+    *
+    * @param Target $target
+    * @param mixed $value
+    */
     protected function addData(Target $target, $value)
     {
         switch ($target->type) {
@@ -109,11 +138,24 @@ class Patcher
         }
     }
 
+    /**
+    * Returns true if we can create a new element
+    *
+    * @param Target $target
+    * @return bool
+    */
     protected function canBuild(Target $target)
     {
         return !$target->invalid && !($this->jsonPatch && count($target->tokens) > 1);
     }
 
+    /**
+    * Returns true if an element is found
+    *
+    * @param mixed $data
+    * @param string $path
+    * @param Target $target
+    */
     protected function find(&$data, $path, &$target)
     {
         $target = new Target($path, $this->error);
@@ -121,6 +163,15 @@ class Patcher
         return $this->finder->get($data, $target);
     }
 
+    /**
+    * Returns true if an element is found or built
+    *
+    * @param mixed $data
+    * @param string $path
+    * @param mixed $value
+    * @param Target $target Set by method
+    * @return bool
+    */
     protected function getElement(&$data, $path, &$value, &$target)
     {
         if ($this->find($data, $path, $target)) {
@@ -136,6 +187,13 @@ class Patcher
         return $this->buildElement($target, $value);
     }
 
+    /**
+    * Return true if a new value has been built
+    *
+    * @param Target $target
+    * @param mixed $value
+    * @return bool
+    */
     protected function buildElement(Target $target, &$value)
     {
         if ($result = $this->canBuild($target)) {
