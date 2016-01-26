@@ -119,7 +119,7 @@ class Target
     {
         $this->error = '';
 
-        if ($code) {
+        if (!empty($code)) {
             $error = new Error();
             $this->error = $error->get($code, $this->path);
         }
