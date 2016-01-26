@@ -25,6 +25,11 @@ class Target
     /**
     * @var bool
     */
+    public $invalid = false;
+
+    /**
+    * @var bool
+    */
     public $found = false;
 
     /**
@@ -50,6 +55,11 @@ class Target
     /**
     * @var mixed
     */
+    public $element;
+
+    /**
+    * @var mixed
+    */
     public $parent;
 
     /**
@@ -61,11 +71,6 @@ class Target
     * @var string
     */
     public $error = '';
-
-    /**
-    * @var integer
-    */
-    public $errorCode = 0;
 
     /**
     * Constructor
@@ -80,12 +85,10 @@ class Target
 
         $tokenizer = new Tokenizer();
         $this->tokens = $tokenizer->decode($this->path);
-        $this->found = empty($this->tokens);
 
         if (in_array('', $this->tokens, true)) {
+            $this->invalid = true;
             $this->setError(Error::ERR_KEY_EMPTY);
-            $this->tokens = [];
-            $this->found = false;
         }
     }
 
@@ -119,12 +122,11 @@ class Target
     */
     public function setError($code)
     {
-        $this->clearError();
+        $this->error = '';
 
         if (is_integer($code)) {
             $error = new Error();
             $this->error = $error->get($code, $this->path);
-            $this->errorCode = $code;
         }
     }
 
@@ -134,21 +136,13 @@ class Target
     * @api
     * @param bool $found If the element has been found
     */
-    public function setFound($found)
+    public function setFound($found, &$element)
     {
         $this->found = $found;
+        $this->element =& $element;
 
         if (!$this->found && !$this->error) {
             $this->setError(Error::ERR_NOT_FOUND);
         }
-    }
-
-    /**
-    * Clears error values
-    */
-    protected function clearError()
-    {
-        $this->error = '';
-        $this->errorCode = 0;
     }
 }

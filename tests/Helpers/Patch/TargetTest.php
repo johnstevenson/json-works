@@ -5,7 +5,7 @@ namespace JsonWorks\Tests\Helpers\Patch;
 use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
-class TargetTest extends \PHPUnit_Framework_TestCase
+class TargetTest extends \JsonWorks\Tests\Base
 {
     protected function getMsg($key, $value)
     {
@@ -21,7 +21,6 @@ class TargetTest extends \PHPUnit_Framework_TestCase
             'key' => '',
             'childKey' => '',
             'error' => '',
-            'errorCode' => 0,
         ];
 
         foreach ($tests as $key => $value) {
@@ -40,9 +39,6 @@ class TargetTest extends \PHPUnit_Framework_TestCase
 
         $msg = 'Test tokens is empty';
         $this->assertEmpty($target->tokens, $msg);
-
-        $msg = 'Test found is true';
-        $this->assertTrue($target->found, $msg);
     }
 
     public function testConstructorValidPath()
@@ -60,18 +56,7 @@ class TargetTest extends \PHPUnit_Framework_TestCase
     {
         $target = new Target('/invalid//key', $error);
 
-        $msg = 'Test found is false with invalid path';
-        $this->assertFalse($target->found, $msg);
-
-        $msg = 'Test tokens have been emtpied with invalid path';
-        $this->assertEmpty($target->tokens, $msg);
-
-        $msg = 'Testing error contains ERR_KEY_EMPTY';
         $this->assertContains('ERR_KEY_EMPTY', $target->error);
-
-        $errorCode = Error::ERR_KEY_EMPTY;
-        $msg = $this->getMsg('errorCode', $errorCode);
-        $this->assertEquals($errorCode, $target->errorCode, $msg);
     }
 
     public function testSetArray()
@@ -112,45 +97,35 @@ class TargetTest extends \PHPUnit_Framework_TestCase
         $msg = 'Testing error is not empty';
         $this->assertNotEmpty($target->error, $msg);
 
-        $msg = $this->getMsg('errorCode', $value);
-        $this->assertEquals($value, $target->errorCode, $msg);
-
         // check null clears error
         $target->setError(null);
 
-        $tests = [
-            'error' => '',
-            'errorCode' => 0,
-        ];
-
-        foreach ($tests as $key => $value) {
-            $msg = $this->getMsg($key, $value);
-            $this->assertEquals($target->$key, $value, $msg);
-        }
+        $msg = 'Testing error is empty';
+        $this->assertEmpty($target->error, $msg);
     }
 
     public function testSetFound()
     {
         $target = new Target('/prop1/prop2', $error);
 
+        $element = [];
         $value = !$target->found;
-        $target->setFound($value);
+
+        $target->setFound($value, $element);
 
         $msg = $this->getMsg('key', $value);
         $this->assertEquals($value, $target->found, $msg);
+        $this->assertTrue($this->sameRef($element, $target->element));
     }
 
     public function testSetFoundFalseSetsError()
     {
         $target = new Target('/prop1/prop2', $error);
-        $target->setFound(false);
+
+        $target->setFound(false, $element);
 
         $msg = 'Testing error contains ERR_NOT_FOUND';
         $this->assertContains('ERR_NOT_FOUND', $target->error);
-
-        $errorCode = Error::ERR_NOT_FOUND;
-        $msg = $this->getMsg('errorCode', $errorCode);
-        $this->assertEquals($errorCode, $target->errorCode, $msg);
     }
 
     public function testSetFoundFalsePreservesExistingError()
@@ -162,12 +137,9 @@ class TargetTest extends \PHPUnit_Framework_TestCase
         $target->setError($errorCode);
 
         // set found
-        $target->setFound(false);
+        $target->setFound(false, $element);
 
         $msg = 'Testing error contains original ERR_KEY_INVALID';
         $this->assertContains('ERR_KEY_INVALID', $target->error);
-
-        $msg = $this->getMsg('errorCode', $errorCode);
-        $this->assertEquals($errorCode, $target->errorCode, $msg);
     }
 }

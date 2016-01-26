@@ -56,7 +56,7 @@ class Document extends BaseDocument
     {
         $value = null;
 
-        if ($result = $this->finder->find($path, $this->data, $element)) {
+        if ($result = $this->finder->find($path, $this->data, $element, $this->lastError)) {
             $value = $this->formatter->copy($element);
         }
 

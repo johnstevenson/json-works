@@ -35,18 +35,18 @@ class Finder
     * @param string $path
     * @param mixed $data
     * @param mixed $element Set by method if found
+    * @param string $error Set by method
     * @return bool
     */
-    public function find($path, $data, &$element)
+    public function find($path, $data, &$element, &$error)
     {
-        $target = new Target($path, $dummy);
-        $this->get($data, $target);
+        $target = new Target($path, $error);
 
-        if ($target->found) {
-            $element = $this->element;
+        if ($result = $this->get($data, $target)) {
+            $element = $target->element;
         }
 
-        return $target->found;
+        return $result;
     }
 
     /**
@@ -57,17 +57,22 @@ class Finder
     * @param Target $target Modified by method
     * @return mixed A reference to the found element
     */
-    public function &get(&$data, Target $target)
+    public function get(&$data, Target $target)
     {
         $this->element =& $data;
-        $this->target =& $target;
+        $this->target = $target;
 
-        if (!empty($this->target->tokens)) {
-            $found = $this->search($this->target->tokens);
-            $this->target->setFound($found);
+        if ($target->invalid) {
+            return false;
         }
 
-        return $this->element;
+        if (!$found = empty($target->tokens)) {
+            $found = $this->search($target->tokens);
+        }
+
+        $target->setFound($found, $this->element);
+
+        return $found;
     }
 
     /**
@@ -82,8 +87,10 @@ class Finder
         while (!empty($tokens)) {
             $token = $tokens[0];
 
+            $this->target->parent =& $this->element;
+
             if (count($tokens) === 1) {
-                $this->target->parent =& $this->element;
+                //$this->target->parent =& $this->element;
                 $this->target->childKey = $token;
             }
 

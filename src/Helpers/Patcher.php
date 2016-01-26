@@ -11,6 +11,7 @@
 namespace JohnStevenson\JsonWorks\Helpers;
 
 use InvalidArgumentException;
+use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Finder;
 use JohnStevenson\JsonWorks\Helpers\Patch\Builder;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
@@ -29,16 +30,6 @@ class Patcher
     * @var Finder
     */
     protected $finder;
-
-    /**
-    * @var object|array|null
-    */
-    protected $data;
-
-    /**
-    * @var mixed
-    */
-    protected $element;
 
     /**
     * @var string
@@ -63,11 +54,7 @@ class Patcher
             return false;
         }
 
-        if ($result = $this->addToData($value, $target)) {
-            $data = $this->data;
-        }
-
-        return $result;
+        return $this->addToData($value, $target);
     }
 
     public function remove(&$data, $path)
@@ -96,11 +83,11 @@ class Patcher
     */
     public function replace(&$data, $path, $value)
     {
-        if ($result = $this->find($data, $path, $target)) {
-            $result = $this->addToData($value, $target);
+        if (!$this->find($data, $path, $target)) {
+            return false;
         }
 
-        return $result;
+        return $this->addToData($value, $target);
     }
 
     public function getError()
@@ -108,83 +95,69 @@ class Patcher
         return $this->error;
     }
 
-    protected function find(&$data, $path, &$target, $add = false)
-    {
-        // We won't need these assignments when we have refactored
-        // the builder to return a value to add to the found element
-        $this->data = $data;
-        $this->element =& $this->data;
-
-        $target = new Target($path, $this->error);
-
-        if ($target->errorCode) {
-            return false;
-        }
-
-        if ($add) {
-            $this->element =& $this->finder->get($this->element, $target);
-        } else {
-            $this->element =& $this->finder->get($data, $target);
-        }
-
-
-        return $target->found;
-    }
-
-    protected function addToRoot($value)
-    {
-        if (!(is_object($value) || is_array($value))) {
-            $this->error = 'Value must be an object or array';
-            return false;
-        }
-
-        $this->element = $value;
-
-        return true;
-    }
-
     protected function addToData($value, Target $target)
     {
         if ($target->type === Target::TYPE_ARRAY) {
-            array_splice($this->element, $target->key, 0, [$value]);
+            array_splice($target->element, $target->key, 0, [$value]);
+
         } elseif ($target->type === Target::TYPE_OBJECT) {
-            $this->element->{$target->key} = $value;
-        } elseif ($this->data === $this->element) {
-            return $this->addToRoot($value);
+            $target->element->{$target->key} = $value;
+
+        } elseif (!$target->path) {
+            return $this->addToRoot($value, $target);
+
         } else {
-            $this->element = $value;
+            $target->element = $value;
         }
 
         return true;
+    }
+
+    protected function addToRoot($value, Target $target)
+    {
+        if (!(is_object($value) || is_array($value))) {
+            $target->setError(Error::ERR_BAD_VALUE);
+            return false;
+        }
+
+        $target->element = $value;
+
+        return true;
+    }
+
+    protected function find(&$data, $path, &$target)
+    {
+        $target = new Target($path, $this->error);
+
+        return $this->finder->get($data, $target);
     }
 
     protected function getElement(&$data, $path, &$value, &$target)
     {
-        if ($result = $this->find($data, $path, $target, true)) {
+        if ($this->find($data, $path, $target)) {
 
             if (is_array($target->parent)) {
                 $target->setArray($target->childKey);
-                $this->element =& $target->parent;
+                $target->element =& $target->parent;
             }
 
             return true;
         }
 
-        if ($this->jsonPatch && count($target->tokens) > 1) {
+        if ($target->invalid || ($this->jsonPatch && count($target->tokens) > 1)) {
             return false;
         }
 
-        return $this->buildElement($target);
+        return $this->buildElement($target, $value);
     }
 
-    protected function buildElement(Target $target)
+    protected function buildElement(Target $target, &$value)
     {
         $result = true;
 
         try {
-            $this->element =& $this->builder->add($this->element, $target);
+            $value = $this->builder->add($target->element, $value, $target);
         } catch (InvalidArgumentException $e) {
-            $this->error = $e->getMessage();
             $result = false;
         }
 

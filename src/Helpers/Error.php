@@ -21,6 +21,7 @@ class Error
     const ERR_NOT_FOUND = 1;
     const ERR_KEY_EMPTY = 2;
     const ERR_KEY_INVALID = 3;
+    const ERR_BAD_VALUE = 4;
 
     /**
     * Returns a formatted error message
@@ -64,6 +65,10 @@ class Error
             case self::ERR_KEY_INVALID:
                 $title = 'ERR_KEY_INVALID';
                 $msg = 'Invalid key in path';
+                break;
+            case self::ERR_BAD_VALUE:
+                $title = 'ERR_BAD_VALUE';
+                $msg = 'Value must be an object or array';
                 break;
             default:
                 $title = 'ERR_UNKNOWN';

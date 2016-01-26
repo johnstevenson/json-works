@@ -28,9 +28,10 @@ class FinderTest extends \JsonWorks\Tests\Base
         $path = '';
         $target = new Target($path, $error);
 
-        $result =& $this->finder->get($data, $target);
+        $result = $this->finder->get($data, $target);
+        $this->assertTrue($result);
         $this->assertTrue($target->found);
-        $this->assertTrue($this->sameRef($expected, $result));
+        $this->assertTrue($this->sameRef($expected, $target->element));
         $this->assertEquals('', $error);
     }
 
@@ -46,12 +47,13 @@ class FinderTest extends \JsonWorks\Tests\Base
 
         $path = '/prop1/inner1';
         $target = new Target($path, $error);
-        $result =& $this->finder->get($data, $target);
+        $result = $this->finder->get($data, $target);
 
         // check result
         $msg = 'Testing result';
+        $this->assertTrue($result, $msg);
         $this->assertTrue($target->found, $msg);
-        $this->assertTrue($this->sameRef($expected, $result), $msg);
+        $this->assertTrue($this->sameRef($expected, $target->element), $msg);
         $this->assertEquals('', $error, $msg);
 
         // check parent
@@ -73,12 +75,13 @@ class FinderTest extends \JsonWorks\Tests\Base
 
         $path = '/prop1/inner1/2';
         $target = new Target($path, $error);
-        $result =& $this->finder->get($data, $target);
+        $result = $this->finder->get($data, $target);
 
         // check result
         $msg = 'Testing result';
+        $this->assertTrue($result, $msg);
         $this->assertTrue($target->found, $msg);
-        $this->assertTrue($this->sameRef($expected, $result), $msg);
+        $this->assertTrue($this->sameRef($expected, $target->element), $msg);
         $this->assertEquals('', $error, $msg);
 
         // check parent
@@ -96,18 +99,21 @@ class FinderTest extends \JsonWorks\Tests\Base
             }
         }');
 
+        $expected =& $data->prop1->inner1;
+
         $path = '/prop1/inner1/8';
         $target = new Target($path, $error);
-        $this->finder->get($data, $target);
+        $result = $this->finder->get($data, $target);
 
         // check result
         $msg = 'Testing result';
+        $this->assertFalse($result, $msg);
         $this->assertFalse($target->found, $msg);
-        $this->assertEquals(Error::ERR_NOT_FOUND, $target->errorCode, $msg);
+        $this->assertTrue($this->sameRef($expected, $target->element), $msg);
+        $this->assertContains('ERR_NOT_FOUND', $target->error, $msg);
 
-        // check parent
+        // check parent, will be the same as element
         $msg = 'Testing parent';
-        $expected =& $data->prop1->inner1;
         $this->assertTrue($this->sameRef($expected, $target->parent), $msg);
         $this->assertEquals('8', $target->childKey, $msg);
     }
@@ -120,18 +126,21 @@ class FinderTest extends \JsonWorks\Tests\Base
             }
         }');
 
+        $expected =& $data->prop1->inner1;
+
         $path = '/prop1/inner1/item';
         $target = new Target($path, $error);
-        $this->finder->get($data, $target);
+        $result = $this->finder->get($data, $target);
 
         // check result
         $msg = 'Testing result';
+        $this->assertFalse($result, $msg);
         $this->assertFalse($target->found, $msg);
-        $this->assertEquals(Error::ERR_KEY_INVALID, $target->errorCode, $msg);
+        $this->assertTrue($this->sameRef($expected, $target->element), $msg);
+        $this->assertContains('ERR_KEY_INVALID', $target->error, $msg);
 
-        // check parent
+        // check parent, will be the same as element
         $msg = 'Testing parent';
-        $expected =& $data->prop1->inner1;
         $this->assertTrue($this->sameRef($expected, $target->parent), $msg);
         $this->assertEquals('item', $target->childKey, $msg);
     }
@@ -144,18 +153,19 @@ class FinderTest extends \JsonWorks\Tests\Base
             }
         }');
 
-        $path = '/prop1//item';
+        $path = '/prop1//inner1';
         $target = new Target($path, $error);
-        $this->finder->get($data, $target);
+        $result = $this->finder->get($data, $target);
 
         // check result
         $msg = 'Testing result';
+        $this->assertFalse($result, $msg);
         $this->assertFalse($target->found, $msg);
-        $this->assertEquals(Error::ERR_KEY_EMPTY, $target->errorCode, $msg);
+        $this->assertNull($target->element, $msg);
+        $this->assertContains('ERR_KEY_EMPTY', $target->error, $msg);
 
-        // check parent
+        // check parent values are not set
         $msg = 'Testing parent';
-        $expected =& $data->prop1->inner1;
         $this->assertNull($target->parent, $msg);
         $this->assertEquals('', $target->childKey, $msg);
     }
@@ -171,11 +181,12 @@ class FinderTest extends \JsonWorks\Tests\Base
         $expected = 2;
 
         $path = '/prop1/inner1/2';
-        $result = $this->finder->find($path, $data, $element);
+        $result = $this->finder->find($path, $data, $element, $error);
 
         // check result
         $this->assertTrue($result);
         $this->assertEquals($expected, $element);
+        $this->assertEmpty($error);
 
         // check $element does not reference the data
         $dataRef =& $data->prop1->inner1[2];
@@ -194,10 +205,55 @@ class FinderTest extends \JsonWorks\Tests\Base
         $expected = $element;
 
         $path = '/prop1/inner1/8';
-        $result = $this->finder->find($path, $data, $element);
+        $result = $this->finder->find($path, $data, $element, $error);
 
         // check result
         $this->assertFalse($result);
+        $this->assertContains('ERR_NOT_FOUND', $error);
+
+        // check passed-in $element has not been modified
+        $this->assertEquals($expected, $element);
+    }
+
+    public function testFindInvalidKey()
+    {
+        $data = json_decode('{
+            "prop1": {
+                "inner1": [0, 1, 2, 3]
+            }
+        }');
+
+        $element = 'original-value';
+        $expected = $element;
+
+        $path = '/prop1/inner1/item';
+        $result = $this->finder->find($path, $data, $element, $error);
+
+        // check result
+        $this->assertFalse($result);
+        $this->assertContains('ERR_KEY_INVALID', $error);
+
+        // check passed-in $element has not been modified
+        $this->assertEquals($expected, $element);
+    }
+
+    public function testFindEmptyKey()
+    {
+        $data = json_decode('{
+            "prop1": {
+                "inner1": [0, 1, 2, 3]
+            }
+        }');
+
+        $element = 'original-value';
+        $expected = $element;
+
+        $path = '/prop1/inner1//item';
+        $result = $this->finder->find($path, $data, $element, $error);
+
+        // check result
+        $this->assertFalse($result);
+        $this->assertContains('ERR_KEY_EMPTY', $error);
 
         // check passed-in $element has not been modified
         $this->assertEquals($expected, $element);

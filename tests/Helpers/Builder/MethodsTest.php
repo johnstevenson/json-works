@@ -13,7 +13,8 @@ class MethodsTest extends \JsonWorks\Tests\Base
         $this->builder = new Builder();
         $target = new Target('', $dummy);
         $data = null;
-        $this->builder->add($data, $target);
+        $value = null;
+        $this->builder->add($data, $value, $target);
     }
 
     protected function call($name, $args)

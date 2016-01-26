@@ -24,23 +24,48 @@ class Builder
     /**
     * @var mixed
     */
+    protected $data;
+
+    /**
+    * @var mixed
+    */
     protected $element;
 
-    public function &add(&$data, Target $target)
+    public function add($data, $value, Target $target)
     {
-        $this->element =& $data;
-        $this->target =& $target;
+        $this->data = $data;
+        $this->element =& $this->data;
+        $this->target = $target;
 
-        if (is_null($this->element) && !empty($this->target->tokens)) {
-            $this->addContainer($this->target->tokens[0]);
+        $this->initData();
+
+        if (empty($this->target->tokens)) {
+            $this->data = $value;
+        } else {
+            $this->processTokens($this->target->tokens, $value);
         }
 
-        $this->processTokens($this->target->tokens);
-
-        return $this->element;
+        return $this->data;
     }
 
-    protected function processTokens(array &$tokens)
+    protected function initData()
+    {
+        if (!empty($this->target->tokens)) {
+
+            $key = $this->target->tokens[0];
+
+            if (is_null($this->data)) {
+                $this->addContainer($key);
+            } else {
+                $this->setTarget($key);
+                $this->data = null;
+                array_shift($this->target->tokens);
+                $this->initData();
+            }
+        }
+    }
+
+    protected function processTokens(array &$tokens, $value)
     {
         while (!empty($tokens)) {
 
@@ -50,8 +75,8 @@ class Builder
                 $this->createElement($key, $tokens[0]);
 
             } else {
-                // No tokens left so set target type from the key
-                $this->setTarget($key);
+                // No tokens left so set the value
+                $this->setValue($key, $value);
             }
         }
     }
@@ -84,12 +109,23 @@ class Builder
 
     protected function setTarget($key)
     {
-        if (is_array($this->element)) {
-
-            $this->checkArrayKey($this->element, $key, $index);
+        if (is_array($this->data)) {
+            $this->checkArrayKey($this->data, $key, $index);
             $this->target->setArray($index);
-        } else {
+
+        } elseif (is_object($this->data)) {
             $this->target->setObject($key);
+        }
+    }
+
+    protected function setValue($key, $value)
+    {
+        if (is_array($this->element)) {
+            $this->checkArrayKey($this->element, $key, $index);
+            $this->element[$index] = $value;
+
+        } elseif (is_object($this->element)) {
+            $this->element->$key = $value;
         }
     }
 
