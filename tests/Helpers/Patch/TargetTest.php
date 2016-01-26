@@ -17,6 +17,7 @@ class TargetTest extends \JsonWorks\Tests\Base
         $target = new Target('', $error);
 
         $tests = [
+            'invalid' => false,
             'type' => Target::TYPE_VALUE,
             'key' => '',
             'childKey' => '',
@@ -37,25 +38,21 @@ class TargetTest extends \JsonWorks\Tests\Base
     {
         $target = new Target('', $error);
 
-        $msg = 'Test tokens is empty';
-        $this->assertEmpty($target->tokens, $msg);
+        $this->assertEmpty($target->tokens);
     }
 
     public function testConstructorValidPath()
     {
         $target = new Target('/prop1/prop2', $error);
 
-        $msg = 'Test tokens contains 2 entries';
-        $this->assertCount(2, $target->tokens, $msg);
-
-        $msg = 'Test found is false';
-        $this->assertFalse($target->found, $msg);
+        $this->assertCount(2, $target->tokens);
     }
 
     public function testConstructorInvalidPath()
     {
         $target = new Target('/invalid//key', $error);
 
+        $this->assertTrue($target->invalid);
         $this->assertContains('ERR_KEY_EMPTY', $target->error);
     }
 
@@ -104,31 +101,27 @@ class TargetTest extends \JsonWorks\Tests\Base
         $this->assertEmpty($target->error, $msg);
     }
 
-    public function testSetFound()
+    public function testSetResult()
     {
         $target = new Target('/prop1/prop2', $error);
 
         $element = [];
-        $value = !$target->found;
 
-        $target->setFound($value, $element);
+        $target->setResult(true, $element);
 
-        $msg = $this->getMsg('key', $value);
-        $this->assertEquals($value, $target->found, $msg);
         $this->assertTrue($this->sameRef($element, $target->element));
     }
 
-    public function testSetFoundFalseSetsError()
+    public function testSetResultFalseSetsError()
     {
         $target = new Target('/prop1/prop2', $error);
 
-        $target->setFound(false, $element);
+        $target->setResult(false, $element);
 
-        $msg = 'Testing error contains ERR_NOT_FOUND';
         $this->assertContains('ERR_NOT_FOUND', $target->error);
     }
 
-    public function testSetFoundFalsePreservesExistingError()
+    public function testSetResultFalsePreservesExistingError()
     {
         $target = new Target('/prop1/prop2', $error);
 
@@ -136,10 +129,9 @@ class TargetTest extends \JsonWorks\Tests\Base
         $errorCode = Error::ERR_KEY_INVALID;
         $target->setError($errorCode);
 
-        // set found
-        $target->setFound(false, $element);
+        // set result
+        $target->setResult(false, $element);
 
-        $msg = 'Testing error contains original ERR_KEY_INVALID';
         $this->assertContains('ERR_KEY_INVALID', $target->error);
     }
 }

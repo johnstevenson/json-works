@@ -30,7 +30,6 @@ class FinderTest extends \JsonWorks\Tests\Base
 
         $result = $this->finder->get($data, $target);
         $this->assertTrue($result);
-        $this->assertTrue($target->found);
         $this->assertTrue($this->sameRef($expected, $target->element));
         $this->assertEquals('', $error);
     }
@@ -52,7 +51,6 @@ class FinderTest extends \JsonWorks\Tests\Base
         // check result
         $msg = 'Testing result';
         $this->assertTrue($result, $msg);
-        $this->assertTrue($target->found, $msg);
         $this->assertTrue($this->sameRef($expected, $target->element), $msg);
         $this->assertEquals('', $error, $msg);
 
@@ -80,7 +78,6 @@ class FinderTest extends \JsonWorks\Tests\Base
         // check result
         $msg = 'Testing result';
         $this->assertTrue($result, $msg);
-        $this->assertTrue($target->found, $msg);
         $this->assertTrue($this->sameRef($expected, $target->element), $msg);
         $this->assertEquals('', $error, $msg);
 
@@ -108,7 +105,6 @@ class FinderTest extends \JsonWorks\Tests\Base
         // check result
         $msg = 'Testing result';
         $this->assertFalse($result, $msg);
-        $this->assertFalse($target->found, $msg);
         $this->assertTrue($this->sameRef($expected, $target->element), $msg);
         $this->assertContains('ERR_NOT_FOUND', $target->error, $msg);
 
@@ -135,7 +131,6 @@ class FinderTest extends \JsonWorks\Tests\Base
         // check result
         $msg = 'Testing result';
         $this->assertFalse($result, $msg);
-        $this->assertFalse($target->found, $msg);
         $this->assertTrue($this->sameRef($expected, $target->element), $msg);
         $this->assertContains('ERR_KEY_INVALID', $target->error, $msg);
 
@@ -160,7 +155,7 @@ class FinderTest extends \JsonWorks\Tests\Base
         // check result
         $msg = 'Testing result';
         $this->assertFalse($result, $msg);
-        $this->assertFalse($target->found, $msg);
+        $this->assertTrue($target->invalid);
         $this->assertNull($target->element, $msg);
         $this->assertContains('ERR_KEY_EMPTY', $target->error, $msg);
 

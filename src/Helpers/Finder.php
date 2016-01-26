@@ -70,7 +70,7 @@ class Finder
             $found = $this->search($target->tokens);
         }
 
-        $target->setFound($found, $this->element);
+        $target->setResult($found, $this->element);
 
         return $found;
     }
@@ -78,7 +78,7 @@ class Finder
     /**
     * Returns true if the element is found
     *
-    * @param Target $target Modified by method
+    * @param array $tokens Modified by method
     * @return bool
     */
     protected function search(array &$tokens)
@@ -90,7 +90,6 @@ class Finder
             $this->target->parent =& $this->element;
 
             if (count($tokens) === 1) {
-                //$this->target->parent =& $this->element;
                 $this->target->childKey = $token;
             }
 

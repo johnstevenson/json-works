@@ -54,7 +54,7 @@ class Patcher
             return false;
         }
 
-        return $this->addToData($value, $target);
+        return $this->addData($target, $value);
     }
 
     public function remove(&$data, $path)
@@ -87,7 +87,7 @@ class Patcher
             return false;
         }
 
-        return $this->addToData($value, $target);
+        return $this->addData($target, $value);
     }
 
     public function getError()
@@ -95,7 +95,7 @@ class Patcher
         return $this->error;
     }
 
-    protected function addToData($value, Target $target)
+    protected function addData(Target $target, $value)
     {
         if ($target->type === Target::TYPE_ARRAY) {
             array_splice($target->element, $target->key, 0, [$value]);
@@ -104,7 +104,7 @@ class Patcher
             $target->element->{$target->key} = $value;
 
         } elseif (!$target->path) {
-            return $this->addToRoot($value, $target);
+            return $this->addRoot($target, $value);
 
         } else {
             $target->element = $value;
@@ -113,7 +113,7 @@ class Patcher
         return true;
     }
 
-    protected function addToRoot($value, Target $target)
+    protected function addRoot(Target $target, $value)
     {
         if (!(is_object($value) || is_array($value))) {
             $target->setError(Error::ERR_BAD_VALUE);
@@ -144,19 +144,19 @@ class Patcher
             return true;
         }
 
-        if ($target->invalid || ($this->jsonPatch && count($target->tokens) > 1)) {
-            return false;
-        }
-
         return $this->buildElement($target, $value);
     }
 
     protected function buildElement(Target $target, &$value)
     {
+        if ($target->invalid || ($this->jsonPatch && count($target->tokens) > 1)) {
+            return false;
+        }
+
         $result = true;
 
         try {
-            $value = $this->builder->add($target->element, $value, $target);
+            $value = $this->builder->make($target, $value);
         } catch (InvalidArgumentException $e) {
             $result = false;
         }

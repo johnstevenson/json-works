@@ -13,6 +13,23 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $this->patcher = new Patcher();
     }
 
+    public function testAddEmptyKeyFails()
+    {
+        $data = json_decode('{
+            "prop1": {
+                "inner1": [0, 1, 2, 3]
+            }
+        }');
+
+        $expected = $data;
+
+        $path = '/prop1//inner2';
+        $value = true;
+
+        $this->assertFalse($this->patcher->add($data, $path, $value));
+        $this->assertEquals($expected, $data);
+    }
+
     public function testReplaceNullRoot()
     {
         $data = null;
@@ -83,6 +100,23 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $expected = $data;
 
         $path = '';
+        $value = true;
+
+        $this->assertFalse($this->patcher->replace($data, $path, $value));
+        $this->assertEquals($expected, $data);
+    }
+
+    public function testReplaceMissingObjectPropertyFails()
+    {
+        $data = json_decode('{
+            "prop1": {
+                "inner1": [0, 1, 2, 3]
+            }
+        }');
+
+        $expected = $data;
+
+        $path = '/prop1/inner2';
         $value = true;
 
         $this->assertFalse($this->patcher->replace($data, $path, $value));

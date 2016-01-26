@@ -31,9 +31,9 @@ class Builder
     */
     protected $element;
 
-    public function add($data, $value, Target $target)
+    public function make(Target $target, $value)
     {
-        $this->data = $data;
+        $this->data = $target->element;
         $this->element =& $this->data;
         $this->target = $target;
 
@@ -113,7 +113,7 @@ class Builder
             $this->checkArrayKey($this->data, $key, $index);
             $this->target->setArray($index);
 
-        } elseif (is_object($this->data)) {
+        } else {
             $this->target->setObject($key);
         }
     }
@@ -124,7 +124,7 @@ class Builder
             $this->checkArrayKey($this->element, $key, $index);
             $this->element[$index] = $value;
 
-        } elseif (is_object($this->element)) {
+        } else {
             $this->element->$key = $value;
         }
     }

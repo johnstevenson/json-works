@@ -28,11 +28,6 @@ class Target
     public $invalid = false;
 
     /**
-    * @var bool
-    */
-    public $found = false;
-
-    /**
     * @var integer
     */
     public $type = self::TYPE_VALUE;
@@ -131,17 +126,16 @@ class Target
     }
 
     /**
-    * Sets found and error if not already set
+    * Sets element and error if not already set
     *
     * @api
     * @param bool $found If the element has been found
     */
-    public function setFound($found, &$element)
+    public function setResult($found, &$element)
     {
-        $this->found = $found;
         $this->element =& $element;
 
-        if (!$this->found && !$this->error) {
+        if (!$found && !$this->error) {
             $this->setError(Error::ERR_NOT_FOUND);
         }
     }
