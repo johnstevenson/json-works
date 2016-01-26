@@ -39,10 +39,10 @@ class Builder
 
         $this->initData();
 
-        if (empty($this->target->tokens)) {
+        if (empty($target->tokens)) {
             $this->data = $value;
         } else {
-            $this->processTokens($this->target->tokens, $value);
+            $this->processTokens($target->tokens, $value);
         }
 
         return $this->data;
@@ -55,6 +55,8 @@ class Builder
             $key = $this->target->tokens[0];
 
             if (is_null($this->data)) {
+                // 1st pass: creating a root container
+                // 2nd pass: recursing
                 $this->addContainer($key);
             } else {
                 $this->setTarget($key);

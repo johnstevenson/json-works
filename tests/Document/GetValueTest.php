@@ -19,8 +19,9 @@ class GetValueTest extends \JsonWorks\Tests\Base
 
         $path = '/prop1/prop11';
         $expected = 'prop11 value';
-        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
-        $this->assertEquals($expected, $value);
+        //$this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
+        $result = $document->getValue($path);
+        $this->assertEquals($expected, $result, 'Testing success: '.$path);
 
         $path = '/prop1/prop111';
         $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);

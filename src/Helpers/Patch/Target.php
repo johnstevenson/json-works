@@ -113,13 +113,13 @@ class Target
     * Sets or clears an error message
     *
     * @api
-    * @param integer|null $code
+    * @param string|null $code
     */
     public function setError($code)
     {
         $this->error = '';
 
-        if (is_integer($code)) {
+        if ($code) {
             $error = new Error();
             $this->error = $error->get($code, $this->path);
         }

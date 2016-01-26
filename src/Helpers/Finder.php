@@ -87,9 +87,8 @@ class Finder
         while (!empty($tokens)) {
             $token = $tokens[0];
 
-            $this->target->parent =& $this->element;
-
             if (count($tokens) === 1) {
+                $this->target->parent =& $this->element;
                 $this->target->childKey = $token;
             }
 

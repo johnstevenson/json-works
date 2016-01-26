@@ -17,66 +17,56 @@ use JohnStevenson\JsonWorks\Helpers\Error;
 */
 class Error
 {
-    const ERR_SUCCESS = 0;
-    const ERR_NOT_FOUND = 1;
-    const ERR_PATH_KEY = 2;
-    const ERR_BAD_INPUT = 3;
-    const ERR_VALIDATE = 4;
+    const ERR_NOT_FOUND = 'ERR_NOT_FOUND';
+    const ERR_PATH_KEY = 'ERR_PATH_KEY';
+    const ERR_BAD_INPUT = 'ERR_BAD_INPUT';
+    const ERR_VALIDATE = 'ERR_VALIDATE';
 
     /**
     * Returns a formatted error message
     *
     * @api
-    * @param integer $code
+    * @param string $code
     * @param string $msg
     * @return string
     */
-    public function get($code, $msg = '')
+    public function get($code, $msg)
     {
         if ($code === self::ERR_VALIDATE) {
-            return sprintf('ERR_VALIDATE: %s', $msg);
+            return sprintf('%s: %s', self::ERR_VALIDATE, $msg);
         }
 
-        $error = $this->codeToString($code, $matched);
-
-        if ($msg) {
-            $format = $matched ? ' [%s]' : ' %s';
-            $error .= sprintf($format, $msg);
+        if ($caption = $this->codeGetCaption($code)) {
+            $error = sprintf('%s: %s [%s]', $code, $caption, $msg);
+        } else {
+            $error = sprintf('%s: %s', $code, $msg);
         }
 
         return $error;
     }
 
     /**
-    * Formats and returns an error message
+    * Returns an error caption
     *
-    * @param integer $code
-    * @param $matched Set by method
+    * @param string $code
     * @return string
     */
-    protected function codeToString($code, &$matched)
+    protected function codeGetCaption($code)
     {
-        $matched = true;
+        $result = '';
 
         switch ($code) {
             case self::ERR_NOT_FOUND:
-                $title = 'ERR_NOT_FOUND';
-                $msg = 'Unable to find resource';
+                $result = 'Unable to find resource';
                 break;
             case self::ERR_PATH_KEY:
-                $title = 'ERR_PATH_KEY';
-                $msg = 'Invalid path key';
+                $result = 'Invalid path key';
                 break;
             case self::ERR_BAD_INPUT:
-                $title = 'ERR_BAD_INPUT';
-                $msg = 'Invalid input';
+                $result = 'Invalid input';
                 break;
-            default:
-                $title = 'ERR_UNKNOWN';
-                $msg = 'An error occurred';
-                $matched = false;
         }
 
-        return sprintf('%s: %s', $title, $msg);
+        return $result;
     }
 }

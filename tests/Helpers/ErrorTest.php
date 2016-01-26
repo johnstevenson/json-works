@@ -13,33 +13,27 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $this->error = new Error();
     }
 
-    public function testKnownCodeWithMsg()
+    public function testKnownCodes()
     {
-        $code = Error::ERR_PATH_KEY;
-        $msg = 'prop1/inner1';
+        $class = new \ReflectionClass($this->error);
+        $msg = 'something';
+        $expected = '[something]';
 
-        $result = $this->error->get($code, $msg);
-        $this->assertStringStartsWith('ERR_PATH_KEY', $result);
-        $this->assertStringEndsWith('[prop1/inner1]', $result);
+        foreach ($class->getConstants() as $code) {
+            $result = $this->error->get($code, $msg);
+            $this->assertStringStartsWith($code, $result);
+            $expected = $code !== Error::ERR_VALIDATE ? '[something]' : $msg;
+            $this->assertStringEndsWith($expected, $result);
+        }
     }
 
-    public function testKnownCodeNoMsg()
+    public function testUnknownCode()
     {
-        $code = Error::ERR_PATH_KEY;
-
-        $result = $this->error->get($code);
-        $this->assertStringStartsWith('ERR_PATH_KEY', $result);
-        $this->assertStringNotMatchesFormat('%a [%s]', $result);
-    }
-
-    public function testUnknownCodeWithMsg()
-    {
-        // We use null to represent an Unknown code
-        $code = null;
-        $msg = 'prop1/inner1';
+        $code = 'ERR_UNKNOWN';
+        $msg = 'Custom message';
 
         $result = $this->error->get($code, $msg);
         $this->assertStringStartsWith('ERR_UNKNOWN', $result);
-        $this->assertStringEndsNotWith('[prop1/inner1]', $result);
+        $this->assertStringEndsWith('Custom message', $result);
     }
 }
