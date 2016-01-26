@@ -11,7 +11,6 @@
 namespace JohnStevenson\JsonWorks\Helpers;
 
 use InvalidArgumentException;
-use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Finder;
 use JohnStevenson\JsonWorks\Helpers\Patch\Builder;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
@@ -50,11 +49,11 @@ class Patcher
 
     public function add(&$data, $path, $value)
     {
-        if (!$this->getElement($data, $path, $value, $target)) {
-            return false;
+        if ($result = $this->getElement($data, $path, $value, $target)) {
+            $this->addData($target, $value);
         }
 
-        return $this->addData($target, $value);
+        return $result;
     }
 
     public function remove(&$data, $path)
@@ -83,11 +82,11 @@ class Patcher
     */
     public function replace(&$data, $path, $value)
     {
-        if (!$this->find($data, $path, $target)) {
-            return false;
+        if ($result = $this->find($data, $path, $target)) {
+            $this->addData($target, $value);
         }
 
-        return $this->addData($target, $value);
+        return $result;
     }
 
     public function getError()
@@ -97,32 +96,22 @@ class Patcher
 
     protected function addData(Target $target, $value)
     {
-        if ($target->type === Target::TYPE_ARRAY) {
-            array_splice($target->element, $target->key, 0, [$value]);
-
-        } elseif ($target->type === Target::TYPE_OBJECT) {
-            $target->element->{$target->key} = $value;
-
-        } elseif (!$target->path) {
-            return $this->addRoot($target, $value);
-
-        } else {
-            $target->element = $value;
+        switch ($target->type) {
+            case Target::TYPE_VALUE:
+                $target->element = $value;
+                break;
+            case Target::TYPE_OBJECT:
+                $target->element->{$target->key} = $value;
+                break;
+            case Target::TYPE_ARRAY:
+                array_splice($target->element, $target->key, 0, [$value]);
+                break;
         }
-
-        return true;
     }
 
-    protected function addRoot(Target $target, $value)
+    protected function canBuild(Target $target)
     {
-        if (!(is_object($value) || is_array($value))) {
-            $target->setError(Error::ERR_BAD_VALUE);
-            return false;
-        }
-
-        $target->element = $value;
-
-        return true;
+        return !$target->invalid && !($this->jsonPatch && count($target->tokens) > 1);
     }
 
     protected function find(&$data, $path, &$target)
@@ -149,16 +138,13 @@ class Patcher
 
     protected function buildElement(Target $target, &$value)
     {
-        if ($target->invalid || ($this->jsonPatch && count($target->tokens) > 1)) {
-            return false;
-        }
+        if ($result = $this->canBuild($target)) {
 
-        $result = true;
-
-        try {
-            $value = $this->builder->make($target, $value);
-        } catch (InvalidArgumentException $e) {
-            $result = false;
+            try {
+                $value = $this->builder->make($target, $value);
+            } catch (InvalidArgumentException $e) {
+                $result = false;
+            }
         }
 
         return $result;

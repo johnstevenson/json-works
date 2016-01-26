@@ -22,13 +22,12 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $this->assertEquals($value, $document->data);
     }
 
-    public function testInvalid()
+    public function testScalar()
     {
         $document = $this->getDocument(null, null);
         $path = '';
         $value = 'value';
-        $this->assertFalse($document->addValue($path, $value));
-        $this->assertNull($document->data);
-
+        $this->assertTrue($document->addValue($path, $value));
+        $this->assertEquals($value, $document->data);
     }
 }

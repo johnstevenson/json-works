@@ -134,7 +134,7 @@ class Finder
     protected function findArray($token)
     {
         if (!$this->isArrayKey($token, $index)) {
-            $this->target->setError(Error::ERR_KEY_INVALID);
+            $this->target->setError(Error::ERR_PATH_KEY);
             return false;
         }
 

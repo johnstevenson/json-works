@@ -91,7 +91,7 @@ class Builder
         if (is_array($this->element)) {
 
             if (!$this->isPushKey($key)) {
-                $this->target->setError(Error::ERR_KEY_INVALID);
+                $this->target->setError(Error::ERR_PATH_KEY);
                 throw new InvalidArgumentException($this->target->error);
             }
 
@@ -147,7 +147,7 @@ class Builder
         }
 
         if (!$result) {
-            $this->target->setError(Error::ERR_KEY_INVALID);
+            $this->target->setError(Error::ERR_PATH_KEY);
             throw new InvalidArgumentException($this->target->error);
         }
     }

@@ -89,7 +89,7 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $data);
     }
 
-    public function testReplaceRootWithScalarFails()
+    public function testReplaceRootWithScalar()
     {
         $data = json_decode('{
             "prop1": {
@@ -97,12 +97,12 @@ class PatcherTest extends \JsonWorks\Tests\Base
             }
         }');
 
-        $expected = $data;
+        $expected = true;
 
         $path = '';
         $value = true;
 
-        $this->assertFalse($this->patcher->replace($data, $path, $value));
+        $this->assertTrue($this->patcher->replace($data, $path, $value));
         $this->assertEquals($expected, $data);
     }
 

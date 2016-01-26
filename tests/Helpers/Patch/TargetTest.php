@@ -53,7 +53,7 @@ class TargetTest extends \JsonWorks\Tests\Base
         $target = new Target('/invalid//key', $error);
 
         $this->assertTrue($target->invalid);
-        $this->assertContains('ERR_KEY_EMPTY', $target->error);
+        $this->assertContains('ERR_PATH_KEY', $target->error);
     }
 
     public function testSetArray()
@@ -88,7 +88,7 @@ class TargetTest extends \JsonWorks\Tests\Base
     {
         $target = new Target('/prop1/prop2', $error);
 
-        $value = Error::ERR_KEY_INVALID;
+        $value = Error::ERR_PATH_KEY;
         $target->setError($value);
 
         $msg = 'Testing error is not empty';
@@ -126,12 +126,12 @@ class TargetTest extends \JsonWorks\Tests\Base
         $target = new Target('/prop1/prop2', $error);
 
         // set an error
-        $errorCode = Error::ERR_KEY_INVALID;
+        $errorCode = Error::ERR_PATH_KEY;
         $target->setError($errorCode);
 
         // set result
         $target->setResult(false, $element);
 
-        $this->assertContains('ERR_KEY_INVALID', $target->error);
+        $this->assertContains('ERR_PATH_KEY', $target->error);
     }
 }

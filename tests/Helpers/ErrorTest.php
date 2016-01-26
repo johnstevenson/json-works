@@ -15,20 +15,20 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
 
     public function testKnownCodeWithMsg()
     {
-        $code = Error::ERR_KEY_INVALID;
+        $code = Error::ERR_PATH_KEY;
         $msg = 'prop1/inner1';
 
         $result = $this->error->get($code, $msg);
-        $this->assertStringStartsWith('ERR_KEY_INVALID', $result);
+        $this->assertStringStartsWith('ERR_PATH_KEY', $result);
         $this->assertStringEndsWith('[prop1/inner1]', $result);
     }
 
     public function testKnownCodeNoMsg()
     {
-        $code = Error::ERR_KEY_INVALID;
+        $code = Error::ERR_PATH_KEY;
 
         $result = $this->error->get($code);
-        $this->assertStringStartsWith('ERR_KEY_INVALID', $result);
+        $this->assertStringStartsWith('ERR_PATH_KEY', $result);
         $this->assertStringNotMatchesFormat('%a [%s]', $result);
     }
 

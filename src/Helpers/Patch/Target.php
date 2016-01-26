@@ -83,7 +83,7 @@ class Target
 
         if (in_array('', $this->tokens, true)) {
             $this->invalid = true;
-            $this->setError(Error::ERR_KEY_EMPTY);
+            $this->setError(Error::ERR_PATH_KEY);
         }
     }
 

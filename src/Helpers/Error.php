@@ -19,9 +19,9 @@ class Error
 {
     const ERR_SUCCESS = 0;
     const ERR_NOT_FOUND = 1;
-    const ERR_KEY_EMPTY = 2;
-    const ERR_KEY_INVALID = 3;
-    const ERR_BAD_VALUE = 4;
+    const ERR_PATH_KEY = 2;
+    const ERR_BAD_INPUT = 3;
+    const ERR_VALIDATE = 4;
 
     /**
     * Returns a formatted error message
@@ -33,10 +33,15 @@ class Error
     */
     public function get($code, $msg = '')
     {
+        if ($code === self::ERR_VALIDATE) {
+            return sprintf('ERR_VALIDATE: %s', $msg);
+        }
+
         $error = $this->codeToString($code, $matched);
 
-        if ($matched && $msg) {
-            $error .= sprintf(' [%s]', $msg);
+        if ($msg) {
+            $format = $matched ? ' [%s]' : ' %s';
+            $error .= sprintf($format, $msg);
         }
 
         return $error;
@@ -58,21 +63,17 @@ class Error
                 $title = 'ERR_NOT_FOUND';
                 $msg = 'Unable to find resource';
                 break;
-            case self::ERR_KEY_EMPTY:
-                $title = 'ERR_KEY_EMPTY';
-                $msg = 'Empty key in path';
+            case self::ERR_PATH_KEY:
+                $title = 'ERR_PATH_KEY';
+                $msg = 'Invalid path key';
                 break;
-            case self::ERR_KEY_INVALID:
-                $title = 'ERR_KEY_INVALID';
-                $msg = 'Invalid key in path';
-                break;
-            case self::ERR_BAD_VALUE:
-                $title = 'ERR_BAD_VALUE';
-                $msg = 'Value must be an object or array';
+            case self::ERR_BAD_INPUT:
+                $title = 'ERR_BAD_INPUT';
+                $msg = 'Invalid input';
                 break;
             default:
                 $title = 'ERR_UNKNOWN';
-                $msg = 'An error occured';
+                $msg = 'An error occurred';
                 $matched = false;
         }
 
