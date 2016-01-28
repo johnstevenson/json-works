@@ -37,18 +37,28 @@ class Tokenizer
     *
     * @api
     * @param string $pointer The JSON Pointer to split
-    * @return array The decoded tokens
+    * @param array $tokens Placeholder for decoded tokens
+    * @return bool If the pointer is valid
     */
-    public function decode($pointer)
+    public function decode($pointer, &$tokens)
     {
+        if (strlen($pointer) && $pointer[0] !== '/') {
+            return false;
+        }
+
         $tokens = explode('/', $pointer);
         array_shift($tokens);
 
         foreach ($tokens as &$value) {
-            $value = str_replace('~0', '~', str_replace('~1', '/', $value));
+
+            if ($value === '') {
+                $value = '_empty_';
+            } else {
+                $value = str_replace('~0', '~', str_replace('~1', '/', $value));
+            }
         }
 
-        return $tokens;
+        return true;
     }
 
     /**

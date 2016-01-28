@@ -1,7 +1,17 @@
 filter:
-    paths: ["src/*"]
+    excluded_paths:
+        - 'vendor/*'
+        - 'tests/*'
+
 tools:
-    external_code_coverage: true
-    php_sim: true
-    php_pdepend: true
-    php_analyzer: true
+    external_code_coverage:
+        enabled: true
+        timeout: 900
+    php_sim:
+        enabled: true
+    php_pdepend:
+        enabled: true
+    php_analyzer:
+        enabled: true
+    php_changetracking:
+        enabled: true

@@ -88,6 +88,33 @@ class FinderTest extends \JsonWorks\Tests\Base
         $this->assertEquals('2', $target->childKey, $msg);
     }
 
+    public function testGetEmptyKey()
+    {
+        $data = json_decode('{
+            "prop1": {
+                "": [0, 1, 2, 3]
+            }
+        }');
+
+        $expected =& $data->prop1->_empty_[1];
+
+        $path = '/prop1//1';
+        $target = new Target($path, $error);
+        $result = $this->finder->get($data, $target);
+
+        // check result
+        $msg = 'Testing result';
+        $this->assertTrue($result, $msg);
+        $this->assertTrue($this->sameRef($expected, $target->element), $msg);
+        $this->assertEquals('', $error, $msg);
+
+        // check parent
+        $msg = 'Testing parent';
+        $expected =& $data->prop1->_empty_;
+        $this->assertTrue($this->sameRef($expected, $target->parent), $msg);
+        $this->assertEquals('1', $target->childKey, $msg);
+    }
+
     public function testGetNotFound()
     {
         $data = json_decode('{
@@ -133,36 +160,12 @@ class FinderTest extends \JsonWorks\Tests\Base
         $this->assertFalse($result, $msg);
         $this->assertTrue($this->sameRef($expected, $target->element), $msg);
         $this->assertContains('ERR_PATH_KEY', $target->error, $msg);
+        $this->assertTrue($target->invalid);
 
         // check parent, will be the same as element
         $msg = 'Testing parent';
         $this->assertTrue($this->sameRef($expected, $target->parent), $msg);
         $this->assertEquals('item', $target->childKey, $msg);
-    }
-
-    public function testGetEmptyKey()
-    {
-        $data = json_decode('{
-            "prop1": {
-                "inner1": [0, 1, 2, 3]
-            }
-        }');
-
-        $path = '/prop1//inner1';
-        $target = new Target($path, $error);
-        $result = $this->finder->get($data, $target);
-
-        // check result
-        $msg = 'Testing result';
-        $this->assertFalse($result, $msg);
-        $this->assertTrue($target->invalid);
-        $this->assertNull($target->element, $msg);
-        $this->assertContains('ERR_PATH_KEY', $target->error, $msg);
-
-        // check parent values are not set
-        $msg = 'Testing parent';
-        $this->assertNull($target->parent, $msg);
-        $this->assertEquals('', $target->childKey, $msg);
     }
 
     public function testFind()

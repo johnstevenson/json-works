@@ -79,9 +79,8 @@ class Target
         $this->error =& $error;
 
         $tokenizer = new Tokenizer();
-        $this->tokens = $tokenizer->decode($this->path);
 
-        if (in_array('', $this->tokens, true)) {
+        if (!$tokenizer->decode($this->path, $this->tokens)) {
             $this->invalid = true;
             $this->setError(Error::ERR_PATH_KEY);
         }
@@ -122,6 +121,7 @@ class Target
         if (!empty($code)) {
             $error = new Error();
             $this->error = $error->get($code, $this->path);
+            $this->invalid = $code === Error::ERR_PATH_KEY;
         }
     }
 

@@ -73,14 +73,16 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
     {
         $value = '/prop1/prop2/prop3';
         $expected = array('prop1', 'prop2', 'prop3');
-        $this->assertEquals($expected, $this->tokenizer->decode($value));
+        $this->assertTrue($this->tokenizer->decode($value, $tokens));
+        $this->assertEquals($expected, $tokens);
     }
 
     public function testDecodePathEncoded()
     {
         $value = '/key~01/key~02~1sub';
         $expected = array('key~1', 'key~2/sub');
-        $this->assertEquals($expected, $this->tokenizer->decode($value));
+        $this->assertTrue($this->tokenizer->decode($value, $tokens));
+        $this->assertEquals($expected, $tokens);
     }
 
     public function testEncodePathPlain()

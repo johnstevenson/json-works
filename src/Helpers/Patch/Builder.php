@@ -183,7 +183,7 @@ class Builder
     */
     protected function checkArrayKey(array $array, $key, &$index)
     {
-        if ($result = preg_match('/^(?:(-)|(0)|([1-9]\d*))$/', $key, $matches)) {
+        if ($result = preg_match('/^(?:(-)|(0)|([1-9]\d*))$/', $key)) {
 
             if ($key === '-') {
                 $index = count($array);

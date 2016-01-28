@@ -50,7 +50,7 @@ class TargetTest extends \JsonWorks\Tests\Base
 
     public function testConstructorInvalidPath()
     {
-        $target = new Target('/invalid//key', $error);
+        $target = new Target('invalid/key', $error);
 
         $this->assertTrue($target->invalid);
         $this->assertContains('ERR_PATH_KEY', $target->error);

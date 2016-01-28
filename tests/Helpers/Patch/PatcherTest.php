@@ -13,20 +13,24 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $this->patcher = new Patcher();
     }
 
-    public function testAddEmptyKeyFails()
+    public function testAddEmptyArrayKey()
     {
         $data = json_decode('{
             "prop1": {
-                "inner1": [0, 1, 2, 3]
+                "": [0, 1, 2, 3]
             }
         }');
 
-        $expected = $data;
+        $expected = json_decode('{
+            "prop1": {
+                "": [0, 1, true, 2, 3]
+            }
+        }');
 
-        $path = '/prop1//inner2';
+        $path = '/prop1//2';
         $value = true;
 
-        $this->assertFalse($this->patcher->add($data, $path, $value));
+        $this->assertTrue($this->patcher->add($data, $path, $value));
         $this->assertEquals($expected, $data);
     }
 

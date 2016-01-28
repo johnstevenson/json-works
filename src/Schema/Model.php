@@ -77,7 +77,10 @@ class Model
         if (!empty($this->references)) {
 
             foreach (array_keys($this->references) as $ref) {
-                $keys = $this->tokenizer->decode($ref);
+
+                if (!$this->tokenizer->decode(substr($ref, 1), $keys)) {
+                    throw new \RuntimeException('Invalid ref '.$ref);
+                }
 
                 if ($schema = $this->find($this->data, $keys)) {
                     $this->references[$ref] = $schema;

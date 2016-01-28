@@ -16,7 +16,7 @@ class MoveValueTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $expected = '{
+        $expected = json_decode('{
             "prop1": {
                 "collection": [
                     {"firstName": "Fred", "lastName": "Bloggs"}
@@ -27,17 +27,17 @@ class MoveValueTest extends \JsonWorks\Tests\Base
                     {"firstName": "Harry", "lastName": "Smith"}
                 ]
              }
-        }';
+        }');
 
         $document = $this->getDocument($schema, $data);
 
         $fromPath = '/prop1/collection/1';
         $toPath = '/prop2/collection/-';
         $this->assertTrue($document->moveValue($fromPath, $toPath));
-        $this->assertEquals(json_decode($expected), $document->data);
+        $this->assertEquals($expected, $document->data);
     }
 
-    public function testFailSchema()
+    public function testFail()
     {
         $schema = null;
         $data = '{

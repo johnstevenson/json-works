@@ -117,14 +117,17 @@ class Finder
         if (is_object($this->element)) {
             $found = $this->findObject($token);
         } elseif (is_array($this->element)) {
-            $found = $this->findArray($token);
+
+            if ($token !== '-') {
+                $found = $this->findArray($token);
+            }
         }
 
         return $found;
     }
 
     /**
-    * Returns true if the token is an array key
+    * Returns true if the token is an existing array key
     *
     * Sets $this->element to reference the value
     * @param string $token
@@ -132,12 +135,13 @@ class Finder
     */
     protected function findArray($token)
     {
+
         if (!$this->isArrayKey($token, $index)) {
             $this->target->setError(Error::ERR_PATH_KEY);
             return false;
         }
 
-        if ($result = array_key_exists($index, $this->element)) {
+        if ($result = isset($this->element[$index]) || array_key_exists($index, $this->element)) {
             $this->element = &$this->element[$index];
         }
 
@@ -145,7 +149,7 @@ class Finder
     }
 
     /**
-    * Returns true if the token is an object property key
+    * Returns true if the token is an existing object property key
     *
     * Sets $this->element to reference the value
     * @param string $token

@@ -118,6 +118,9 @@ class BuilderTest extends \JsonWorks\Tests\Base
 
     public function testArrayNestedLevel()
     {
+        $res = json_encode(json_decode('{"": "value"}'));
+
+        $json = json_encode(["" => "value"]);
         $data = json_decode('[
             0, 1
         ]');

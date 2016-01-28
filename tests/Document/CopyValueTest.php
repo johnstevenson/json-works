@@ -16,7 +16,7 @@ class CopyValueTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $expected = '{
+        $expected = json_decode('{
             "prop1": {
                 "collection": [
                     {"firstName": "Fred", "lastName": "Bloggs"},
@@ -28,7 +28,7 @@ class CopyValueTest extends \JsonWorks\Tests\Base
                     {"firstName": "Harry", "lastName": "Smith"}
                 ]
              }
-        }';
+        }');
 
         $document = $this->getDocument($schema, $data);
 
@@ -36,7 +36,7 @@ class CopyValueTest extends \JsonWorks\Tests\Base
         $toPath = '/prop2/collection/-';
 
         $this->assertTrue($document->copyValue($fromPath, $toPath));
-        $this->assertEquals(json_decode($expected), $document->data);
+        $this->assertEquals($expected, $document->data);
     }
 
     public function testFail()
