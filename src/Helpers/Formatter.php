@@ -86,4 +86,16 @@ class Formatter
 
         return $this->pruner->run($data);
     }
+
+    /**
+    * Returns json, with any _empty_ properties renamed
+    *
+    * @param mixed $data
+    * @param integer $options
+    * @return string
+    */
+    public function toJson($data, $options)
+    {
+        return str_replace('"_empty_":', '"":', json_encode($data, $options));
+    }
 }

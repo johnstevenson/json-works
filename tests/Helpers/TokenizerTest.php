@@ -85,6 +85,17 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $tokens);
     }
 
+    public function testDecodeFailsWithInvalidPath()
+    {
+        $msg = 'Testing failure with missing root slash';
+        $value = 'prop1/prop2/prop3';
+        $this->assertFalse($this->tokenizer->decode($value, $tokens), $msg);
+
+        $msg = 'Testing failure with # ref at root';
+        $value = '#prop1/prop2/prop3';
+        $this->assertFalse($this->tokenizer->decode($value, $tokens), $msg);
+    }
+
     public function testEncodePathPlain()
     {
         $value = 'key1';

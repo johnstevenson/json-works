@@ -3,18 +3,19 @@
     "prop2": {
         "inner1": [
             {
-                "lat": 50,
+                "": "prop2-inner1-0",
+                "lat": 7,
                 "lng": 120
             },
             {
+                "": "prop2-inner1-1",
                 "lat": 27,
                 "lng": 3
             }
         ],
         "inner2": 2
     },
-    "prop3": [],
-    "prop4": null,
-    "prop5": 5,
-    "prop6": {}
+    "prop3": {
+        "": "prop3"
+    }
 }

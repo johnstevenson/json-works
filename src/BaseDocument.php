@@ -54,7 +54,7 @@ class BaseDocument
         $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         $options |= $pretty ? JSON_PRETTY_PRINT : 0;
 
-        return json_encode($this->data, $options);
+        return $this->formatter->toJson($this->data, $options);
     }
 
     public function validate($lax = false)

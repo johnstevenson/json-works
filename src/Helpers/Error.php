@@ -32,10 +32,6 @@ class Error
     */
     public function get($code, $msg)
     {
-        if ($code === self::ERR_VALIDATE) {
-            return sprintf('%s: %s', self::ERR_VALIDATE, $msg);
-        }
-
         if ($caption = $this->codeGetCaption($code)) {
             $error = sprintf('%s: %s [%s]', $code, $caption, $msg);
         } else {

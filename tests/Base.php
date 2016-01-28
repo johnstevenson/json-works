@@ -82,9 +82,14 @@ class Base extends \PHPUnit_Framework_TestCase
         return json_encode(json_decode($expected));
     }
 
-    protected function getFileExpectedJson($filename)
+    protected function getFixtureFile($filename)
     {
-        return file_get_contents($filename);
+        return file_get_contents($this->getFixturePath($filename));
+    }
+
+    protected function getFixturePath($filename)
+    {
+        return __DIR__.'/Fixtures/'.$filename;
     }
 
     protected function sameRef(&$var1, &$var2)

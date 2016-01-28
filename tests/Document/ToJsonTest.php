@@ -6,12 +6,6 @@ use \JohnStevenson\JsonWorks\Utils;
 
 class ToJsonTest extends \JsonWorks\Tests\Base
 {
-    protected function getFileExpected($test)
-    {
-        $filename = __DIR__.'/Fixtures/'.$test.'.json';
-        return $this->getFileExpectedJson($filename);
-    }
-
     public function testNoData()
     {
         $schema = null;
@@ -258,7 +252,7 @@ class ToJsonTest extends \JsonWorks\Tests\Base
             "prop6": {}
         }';
 
-        $expected = $this->getFileExpected(__FUNCTION__);
+        $expected = $this->getFixtureFile('pretty.json');
         $document = $this->getDocument($schema, $data);
 
         $json = $document->toJson(true);

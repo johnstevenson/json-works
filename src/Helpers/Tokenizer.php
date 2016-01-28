@@ -91,7 +91,6 @@ class Tokenizer
     * @param string $token
     * @return string
     */
-
     protected function processToken($token)
     {
         if ($token === '') {

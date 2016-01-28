@@ -280,4 +280,44 @@ class FinderTest extends \JsonWorks\Tests\Base
         // check passed-in $element has not been modified
         $this->assertEquals($expected, $element);
     }
+
+    public function testRFC()
+    {
+        $json = '{
+            "foo": ["bar", "baz"],
+            "": 0,
+            "a/b": 1,
+            "c%d": 2,
+            "e^f": 3,
+            "g|h": 4,
+            "i\\\\j": 5,
+            "k\\"l": 6,
+            " ": 7,
+            "m~n": 8
+        }';
+
+        $data = $this->fromJson($json);
+
+        $tests = [
+            "" => $data,
+            "/foo"      => ["bar", "baz"],
+            "/foo/0"    => "bar",
+            "/"         => 0,
+            "/a~1b"     => 1,
+            "/c%d"      => 2,
+            "/e^f"      => 3,
+            "/g|h"      => 4,
+            "/i\\j"     => 5,
+            "/k\"l"     => 6,
+            "/ "        => 7,
+            "/m~0n"     => 8,
+        ];
+
+        foreach ($tests as $pointer => $expected) {
+            $msg = 'Testing '.$pointer;
+            $result = $this->finder->find($pointer, $data, $element, $error);
+            $this->assertTrue($result, $msg);
+            $this->assertEquals($expected, $element, $msg);
+        }
+    }
 }

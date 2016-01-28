@@ -2,13 +2,10 @@
 
 namespace JsonWorks\Tests\Document;
 
-class LoadDataTest extends \PHPUnit_Framework_TestCase
-{
-    private function getFilename($name)
-    {
-        return  __DIR__.'/Fixtures/'.$name.'.json';
-    }
+use JohnStevenson\JsonWorks\Document;
 
+class LoadDataTest extends \JsonWorks\Tests\Base
+{
     /**
     * @expectedException        RuntimeException
     * @expectedExceptionMessage Unable to open file
@@ -16,7 +13,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
     */
     public function testWrongFileFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $filename = 'nofile.json';
 
         $document->loadData($filename);
@@ -24,7 +21,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testWrongFileNoExceptionFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $filename = 'nofile.json';
 
         $result = $document->loadData($filename, true);
@@ -41,8 +38,8 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
     */
     public function testFileEmptyFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
-        $filename = $this->getFilename('testLoadEmpty');
+        $document = new Document();
+        $filename = $this->getFixturePath('empty.json');
 
         $document->loadData($filename);
     }
@@ -54,16 +51,16 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
     */
     public function testFileInvalidFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
-        $filename = $this->getFilename('testLoadInvalid');
+        $document = new Document();
+        $filename = $this->getFixturePath('invalid.json');
 
         $document->loadData($filename);
     }
 
     public function testFileInvalidNoExceptionFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
-        $filename = $this->getFilename('testLoadInvalid');
+        $document = new Document();
+        $filename = $this->getFixturePath('invalid.json');
 
         $result = $document->loadData($filename, true);
         $expected = 'Invalid input';
@@ -74,8 +71,8 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testFileOkay()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
-        $filename = $this->getFilename('testLoadOkay');
+        $document = new Document();
+        $filename = $this->getFixturePath('pretty.json');
 
         $result = $document->loadData($filename);
         $this->assertTrue($result);
@@ -84,8 +81,8 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testFileEmptyArrayOkay()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
-        $filename = $this->getFilename('testLoadEmptyArray');
+        $document = new Document();
+        $filename = $this->getFixturePath('emptyArray.json');
 
         $result = $document->loadData($filename);
         $this->assertTrue($result);
@@ -94,7 +91,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testObjectOkay()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $data = new \stdClass();
 
         $result = $document->loadData($data);
@@ -104,7 +101,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayOkay()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $data = array();
 
         $result = $document->loadData($data);
@@ -114,7 +111,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testNullOkay()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $data = null;
 
         $result = $document->loadData($data);
@@ -129,7 +126,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
     */
     public function testBooleanFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $data = false;
 
         $document->loadData($data);
@@ -137,7 +134,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testBooleanNoExceptionFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $data = false;
 
         $result = $document->loadData($data, true);
@@ -154,7 +151,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
     */
     public function testNumberFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $data = 0;
 
         $document->loadData($data);
@@ -162,7 +159,7 @@ class LoadDataTest extends \PHPUnit_Framework_TestCase
 
     public function testNumberNoExceptionFail()
     {
-        $document = new \JohnStevenson\JsonWorks\Document();
+        $document = new Document();
         $data = 0;
 
         $result = $document->loadData($data, true);
