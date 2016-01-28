@@ -49,13 +49,8 @@ class Tokenizer
         $tokens = explode('/', $pointer);
         array_shift($tokens);
 
-        foreach ($tokens as &$value) {
-
-            if ($value === '') {
-                $value = '_empty_';
-            } else {
-                $value = str_replace('~0', '~', str_replace('~1', '/', $value));
-            }
+        foreach ($tokens as $key => $value) {
+            $tokens[$key] = $this->processToken($value);
         }
 
         return true;
@@ -88,5 +83,21 @@ class Tokenizer
     public function encodeToken($token)
     {
         return str_replace('/', '~1', str_replace('~', '~0', strval($token)));
+    }
+
+    /**
+    * Returns a correctly formatted token
+    *
+    * @param string $token
+    * @return string
+    */
+
+    protected function processToken($token)
+    {
+        if ($token === '') {
+            return '_empty_';
+        }
+
+        return str_replace('~0', '~', str_replace('~1', '/', $token));
     }
 }

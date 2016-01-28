@@ -50,12 +50,12 @@ class Finder
     }
 
     /**
-    * Searches for and returns a reference to an element
+    * Returns true if an element is found
     *
     * @api
     * @param mixed $data
     * @param Target $target Modified by method
-    * @return mixed A reference to the found element
+    * @return bool
     */
     public function get(&$data, Target $target)
     {
@@ -141,7 +141,7 @@ class Finder
             return false;
         }
 
-        if ($result = isset($this->element[$index]) || array_key_exists($index, $this->element)) {
+        if ($result = (isset($this->element[$index]) || array_key_exists($index, $this->element))) {
             $this->element = &$this->element[$index];
         }
 
