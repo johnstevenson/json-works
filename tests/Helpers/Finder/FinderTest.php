@@ -314,7 +314,7 @@ class FinderTest extends \JsonWorks\Tests\Base
         ];
 
         foreach ($tests as $pointer => $expected) {
-            $msg = 'Testing '.$pointer;
+            $msg = 'Testing ' . (strlen($pointer) ? $pointer : 'empty key');
             $result = $this->finder->find($pointer, $data, $element, $error);
             $this->assertTrue($result, $msg);
             $this->assertEquals($expected, $element, $msg);

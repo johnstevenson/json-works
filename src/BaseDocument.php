@@ -3,6 +3,7 @@
 namespace JohnStevenson\JsonWorks;
 
 use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Helpers\Loader;
 use JohnStevenson\JsonWorks\Schema\Model;
 use JohnStevenson\JsonWorks\Schema\Validator;
 
@@ -27,17 +28,17 @@ class BaseDocument
         $this->formatter = new Formatter();
     }
 
-    public function loadData($data, $noException = false)
+    public function loadData($data)
     {
-        $data = $this->getInput($data, false, $noException);
-        $this->data = $data ? $this->formatter->copy($data) : null;
-        return empty($this->lastError);
+        $loader = new Loader();
+        $this->data = $loader->load($data, false);
     }
 
-    public function loadSchema($schema, $noException = false)
+    public function loadSchema($schema)
     {
-        $this->schema = $this->getInput($schema, true, $noException);
-        return empty($this->lastError);
+        $loader = new Loader();
+        $data = $loader->load($schema, true);
+        $this->schema = new Model($data);
     }
 
     public function tidy($order = false)
@@ -72,63 +73,5 @@ class BaseDocument
         }
 
         return $result;
-    }
-
-    protected function getInput($input, $isSchema, $noException)
-    {
-        $this->lastError = null;
-        $input = $this->getInputWork($input, $isSchema);
-
-        if (false === $input) {
-            $this->lastError = $this->lastError ?: 'Invalid input';
-        }
-
-        if ($this->lastError !== null && !$noException) {
-            throw new \RuntimeException($this->lastError);
-        }
-
-        return $this->lastError ? null : $input;
-    }
-
-    protected function getInputWork($input, $isSchema)
-    {
-        if (is_string($input)) {
-
-            if (!preg_match('/^(\{|\[)/', $input)) {
-                $filename = $input;
-
-                if (!$input = @file_get_contents($filename)) {
-                    if (false === $input) {
-                        $this->lastError = 'Unable to open file: '.$filename;
-                    } else {
-                        $this->lastError = 'File is empty: '.$filename;
-                    }
-
-                    return false;
-                }
-            }
-
-            $input = json_decode($input);
-            if (json_last_error()) {
-                return false;
-            }
-        }
-
-        if (is_array($input) || is_null($input)) {
-            $result = !$isSchema;
-        } else {
-            $result = is_object($input);
-        }
-
-        if ($result && $isSchema) {
-            try {
-                $input = new Model($input);
-            } catch (\RuntimeException $e) {
-                $result = false;
-                $this->lastError = 'Schema error: '.$e->getMessage();
-            }
-        }
-
-        return $result ? $input : false;
     }
 }
