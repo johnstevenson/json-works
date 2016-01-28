@@ -56,7 +56,7 @@ class Model
             if (is_string($ref) && 0 === strpos($ref, '#')) {
                 $this->references[$ref] = null;
             } else {
-                throw new \RuntimeException('Invalid reference');
+                throw new \RuntimeException('Invalid reference '.$ref);
             }
         }
 
@@ -72,22 +72,11 @@ class Model
         return $data;
     }
 
-    private function resolveReferences()
+    protected function resolveReferences()
     {
         if (!empty($this->references)) {
 
-            foreach (array_keys($this->references) as $ref) {
-
-                if (!$this->tokenizer->decode(substr($ref, 1), $keys)) {
-                    throw new \RuntimeException('Invalid ref '.$ref);
-                }
-
-                if ($schema = $this->find($this->data, $keys)) {
-                    $this->references[$ref] = $schema;
-                } else {
-                    throw new \RuntimeException('Unable to find ref '.$ref);
-                }
-            }
+            $this->getReferences();
 
             foreach ($this->references as $ref => $schema) {
                 $this->references[$ref] = $this->resolve($schema);
@@ -98,7 +87,23 @@ class Model
         }
     }
 
-    private function resolve($schema, $parents = array())
+    protected function getReferences()
+    {
+        foreach (array_keys($this->references) as $ref) {
+
+            if (!$this->tokenizer->decode(substr($ref, 1), $keys)) {
+                throw new \RuntimeException('Invalid reference '.$ref);
+            }
+
+            if ($schema = $this->find($this->data, $keys)) {
+                $this->references[$ref] = $schema;
+            } else {
+                throw new \RuntimeException('Unable to find ref '.$ref);
+            }
+        }
+    }
+
+    protected function resolve($schema, $parents = array())
     {
         $result = $schema;
 

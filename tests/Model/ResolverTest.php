@@ -61,6 +61,26 @@ class ResolverTest extends \JsonWorks\Tests\Base
     * @expectedExceptionMessage Invalid reference
     *
     */
+    public function testInvalidRefValue()
+    {
+        $schema = '{
+            "type" : "object",
+            "properties":
+            {
+                "prop1": {"$ref": "#definitions/alphanum"},
+                "prop2": {}
+            }
+        }';
+
+        $data = null;
+        $this->getDocument($schema, $data);
+    }
+
+    /**
+    * @expectedException        RuntimeException
+    * @expectedExceptionMessage Invalid reference
+    *
+    */
     public function testInvalidRef1()
     {
         $schema = '{
