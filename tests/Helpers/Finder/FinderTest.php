@@ -168,6 +168,30 @@ class FinderTest extends \JsonWorks\Tests\Base
         $this->assertEquals('item', $target->childKey, $msg);
     }
 
+    public function testGetChecksForInvalidTarget()
+    {
+        $data = json_decode('{
+            "prop1": {
+                "inner1": [0, 1, 2, 3]
+            }
+        }');
+
+        $expected =& $data;
+
+        $path = 'prop1/inner1/2';
+        $target = new Target($path, $error);
+        $result = $this->finder->get($data, $target);
+
+        // check result
+        $msg = 'Testing result';
+        $this->assertFalse($result, $msg);
+        $this->assertNull($target->element, $msg);
+
+        // check parent is null
+        $msg = 'Testing parent';
+        $this->assertNull($target->parent, $msg);
+    }
+
     public function testFind()
     {
         $data = json_decode('{
