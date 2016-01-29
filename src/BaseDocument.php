@@ -31,13 +31,13 @@ class BaseDocument
     public function loadData($data)
     {
         $loader = new Loader();
-        $this->data = $loader->load($data, false);
+        $this->data = $loader->loadData($data);
     }
 
     public function loadSchema($schema)
     {
         $loader = new Loader();
-        $data = $loader->load($schema, true);
+        $data = $loader->loadSchema($schema);
         $this->schema = new Model($data);
     }
 

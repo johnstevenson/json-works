@@ -14,41 +14,88 @@ use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Formatter;
 
 /**
-* A class for loading data
+* A class for loading input data*
 */
 class Loader
 {
-    public function load($input, $isSchema)
+    const TYPE_DOCUMENT = 0;
+    const TYPE_SCHEMA = 1;
+    const TYPE_PATCH = 2;
+
+    /**
+    * Processes input to be used as a document
+    *
+    * The input can be:
+    *   - a json string, passed to json_decode
+    *   - a .json filename, passed to file_get_contents then json_decode
+    *   - an object, class, array or null
+    *
+    * @api
+    * @param mixed $input
+    * @return mixed
+    */
+    public function loadData($input)
     {
-        if (is_string($input)) {
-            $this->checkData($input, $isSchema);
-            return $this->processStringInput($input);
+        $data = $this->processInput($input, self::TYPE_DOCUMENT);
+
+        if (!is_string($input)) {
+            $formatter = new Formatter();
+            $data = $formatter->copy($input);
         }
 
-        $this->checkData($input, $isSchema);
-
-        if ($isSchema) {
-            return $input;
-        }
-
-        $formatter = new Formatter();
-        return $formatter->copy($input);
+        return $data;
     }
 
+    /**
+    * Processes input to be used as a schema
+    *
+    * The input can be:
+    *   - a json string, passed to json_decode
+    *   - a .json filename, passed to file_get_contents then json_decode
+    *   - an object
+    *
+    * The resulting data must be an object.
+    *
+    * @api
+    * @param mixed $input
+    * @return object
+    */
+    public function loadSchema($input)
+    {
+        return $this->processInput($input, self::TYPE_SCHEMA);
+    }
+
+    /**
+    * The main input processing method
+    *
+    * @param mixed $data
+    * @param integer $type
+    * @return mixed
+    */
+    protected function processInput($data, $type)
+    {
+        if (is_string($data)) {
+            $data = $this->processStringInput($data);
+        }
+
+        $this->checkData($data, $type);
+
+        return $data;
+    }
+
+    /**
+    * Processes a file or raw json
+    *
+    * @param mixed $input
+    * @return mixed
+    */
     protected function processStringInput($input)
     {
-        if (!preg_match('/^(\{|\[)/', $input)) {
+        if (pathinfo($input, PATHINFO_EXTENSION) === 'json') {
             $input = $this->getDataFromFile($input);
         }
 
-        $json = json_decode($input);
-
-        if (!json_last_error()) {
-            return $json;
-        }
-
-        $error = new Error();
-        throw new \RuntimeException($error->get(Error::ERR_BAD_INPUT, 'json'));
+        return $this->decodeJson($input);
     }
 
     /**
@@ -69,16 +116,77 @@ class Loader
         return $json;
     }
 
-    protected function checkData($data, $isSchema)
+    /**
+    * Checks that data is valid for type
+    *
+    * @param mixed $data
+    * @param integer $type
+    * @throws \RuntimeException
+    */
+    protected function checkData($data, $type)
     {
-        if (is_resource($data)) {
-            $error = new Error();
-            throw new \RuntimeException($error->get(Error::ERR_BAD_INPUT, 'resource'));
+        $dataType = gettype($data);
+
+        switch ($type) {
+            case self::TYPE_SCHEMA:
+                $valid = $dataType === 'object';
+                break;
+            case self::TYPE_PATCH:
+                $valid = $dataType === 'array';
+                break;
+            default:
+                $valid = in_array($dataType, ['object', 'array', 'NULL']);
         }
 
-        if ($isSchema && !is_object($data)) {
+        if (!$valid) {
             $error = new Error();
-            throw new \RuntimeException($error->get(Error::ERR_BAD_INPUT, gettype($data)));
+            throw new \RuntimeException($error->get(Error::ERR_BAD_INPUT, $dataType));
         }
+    }
+
+    /**
+    * Decodes a json string
+    *
+    * This function normalizes pre PHP7 behaviour to report an error with
+    * an empty string
+    *
+    * @param string $data
+    * @return mixed
+    * @throws \RuntimeException
+    */
+    protected function decodeJson($data)
+    {
+        if (!strlen($data)) {
+            $code = JSON_ERROR_SYNTAX;
+        } else {
+            $json = json_decode($data);
+            $code = json_last_error();
+        }
+
+        if ($code) {
+            throw new \RuntimeException($this->getJsonError($code));
+        }
+
+        return $json;
+    }
+
+    /**
+    * Returns a formatted json error message
+    *
+    * @param integer $code
+    * @return string
+    */
+    protected function getJsonError($code)
+    {
+        $msg = 'json error: ';
+
+        if (function_exists('json_last_error_msg')) {
+            $msg .= json_last_error_msg();
+        } else {
+            $msg .= $code;
+        }
+        $error = new Error();
+
+        return $error->get(Error::ERR_BAD_INPUT, $msg);
     }
 }

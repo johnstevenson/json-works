@@ -281,7 +281,12 @@ class FinderTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $element);
     }
 
-    public function testRFC()
+    /**
+    * Tests the example given in RFC6901
+    *
+    * https://tools.ietf.org/html/rfc6901    *
+    */
+    public function testRfc6901()
     {
         $json = '{
             "foo": ["bar", "baz"],

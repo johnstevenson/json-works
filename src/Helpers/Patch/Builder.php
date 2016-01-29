@@ -101,11 +101,18 @@ class Builder
     /**
     * Creates a new object or array
     *
+    * The new container is created on the current root element and its type
+    * depends on the nature of the key.
+    *
     * @param string $key
     */
     protected function createContainer($key)
     {
-        $this->element = $this->isPushKey($key) ? [] : new \stdClass();
+        if ($key === '-' || $key === '0') {
+            $this->element = [];
+        } else {
+            $this->element = new \stdClass();
+        }
     }
 
     /**
@@ -160,17 +167,6 @@ class Builder
         } else {
             $this->element->$key = $value;
         }
-    }
-
-    /**
-    * Checks if a key indicates an array push
-    *
-    * @param string $key
-    * @return bool
-    */
-    protected function isPushKey($key)
-    {
-        return (bool) preg_match('/^((-)|(0))$/', $key);
     }
 
     /**
