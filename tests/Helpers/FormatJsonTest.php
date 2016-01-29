@@ -15,7 +15,7 @@ class FormatJsonTest extends \JsonWorks\Tests\Base
 
     public function testReplacesEmptyKeys()
     {
-        $expected = $this->getFixtureFile('emptykeys.json');
+        $expected = $this->getFixtureFile('nullkeys.json');
         $data = $this->fromJson($expected);
 
         $result = $this->formatter->toJson($data, JSON_PRETTY_PRINT);
