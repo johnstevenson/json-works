@@ -47,6 +47,25 @@ class Loader
     }
 
     /**
+    * Processes input to be used as a JSON Patch
+    *
+    * The input can be:
+    *   - a json string, passed to json_decode
+    *   - a .json filename, passed to file_get_contents then json_decode
+    *   - an array
+    *
+    * The resulting data must be an array.
+    *
+    * @api
+    * @param mixed $input
+    * @return array
+    */
+    public function loadPatch($input)
+    {
+        return $this->processInput($input, self::TYPE_PATCH);
+    }
+
+    /**
     * Processes input to be used as a schema
     *
     * The input can be:
@@ -86,7 +105,7 @@ class Loader
     /**
     * Processes a file or raw json
     *
-    * @param mixed $input
+    * @param string $input
     * @return mixed
     */
     protected function processStringInput($input)
@@ -154,12 +173,14 @@ class Loader
     * @return mixed
     * @throws \RuntimeException
     */
-    protected function decodeJson($data)
+    protected function decodeJson($json)
     {
-        if (!strlen($data)) {
+        $result = null;
+
+        if (!strlen($json)) {
             $code = JSON_ERROR_SYNTAX;
         } else {
-            $json = json_decode($data);
+            $result = json_decode($json);
             $code = json_last_error();
         }
 
@@ -167,7 +188,7 @@ class Loader
             throw new \RuntimeException($this->getJsonError($code));
         }
 
-        return $json;
+        return $result;
     }
 
     /**
@@ -178,15 +199,14 @@ class Loader
     */
     protected function getJsonError($code)
     {
-        $msg = 'json error: ';
+        $msg = $code;
 
         if (function_exists('json_last_error_msg')) {
-            $msg .= json_last_error_msg();
-        } else {
-            $msg .= $code;
+            $msg = json_last_error_msg();
         }
+
         $error = new Error();
 
-        return $error->get(Error::ERR_BAD_INPUT, $msg);
+        return $error->get(Error::ERR_BAD_INPUT, sprintf('json error: %s', $msg));
     }
 }

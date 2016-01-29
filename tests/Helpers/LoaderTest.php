@@ -139,4 +139,23 @@ class LoaderTest extends \JsonWorks\Tests\Base
         $this->runInvalidFileTest('loadSchema', 'empty.json');
         $this->runMissingFileTest('loadSchema');
     }
+
+    public function testLoadPatchTypes()
+    {
+        $this->runValidTypeTest('loadPatch', 'array', []);
+
+        $this->runInvalidTypeTest('loadPatch', 'object', new \stdClass());
+        $this->runInvalidTypeTest('loadPatch', 'null', null);
+
+        $this->runAllInvalidTypesTest('loadPatch');
+    }
+
+    public function testLoadPatchFiles()
+    {
+        $this->runValidFileTest('loadPatch', 'patch.json');
+
+        $this->runInvalidFileTest('loadPatch', 'invalid.json');
+        $this->runInvalidFileTest('loadPatch', 'empty.json');
+        $this->runMissingFileTest('loadPatch');
+    }
 }
