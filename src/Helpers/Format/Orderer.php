@@ -45,9 +45,12 @@ class Orderer
     */
     protected function arrayWithSchema($data, $schema)
     {
-        if (is_array($data)) {
-            return $this->getProperties($schema, 'items');
+        if (!is_array($data)) {
+            return;
         }
+
+        $items = $this->getProperties($schema, 'items');
+        return $items ?: new \stdClass();
     }
 
     /**
@@ -59,9 +62,15 @@ class Orderer
     */
     protected function objectWithSchema($data, $schema)
     {
-        if (is_object($data)) {
-            return $this->getProperties($schema, 'properties');
+        if (!is_object($data)) {
+            return;
         }
+
+        if (!$properties = $this->getProperties($schema, 'properties')) {
+            $properties = $this->getPropertiesFromData($data);
+        }
+
+        return $properties;
     }
 
     /**
@@ -78,6 +87,25 @@ class Orderer
         }
     }
 
+    /**
+    * Creates schema properties from ordered data properties
+    *
+    * @param object $data
+    * @return object|null
+    */
+    protected function getPropertiesFromData($data)
+    {
+        $result = new \stdClass();
+
+        $keys = array_keys((array) $data);
+        sort($keys, SORT_NATURAL | SORT_FLAG_CASE);
+
+        foreach ($keys as $key) {
+            $result->$key = new \stdClass();
+        }
+
+        return $result;
+    }
 
     /**
     * Orders an array using the schema items properties

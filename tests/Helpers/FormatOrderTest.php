@@ -23,32 +23,6 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         $this->assertEquals(json_decode($expected), $result);
     }
 
-    public function testNoSchema()
-    {
-        $schema = null;
-
-        $data = '{
-            "prop4": "",
-            "prop2": {},
-            "prop1": [],
-            "prop3": null
-        }';
-
-        $expected = '{
-            "prop4": "",
-            "prop2": {},
-            "prop1": [],
-            "prop3": null
-        }';
-
-        $schema = $this->getSchema($schema);
-        $data = $this->fromJson($data);
-        $expected = $this->getExpectedJson($expected);
-
-        $result = json_encode($this->formatter->order($data, $schema));
-        $this->assertEquals($expected, $result);
-    }
-
     public function testObjectSimple()
     {
         $schema = '{
@@ -80,8 +54,14 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->getExpectedJson($expected);
 
+        $msg = 'Testing with schema';
         $result = json_encode($this->formatter->order($data, $schema));
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result, $msg);
+
+        $msg = 'Testing no schema';
+        $schema = $this->getSchema(null);
+        $result = json_encode($this->formatter->order($data, $schema));
+        $this->assertEquals($expected, $result, $msg);
     }
 
     public function testArraySimple()
@@ -129,8 +109,14 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->getExpectedJson($expected);
 
+        $msg = 'Testing with schema';
         $result = json_encode($this->formatter->order($data, $schema));
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result, $msg);
+
+        $msg = 'Testing no schema';
+        $schema = $this->getSchema(null);
+        $result = json_encode($this->formatter->order($data, $schema));
+        $this->assertEquals($expected, $result, $msg);
     }
 
     public function testNested()

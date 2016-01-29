@@ -169,7 +169,7 @@ class Loader
     * This function normalizes pre PHP7 behaviour to report an error with
     * an empty string
     *
-    * @param string $data
+    * @param string $json
     * @return mixed
     * @throws \RuntimeException
     */
