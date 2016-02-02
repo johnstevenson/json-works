@@ -12,9 +12,6 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 abstract class Matcher extends BaseConstraint
 {
-    abstract protected function getDetails(&$type, &$matchFirst);
-    abstract protected function getResult($matches, $schemaCount, &$error);
-
     protected function run($data, $schema, $key = null)
     {
         $this->getDetails($type, $matchFirst);
