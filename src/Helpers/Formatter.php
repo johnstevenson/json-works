@@ -57,10 +57,10 @@ class Formatter
     *
     * @api
     * @param mixed $data
-    * @param stdClass $schema
+    * @param stdClass|null $schema
     * @return mixed An unreferenced copy of the ordered data
     */
-    public function order($data, stdClass $schema)
+    public function order($data, $schema)
     {
         if (!$this->orderer) {
             $this->orderer = new Orderer();

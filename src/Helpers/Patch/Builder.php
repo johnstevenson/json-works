@@ -32,10 +32,11 @@ class Builder
     protected $element;
 
     /**
-    * Constructor
+    * Returns a new element to be added to the data
     *
     * @param Target $target
     * @param mixed $value
+    * @return mixed
     */
     public function make(Target $target, $value)
     {
@@ -65,7 +66,7 @@ class Builder
 
             if (is_null($this->data)) {
                 // 1st pass: creating a root container
-                // 2nd pass: recursing
+                // 2nd pass: recursing from statement below
                 $this->createContainer($key);
             } else {
                 $this->setTarget($key);
@@ -126,7 +127,6 @@ class Builder
         if (is_array($this->element)) {
             $this->element[0] = null;
             $this->element =& $this->element[0];
-
 
         } else {
             $this->element->$key = null;

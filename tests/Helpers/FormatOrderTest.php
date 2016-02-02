@@ -59,8 +59,7 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $result, $msg);
 
         $msg = 'Testing no schema';
-        $schema = $this->getSchema(null);
-        $result = json_encode($this->formatter->order($data, $schema));
+        $result = json_encode($this->formatter->order($data, null));
         $this->assertEquals($expected, $result, $msg);
     }
 
@@ -114,8 +113,7 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         $this->assertEquals($expected, $result, $msg);
 
         $msg = 'Testing no schema';
-        $schema = $this->getSchema(null);
-        $result = json_encode($this->formatter->order($data, $schema));
+        $result = json_encode($this->formatter->order($data, null));
         $this->assertEquals($expected, $result, $msg);
     }
 
@@ -197,7 +195,12 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         $data = $this->fromJson($data);
         $expected = $this->getExpectedJson($expected);
 
+        $msg = 'Testing with schema';
         $result = json_encode($this->formatter->order($data, $schema));
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected, $result, $msg);
+
+        $msg = 'Testing no schema';
+        $result = json_encode($this->formatter->order($data, null));
+        $this->assertEquals($expected, $result, $msg);
     }
 }

@@ -2,15 +2,18 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
+use JohnStevenson\JsonWorks\Schema\ValidationException;
+
 class Validator
 {
     public $error;
+    protected $errors;
 
     public function check($data, $model, $lax = false)
     {
         $result = true;
         $this->error = '';
-        $constraints = new Constraints($lax);
+        $constraints = new Constraints\Manager($lax);
 
         try {
             $constraints->validate($data, $model->data);
@@ -19,6 +22,12 @@ class Validator
             $result = false;
         }
 
-        return $result;
+        //return $result;
+        return empty($this->error) && empty($constraints->errors);
+    }
+
+    public function checkX($data, $model, $lax = false)
+    {
+        $this->errors = [];
     }
 }

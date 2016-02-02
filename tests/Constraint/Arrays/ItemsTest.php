@@ -27,7 +27,7 @@ class ItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": false
         }';
 
-        $data = '[1, {}, 5, 6]';
+        $data = '[1, {}, 5, {}]';
 
         $this->assertFalse($this->validate($schema, $data));
     }
