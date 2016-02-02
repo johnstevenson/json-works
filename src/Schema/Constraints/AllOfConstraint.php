@@ -10,15 +10,15 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-class AllOfConstraint extends Matcher
+class AllOfConstraint extends Matcher implements MatcherInterface
 {
-    protected function getDetails(&$type, &$matchFirst)
+    public function getDetails(&$type, &$matchFirst)
     {
         $type = 'array';
         $matchFirst = false;
     }
 
-    protected function getResult($matches, $schemaCount, &$error)
+    public function getResult($matches, $schemaCount, &$error)
     {
         $result = $matches === $schemaCount;
 

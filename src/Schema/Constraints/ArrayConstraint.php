@@ -33,7 +33,7 @@ class ArrayConstraint extends BaseConstraint
 
         // uniqueItems
         if ($this->get($schema, 'uniqueItems', false)) {
-            if (!$this->comparer->uniqueArray($data, true)) {
+            if (!$this->comparer->uniqueArray($data)) {
                 $this->addError('contains duplicate values');
             }
         }

@@ -25,9 +25,4 @@ class Validator
         //return $result;
         return empty($this->error) && empty($constraints->errors);
     }
-
-    public function checkX($data, $model, $lax = false)
-    {
-        $this->errors = [];
-    }
 }
