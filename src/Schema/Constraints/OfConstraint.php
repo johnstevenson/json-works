@@ -18,14 +18,29 @@ class OfConstraint extends BaseConstraint
 
     protected function run($data, $schema, $key = null)
     {
-        $this->getDetails($key);
+        $this->setDetails($key);
         $schemas = $this->checkSchema($schema);
-        $matches = 0;
+        $matches = $this->getMatches($data, $schemas);
+
+        if (!$this->checkResult($key, $matches, count($schemas))) {
+            $this->addError($this->error);
+        }
+    }
+
+    protected function setDetails($key)
+    {
+        $this->type = $key === 'not' ? 'object' : 'array';
+        $this->matchFirst = in_array($key, ['anyOf', 'not']);
+    }
+
+    protected function getMatches($data, $schemas)
+    {
+        $result = 0;
 
         foreach ($schemas as $subSchema) {
 
             if ($this->validateChild($data, $subSchema)) {
-                ++$matches;
+                ++$result;
 
                 if ($this->matchFirst) {
                     break;
@@ -33,18 +48,10 @@ class OfConstraint extends BaseConstraint
             }
         }
 
-        if (!$this->getResult($key, $matches, count($schemas))) {
-            $this->addError($this->error);
-        }
+        return $result;
     }
 
-    protected function getDetails($key)
-    {
-        $this->type = $key === 'not' ? 'object' : 'array';
-        $this->matchFirst = in_array($key, ['anyOf', 'not']);
-    }
-
-    protected function getResult($key, $matches, $schemaCount)
+    protected function checkResult($key, $matches, $schemaCount)
     {
         switch ($key) {
             case 'allOf':
