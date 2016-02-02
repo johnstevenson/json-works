@@ -132,12 +132,13 @@ class Manager
     protected function validateCommon($data, $schema)
     {
         $errors = count($this->errors);
-        $common = array('enum', 'type', 'allOf', 'anyOf', 'oneOf', 'not');
+        $common = ['enum', 'type', 'allOf', 'anyOf', 'oneOf', 'not'];
 
-        foreach ($common as $name) {
+        foreach ($common as $key) {
 
-            if ($subSchema = $this->get($schema, $name)) {
-                $this->check($name, [$data, $subSchema]);
+            if ($subSchema = $this->get($schema, $key)) {
+                $name = preg_match('/(?:Of|not)$/', $key) ? 'of' : $key;
+                $this->check($name, [$data, $subSchema, $key]);
             }
         }
 
