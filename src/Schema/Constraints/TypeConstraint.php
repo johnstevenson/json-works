@@ -38,6 +38,8 @@ class TypeConstraint extends BaseConstraint
         if (in_array($type, ['object', 'array', 'string', 'null'])) {
             return call_user_func('is_' . $type, $data);
         }
+
+        return false;
     }
 
     protected function isBoolean($data)

@@ -14,7 +14,6 @@ class OfConstraint extends BaseConstraint
 {
     protected $type;
     protected $matchFirst;
-    protected $error;
 
     protected function run($data, $schema, $key = null)
     {
@@ -23,7 +22,7 @@ class OfConstraint extends BaseConstraint
         $matches = $this->getMatches($data, $schemas);
 
         if (!$this->checkResult($key, $matches, count($schemas))) {
-            $this->addError($this->error);
+            $this->addError($this->getError($key));
         }
     }
 
@@ -72,5 +71,14 @@ class OfConstraint extends BaseConstraint
         }
 
         return $this->type === 'object' ? [$schema] : $schema ;
+    }
+
+    protected function getError($key)
+    {
+        if ($key === 'not') {
+            return 'must not validate against this schema';
+        }
+
+        return sprintf("does not match '%s' schema requirements", $key);
     }
 }

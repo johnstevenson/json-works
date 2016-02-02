@@ -10,7 +10,7 @@ class TypeTest extends \JsonWorks\Tests\Base
             "type": ["string", "array", "number"]
         }';
 
-        $data = array();
+        $data = [];
 
         $this->assertTrue($this->validate($schema, $data));
     }

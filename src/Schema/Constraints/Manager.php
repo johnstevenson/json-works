@@ -298,20 +298,6 @@ class Manager
         }
     }
 
-    protected function validateUnique($data)
-    {
-        $count = count($data);
-        for ($i = 0; $i < $count; ++$i) {
-            for ($j = $i + 1; $j < $count; ++$j) {
-                if (Utils::equals($data[$i], $data[$j])) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     protected function match($regex, $string)
     {
          return preg_match('/'.$regex.'/', $string, $match);
