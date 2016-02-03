@@ -26,10 +26,10 @@ class ObjectConstraint extends BaseConstraint
     protected function run($data, $schema, $key = null)
     {
         // maxProperties
-        $this->maxMin->run($data, $schema, 'maxProperties');
+        $this->maxMin->check($data, $schema, 'maxProperties');
 
         # minProperties
-        $this->maxMin->run($data, $schema, 'minProperties');
+        $this->maxMin->check($data, $schema, 'minProperties');
 
         if (isset($schema->required)) {
             foreach ((array) $schema->required as $name) {

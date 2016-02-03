@@ -12,6 +12,8 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 class MaxMinConstraint extends BaseConstraint
 {
+    protected $max;
+    protected $caption;
 
     protected function run($data, $schema, $key = null)
     {
@@ -19,40 +21,57 @@ class MaxMinConstraint extends BaseConstraint
             return;
         }
 
-        $max = preg_match('/^max/', $key);
-        $this->checkMaxMin($data, $value, $max);
+        $this->setValues($data, $key);
+        $count = count((array) $data);
+
+        if (!$this->compare($count, $value)) {
+            $this->setError($value);
+        }
     }
 
-    protected function checkMaxMin($data, $value, $max)
+    protected function setValues($data, $key)
     {
-        $count = count((array) $data);
-        $error = null;
-
-        if ($max && $count > $value) {
-            $error = "has too many %d, maximum '%d'";
-        } elseif (!$max && $count < $value) {
-            $error = "has too few %d, minimum '%d'";
-        }
-
-        if ($error) {
-            $name = is_object($data) ? 'properties' : 'items';
-            $this->addError(sprintf($error, $name, $value));
-        }
+        $this->max = preg_match('/^max/', $key);
+        $this->caption = is_object($data) ? 'properties' : 'items';
     }
 
     protected function getInteger($schema, $key, &$value)
     {
         if ($result = $this->getValue($schema, $key, $value, $type)) {
-
-            if ($type !== 'integer') {
-                $this->throwSchemaError('integer', $value);
-            }
-
-            if ($value < 0) {
-                $this->throwSchemaError('>= 0', $value);
-            }
+            $this->checkInteger($value, $type);
         }
 
         return $result;
+    }
+
+    protected function checkInteger($value, $type)
+    {
+        $error = '';
+
+        if ($type !== 'integer') {
+            $error = 'integer';
+        } elseif ($value < 0) {
+            $error = '>= 0';
+        }
+
+        if ($error) {
+            $this->throwSchemaError($error, $value);
+        }
+    }
+
+    protected function compare($count, $value)
+    {
+        return $this->max ? $count <= $value : $count >= $value;
+    }
+
+    protected function setError($value)
+    {
+        if ($this->max) {
+            $error = "has too many %d, maximum '%d'";
+        } else {
+            $error = "has too few %d, minimum '%d'";
+        }
+
+        $this->addError(sprintf($error, $this->caption, $value));
     }
 }

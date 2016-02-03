@@ -29,10 +29,10 @@ class ArrayConstraint extends BaseConstraint
     protected function run($data, $schema, $key = null)
     {
         // maxItems
-        $this->maxMin->run($data, $schema, 'maxItems');
+        $this->maxMin->check($data, $schema, 'maxItems');
 
         // minItems
-        $this->maxMin->run($data, $schema, 'minItems');
+        $this->maxMin->check($data, $schema, 'minItems');
 
         // uniqueItems
         if ($this->get($schema, 'uniqueItems', false)) {

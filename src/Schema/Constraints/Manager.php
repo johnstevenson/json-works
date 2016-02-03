@@ -157,26 +157,6 @@ class Manager
         if ($name = $this->getInstanceName($data)) {
             $this->check($name, [$data, $schema]);
         }
-
-        return;
-
-        switch ($name) {
-            case 'object':
-                //$this->validateObject($data, $schema);
-                $this->check($name, [$data, $schema]);
-                break;
-            case 'array':
-                $this->check($name, [$data, $schema]);
-                break;
-            //case 'double':
-            //    # no break
-            case 'number':
-                $this->check($name, [$data, $schema]);
-                break;
-            case 'string':
-                $this->check($name, [$data, $schema]);
-                break;
-        }
     }
 
     protected function getInstanceName($data)
