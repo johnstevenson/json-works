@@ -12,9 +12,23 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 class MaxMinConstraint extends BaseConstraint
 {
+    /**
+    * @var bool
+    */
     protected $max;
+
+    /**
+    * @var string
+    */
     protected $caption;
 
+    /**
+    * The main method
+    *
+    * @param mixed $data
+    * @param mixed $schema
+    * @param mixed $key
+    */
     protected function run($data, $schema, $key = null)
     {
         if (!$this->getInteger($schema, $key, $value)) {
@@ -29,12 +43,25 @@ class MaxMinConstraint extends BaseConstraint
         }
     }
 
+    /**
+    * Sets protected values
+    *
+    * @param mixed $data
+    * @param string $key
+    */
     protected function setValues($data, $key)
     {
-        $this->max = preg_match('/^max/', $key);
+        $this->max = (bool) preg_match('/^max/', $key);
         $this->caption = is_object($data) ? 'properties' : 'items';
     }
 
+    /**
+    * Fetches a value from the schema and checks that it is a valid integer
+    *
+    * @param mixed $schema
+    * @param string $key
+    * @param mixed $value
+    */
     protected function getInteger($schema, $key, &$value)
     {
         if ($result = $this->getValue($schema, $key, $value, $type)) {
@@ -44,6 +71,12 @@ class MaxMinConstraint extends BaseConstraint
         return $result;
     }
 
+    /**
+    * Checks that the value is a positive integer
+    *
+    * @param mixed $value
+    * @param string $type
+    */
     protected function checkInteger($value, $type)
     {
         $error = '';
@@ -59,11 +92,22 @@ class MaxMinConstraint extends BaseConstraint
         }
     }
 
+    /**
+    * The main comparison
+    *
+    * @param integer $count
+    * @param integer $value
+    */
     protected function compare($count, $value)
     {
         return $this->max ? $count <= $value : $count >= $value;
     }
 
+    /**
+    * Adds an appropriate error
+    *
+    * @param integer $value
+    */
     protected function setError($value)
     {
         if ($this->max) {

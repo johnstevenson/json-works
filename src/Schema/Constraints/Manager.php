@@ -125,11 +125,11 @@ class Manager
 
     protected function init($schema, $key)
     {
-        if (is_null($schema)) {
-            throw new \RuntimeException('Schema is null');
+        if (!is_object($schema)) {
+            $this->throwSchemaError('object', gettype($schema));
         }
 
-        if ($result = count(get_object_vars($schema) > 0)) {
+        if ($result = count((array) $schema > 0)) {
             $this->path = $this->tokenizer->add($this->path, $key);
         }
 

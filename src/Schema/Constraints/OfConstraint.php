@@ -67,6 +67,9 @@ class OfConstraint extends BaseConstraint
     protected function checkSchema($schema)
     {
         if ($this->type !== gettype($schema)) {
+            /**
+            * @throws \RuntimeException
+            */
             $this->throwSchemaError($this->type, gettype($schema));
         }
 
