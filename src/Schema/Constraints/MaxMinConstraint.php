@@ -56,19 +56,24 @@ class MaxMinConstraint extends BaseConstraint
     }
 
     /**
-    * Fetches a value from the schema and checks that it is a valid integer
+    * Returns true if a valid integer is found in the schema
     *
     * @param mixed $schema
     * @param string $key
-    * @param mixed $value
+    * @param mixed $value Set by method
+    * @return bool
     */
     protected function getInteger($schema, $key, &$value)
     {
-        if ($result = $this->getValue($schema, $key, $value, $type)) {
-            $this->checkInteger($value, $type);
+        if (!$this->getValue($schema, $key, $value, $type)) {
+            return false;
         }
 
-        return $result;
+        if (!$error = $this->checkInteger($value, $type)) {
+            return true;
+        }
+
+        $this->throwSchemaError($error, $value);
     }
 
     /**
@@ -76,6 +81,7 @@ class MaxMinConstraint extends BaseConstraint
     *
     * @param mixed $value
     * @param string $type
+    * @return string
     */
     protected function checkInteger($value, $type)
     {
@@ -87,9 +93,7 @@ class MaxMinConstraint extends BaseConstraint
             $error = '>= 0';
         }
 
-        if ($error) {
-            $this->throwSchemaError($error, $value);
-        }
+        return $error;
     }
 
     /**
@@ -97,6 +101,7 @@ class MaxMinConstraint extends BaseConstraint
     *
     * @param integer $count
     * @param integer $value
+    * @return bool
     */
     protected function compare($count, $value)
     {

@@ -81,16 +81,17 @@ class Manager
 
     public function getValue($schema, $key, &$value, &$type)
     {
-        if (!is_object($schema)) {
-            $this->throwSchemaError($schema, 'object');
+        if (is_object($schema)) {
+
+            if ($result = property_exists($schema, $key)) {
+                $value = $schema->$key;
+                $type = gettype($value);
+            }
+
+            return $result;
         }
 
-        if ($result = property_exists($schema, $key)) {
-            $value = $schema->$key;
-            $type = gettype($value);
-        }
-
-        return $result;
+        $this->throwSchemaError($schema, 'object');
     }
 
     public function get($schema, $key, $default = null)
@@ -125,15 +126,16 @@ class Manager
 
     protected function init($schema, $key)
     {
-        if (!is_object($schema)) {
-            $this->throwSchemaError('object', gettype($schema));
+        if (is_object($schema)) {
+
+            if ($result = count((array) $schema > 0)) {
+                $this->path = $this->tokenizer->add($this->path, $key);
+            }
+
+            return $result;
         }
 
-        if ($result = count((array) $schema > 0)) {
-            $this->path = $this->tokenizer->add($this->path, $key);
-        }
-
-        return $result;
+        $this->throwSchemaError('object', gettype($schema));
     }
 
     protected function validateCommon($data, $schema)
