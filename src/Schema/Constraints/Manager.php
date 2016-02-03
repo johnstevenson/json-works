@@ -100,7 +100,8 @@ class Manager
             return $result;
         }
 
-        $this->throwSchemaError($schema, 'object');
+        $error = $this->getSchemaError($schema, 'object');
+        throw new \RuntimeException($error);
     }
 
     public function get($schema, $key, $default = null)
@@ -122,15 +123,13 @@ class Manager
         }
     }
 
-    public function throwSchemaError($expected, $value)
+    public function getSchemaError($expected, $value)
     {
-        $error = sprintf(
+        return sprintf(
             "Invalid schema value: expected '%s', got '%s'",
             $expected,
             $value
         );
-
-        throw new \RuntimeException($error);
     }
 
     protected function init($schema, $key)
@@ -144,7 +143,8 @@ class Manager
             return $result;
         }
 
-        $this->throwSchemaError('object', gettype($schema));
+        $error = $this->getSchemaError('object', gettype($schema));
+        throw new \RuntimeException($error);
     }
 
     protected function validateCommon($data, $schema)

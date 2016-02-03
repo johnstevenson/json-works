@@ -70,7 +70,8 @@ class OfConstraint extends BaseConstraint
             return $this->type === 'object' ? [$schema] : $schema ;
         }
 
-        $this->throwSchemaError($this->type, gettype($schema));
+        $error = $this->getSchemaError($this->type, gettype($schema));
+        throw new \RuntimeException($error);
     }
 
     protected function getError($key)
