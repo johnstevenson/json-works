@@ -10,13 +10,13 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-class Comparer
+class Comparer extends JsonTypes
 {
     public function equals($value1, $value2)
     {
-        $type = $this->getJsonType($value1);
+        $type = $this->getGeneric($value1);
 
-        if ($type !== $this->getJsonType($value2)) {
+        if ($type !== $this->getGeneric($value2)) {
             return false;
         }
 
@@ -44,18 +44,6 @@ class Comparer
         return true;
     }
 
-    protected function getJsonType($value)
-    {
-        $result = strtolower(gettype($value));
-
-        if (in_array($result, ['double', 'integer'])) {
-            $value = floatval($value);
-            $result = 'number';
-        }
-
-        return $result;
-    }
-
     protected function equalsArray($arr1, $arr2)
     {
         $count = count($arr1);
@@ -75,7 +63,7 @@ class Comparer
 
     protected function equalsNumber($value1, $value2)
     {
-        return 0 === bccomp($value1, $value2, 16);
+        return 0 === bccomp(strval($value1), strval($value2), 16);
     }
 
     protected function equalsObject($obj1, $obj2)

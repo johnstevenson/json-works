@@ -31,34 +31,6 @@ class TypeConstraint extends BaseConstraint
 
     protected function checkType($data, $type)
     {
-        // native functions
-        if (in_array($type, ['array', 'null', 'object', 'string'])) {
-            return call_user_func('is_' . $type, $data);
-        }
-
-        // class functions
-        if (in_array($type, ['boolean', 'integer', 'number'])) {
-            $method = 'is' . ucfirst($type);
-            return $this->$method($data);
-        }
-
-        return false;
-    }
-
-    protected function isBoolean($data)
-    {
-        return is_bool($data);
-    }
-
-    protected function isInteger($data)
-    {
-        // Large integers may be stored as a float (Issue:1). Note that data
-        // may have been truncated to fit a 64-bit PHP_MAX_INT
-        return is_integer($data) || (is_float($data) && $data === floor($data));
-    }
-
-    protected function isNumber($data)
-    {
-        return is_float($data) || is_integer($data);
+        return $this->manager->jsonTypes->checkType($data, $type);
     }
 }

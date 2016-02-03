@@ -12,6 +12,12 @@ class Manager
     * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
     */
     protected $tokenizer;
+
+    /**
+    * @var JsonTypes
+    */
+    public $jsonTypes;
+
     public $path;
     protected $lax;
     public $errors;
@@ -22,6 +28,7 @@ class Manager
     {
         $this->lax = $lax;
         $this->tokenizer = new Tokenizer();
+        $this->jsonTypes = new JsonTypes();
         $this->errors = [];
         $this->constraints = [];
         $this->stopOnError = false;
@@ -171,16 +178,10 @@ class Manager
 
     protected function getInstanceName($data)
     {
-        $result = '';
+        $result = $this->jsonTypes->getGeneric($data);
 
-        if (is_null($data) || is_bool($data)) {
-            return $result;
-        }
-
-        $result = gettype($data);
-
-        if (in_array($result, ['double', 'integer'])) {
-            $result = 'number';
+        if (in_array($result, ['boolean', 'null'])) {
+            $result = '';
         }
 
         return $result;
