@@ -14,11 +14,14 @@ class Comparer
 {
     public function equals($value1, $value2)
     {
-        if ($this->differentTypes($value1, $value2, $type)) {
+        $type = $this->getJsonType($value1);
+
+        if ($type !== $this->getJsonType($value2)) {
             return false;
         }
 
-        if (method_exists($this, $method = 'equals' . ucfirst($type))) {
+        if (in_array($type, ['array', 'number', 'object'])) {
+            $method = 'equals' . ucfirst($type);
             return $this->$method($value1, $value2);
         }
 
@@ -41,20 +44,16 @@ class Comparer
         return true;
     }
 
-    protected function differentTypes(&$value1, &$value2, &$type1)
+    protected function getJsonType($value)
     {
-        $type1 = gettype($value1);
-        $type2 = gettype($value2);
+        $result = strtolower(gettype($value));
 
-        if ('integer' === $type1 && 'double' === $type2) {
-            $value1 = floatval($value1);
-            $type1 = 'double';
-        } elseif ('integer' === $type2 && 'double' === $type1) {
-            $value2 = floatval($value2);
-            $type2 = 'double';
+        if (in_array($result, ['double', 'integer'])) {
+            $value = floatval($value);
+            $result = 'number';
         }
 
-        return $type1 !== $type2;
+        return $result;
     }
 
     protected function equalsArray($arr1, $arr2)
@@ -74,7 +73,7 @@ class Comparer
         return true;
     }
 
-    protected function equalsDouble($value1, $value2)
+    protected function equalsNumber($value1, $value2)
     {
         return 0 === bccomp($value1, $value2, 16);
     }
@@ -87,11 +86,20 @@ class Comparer
         }
 
         foreach ($obj1 as $key => $value) {
-            if (!property_exists($obj2, $key) || !$this->equals($value, $obj2->$key)) {
+            if (!$this->hasEqualProperty($obj2, $key, $value)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    protected function hasEqualProperty($object, $key, $value)
+    {
+        if (!property_exists($object, $key)) {
+            return false;
+        }
+
+        return $this->equals($value, $object->$key);
     }
 }

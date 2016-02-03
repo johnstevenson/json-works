@@ -141,50 +141,64 @@ class EqualsTest extends \PHPUnit_Framework_TestCase
 
     public function testArrayTrue()
     {
-        $var1 = array(1, true, 20);
+        $var1 = [1, true, 20];
         $var2 = $var1;
         $this->assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testArrayFalse1()
+    public function testArrayFalse()
     {
-        $var1 = array(1, true, 20);
-        $var2 = array(1, true, 20, 5);
-        $this->assertFalse($this->comparer->equals($var1, $var2));
-    }
-
-    public function testArrayFalse2()
-    {
-        $var1 = array(1, true, 20);
-        $var2 = array(1, 20, true);
-        $this->assertFalse($this->comparer->equals($var1, $var2));
-    }
-
-    public function testArrayFalse3()
-    {
-        $var1 = array(1, true, 20);
+        $var1 = [1, true, 20];
         $var2 = 9;
+        $this->assertFalse($this->comparer->equals($var1, $var2));
+    }
+
+    public function testArrayFalseDifferentSize()
+    {
+        $var1 = [1, true, 20];
+        $var2 = [1, true, 20, 5];
+        $this->assertFalse($this->comparer->equals($var1, $var2));
+    }
+
+    public function testArrayFalseDifferentIndex()
+    {
+        $var1 = [1, true, 20];
+        $var2 = [1, 20, true];
         $this->assertFalse($this->comparer->equals($var1, $var2));
     }
 
     public function testObjectTrue()
     {
-        $var1 = (object) array('name' => 'value', 'other' => 'other');
-        $var2 = (object) array('other' => 'other', 'name' => 'value');
+        $var1 = (object) ['name' => 'name', 'other' => 'other'];
+        $var2 = (object) ['other' => 'other', 'name' => 'name'];
         $this->assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testObjectFalse1()
+    public function testObjectFalse()
     {
-        $var1 = (object) array('name' => 'value', 'other' => 'other');
-        $var2 = (object) array('other' => 'other');
+        $var1 = (object) ['name' => 'name', 'other' => 'other'];
+        $var2 = 'other';
         $this->assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testObjectFalse2()
+    public function testObjectFalseDifferentSize()
     {
-        $var1 = (object) array('name' => 'value', 'other' => 'other');
-        $var2 = 'other';
+        $var1 = (object) ['name' => 'name', 'other' => 'other'];
+        $var2 = (object) ['name' => 'name'];
+        $this->assertFalse($this->comparer->equals($var1, $var2));
+    }
+
+    public function testObjectFalseDifferentKeys()
+    {
+        $var1 = (object) ['name' => 'name', 'other' => 'other'];
+        $var2 = (object) ['other' => 'other', 'name1' => 'name1'];
+        $this->assertFalse($this->comparer->equals($var1, $var2));
+    }
+
+    public function testObjectFalseDifferentValues()
+    {
+        $var1 = (object) ['name' => 'name', 'other' => 'other'];
+        $var2 = (object) ['other' => true, 'name' => 'name'];
         $this->assertFalse($this->comparer->equals($var1, $var2));
     }
 }

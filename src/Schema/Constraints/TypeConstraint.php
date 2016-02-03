@@ -31,12 +31,15 @@ class TypeConstraint extends BaseConstraint
 
     protected function checkType($data, $type)
     {
-        if (method_exists($this, $method = 'is' . ucfirst($type))) {
-            return $this->$method($data);
+        // native functions
+        if (in_array($type, ['array', 'null', 'object', 'string'])) {
+            return call_user_func('is_' . $type, $data);
         }
 
-        if (in_array($type, ['object', 'array', 'string', 'null'])) {
-            return call_user_func('is_' . $type, $data);
+        // class functions
+        if (in_array($type, ['boolean', 'integer', 'number'])) {
+            $method = 'is' . ucfirst($type);
+            return $this->$method($data);
         }
 
         return false;
