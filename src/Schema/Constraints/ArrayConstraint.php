@@ -12,24 +12,27 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 use JohnStevenson\JsonWorks\Schema\Constraints\Comparer;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
+use JohnStevenson\JsonWorks\Schema\Constraints\MaxMinConstraint;
 
 class ArrayConstraint extends BaseConstraint
 {
     protected $comparer;
+    protected $maxMin;
 
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
         $this->comparer = new Comparer();
+        $this->maxMin = new MaxMinConstraint($manager);
     }
 
     protected function run($data, $schema, $key = null)
     {
         // maxItems
-        $this->checkMaxItems($data, $schema);
+        $this->maxMin->run($data, $schema, 'maxItems');
 
         // minItems
-        $this->checkMinItems($data, $schema);
+        $this->maxMin->run($data, $schema, 'minItems');
 
         // uniqueItems
         if ($this->get($schema, 'uniqueItems', false)) {
@@ -81,41 +84,5 @@ class ArrayConstraint extends BaseConstraint
 
             $this->validateChild($data[$i], $subSchema, strval($i));
         }
-    }
-
-    protected function checkMaxItems($data, $schema)
-    {
-        if ($this->getInteger($schema, 'maxItems', $value)) {
-            if (count($data) > $value) {
-                $error = sprintf("has too many items, maximum '%d'", $value) ;
-                $this->addError($error);
-            }
-        }
-    }
-
-    protected function checkMinItems($data, $schema)
-    {
-        if ($this->getInteger($schema, 'minItems', $value)) {
-            if (count($data) < $value) {
-                $error = sprintf("has too few items, minimum '%d'", $value) ;
-                $this->addError($error);
-            }
-        }
-    }
-
-    protected function getInteger($schema, $key, &$value)
-    {
-        if ($result = $this->getValue($schema, $key, $value, $type)) {
-
-            if ($type !== 'integer') {
-                $this->throwSchemaError('integer', $value);
-            }
-
-            if ($value < 0) {
-                $this->throwSchemaError('>= 0', $value);
-            }
-        }
-
-        return $result;
     }
 }

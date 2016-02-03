@@ -154,13 +154,16 @@ class Manager
 
     protected function validateInstance($data, $schema)
     {
-        if (!$name = $this->getInstanceName($data)) {
-            return;
+        if ($name = $this->getInstanceName($data)) {
+            $this->check($name, [$data, $schema]);
         }
+
+        return;
 
         switch ($name) {
             case 'object':
-                $this->validateObject($data, $schema);
+                //$this->validateObject($data, $schema);
+                $this->check($name, [$data, $schema]);
                 break;
             case 'array':
                 $this->check($name, [$data, $schema]);
@@ -185,129 +188,5 @@ class Manager
         }
 
         return $result;
-    }
-
-    protected function validateObject($data, $schema)
-    {
-
-        # maxProperties
-        if (isset($schema->maxProperties)) {
-            $this->validateMaxMin($data, $schema->maxProperties, true);
-        }
-
-        if (!$this->lax) {
-
-            # minProperties
-            if (isset($schema->minProperties)) {
-                $this->validateMaxMin($data, $schema->minProperties, false);
-            }
-
-            if (isset($schema->required)) {
-                foreach ((array) $schema->required as $name) {
-                    if (!isset($data->$name)) {
-                        $this->throwError(sprintf("is missing required property '%s'", $name));
-                    }
-                }
-            }
-
-        }
-
-        # additionalProperties
-        $additional = Utils::get($schema, 'additionalProperties', true);
-
-        if (false === $additional) {
-            $this->validateObjectWork($data, $schema);
-        }
-
-        $this->validateObjectChildren($data, $schema, $additional);
-    }
-
-    protected function validateMaxMin($data, $value, $isMax)
-    {
-        $count = count((array) $data);
-
-        if ($isMax && $count > $value) {
-            $error = 'has too many members, maximum %d';
-        } elseif (!$isMax && $count < $value) {
-            $error = 'has too few members, minimum (%d)';
-        }
-
-        if (isset($error)) {
-            $this->throwError(sprintf($error, $value));
-        }
-    }
-
-    protected function validateObjectWork($data, $schema)
-    {
-        $set = (array) $data;
-        $p = Utils::get($schema, 'properties', new \stdClass());
-
-        foreach ($p as $key => $value) {
-            if (isset($set[$key])) {
-                unset($set[$key]);
-            }
-        }
-
-        $pp = Utils::get($schema, 'patternProperties', new \stdClass());
-        $setCopy = $set;
-
-        foreach ($setCopy as $key => $value) {
-
-            foreach ($pp as $regex => $val) {
-                if ($this->match($regex, $key)) {
-                    unset($set[$key]);
-                    break;
-                }
-            }
-        }
-
-        if (!empty($set)) {
-            $this->throwError('contains unspecified additional properties');
-        }
-    }
-
-    protected function validateObjectChildren($data, $schema, $additional)
-    {
-        if (true === $additional) {
-            $additional = new \stdClass();
-        }
-
-        $p = Utils::get($schema, 'properties', new \stdClass());
-        $pp = Utils::get($schema, 'patternProperties', new \stdClass());
-
-        foreach ($data as $key => $value) {
-
-            $child = array();
-
-            if (isset($p->$key)) {
-                $child[] = $p->$key;
-            }
-
-            foreach ($pp as $regex => $val) {
-                if ($this->match($regex, $key)) {
-                    $child[] = $val;
-                }
-            }
-
-            if (empty($child) && $additional) {
-                $child[] = $additional;
-            }
-
-            foreach ($child as $subSchema) {
-                $this->validateChild($value, $subSchema, $key);
-            }
-        }
-    }
-
-    protected function match($regex, $string)
-    {
-         return preg_match('/'.$regex.'/', $string, $match);
-    }
-
-    protected function throwError($msg)
-    {
-        $path = $this->path ?: '#';
-        $error = sprintf("Property: '%s'. Error: %s", $path, $msg);
-        throw new ValidationException($error);
     }
 }
