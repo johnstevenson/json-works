@@ -52,7 +52,7 @@ class MaxMinConstraint extends BaseConstraint
     protected function setValues($data, $key)
     {
         $this->max = (bool) preg_match('/^max/', $key);
-        $this->caption = is_object($data) ? 'properties' : 'items';
+        $this->caption = is_object($data) ? 'properties' : 'elements';
     }
 
     /**
@@ -66,36 +66,16 @@ class MaxMinConstraint extends BaseConstraint
     */
     protected function getInteger($schema, $key, &$value)
     {
-        if (!$this->getValue($schema, $key, $value, $type)) {
+        if (!$this->getValue($schema, $key, $value, $type, 'integer')) {
             return false;
         }
 
-        if ($this->checkInteger($value, $type, $error)) {
+        if ($value >= 0) {
             return true;
         }
 
-        $error = $this->getSchemaError($error, $value);
+        $error = $this->getSchemaError('>= 0', $value);
         throw new \RuntimeException($error);
-    }
-
-    /**
-    * Checks that the value is a positive integer
-    *
-    * @param mixed $value
-    * @param string $type
-    * @return string
-    */
-    protected function checkInteger($value, $type, &$error)
-    {
-        $error = '';
-
-        if ($type !== 'integer') {
-            $error = 'integer';
-        } elseif ($value < 0) {
-            $error = '>= 0';
-        }
-
-        return empty($error);
     }
 
     /**

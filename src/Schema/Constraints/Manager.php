@@ -40,7 +40,7 @@ class Manager
             return;
         }
 
-        if ($this->validateCommon($data, $schema)) {
+        if ($this->check('common', [$data, $schema])) {
             $this->validateInstance($data, $schema);
         }
     }
@@ -86,21 +86,22 @@ class Manager
     * @param mixed $key
     * @param mixed $value
     * @param string $type Set by method
+    * @param mixed $required
     * @throws RuntimeException
     */
-    public function getValue($schema, $key, &$value, &$type)
+    public function getValue($schema, $key, &$value, &$type, $required = null)
     {
         if (is_object($schema)) {
 
             if ($result = property_exists($schema, $key)) {
                 $value = $schema->$key;
-                $type = gettype($value);
+                $type = $this->checkType($type, $value, $required);
             }
 
             return $result;
         }
 
-        $error = $this->getSchemaError($schema, 'object');
+        $error = $this->getSchemaError('object', gettype($schema));
         throw new \RuntimeException($error);
     }
 
@@ -147,22 +148,6 @@ class Manager
         throw new \RuntimeException($error);
     }
 
-    protected function validateCommon($data, $schema)
-    {
-        $errors = count($this->errors);
-        $common = ['enum', 'type', 'allOf', 'anyOf', 'oneOf', 'not'];
-
-        foreach ($common as $key) {
-
-            if ($subSchema = $this->get($schema, $key)) {
-                $name = preg_match('/(?:Of|not)$/', $key) ? 'of' : $key;
-                $this->check($name, [$data, $subSchema, $key]);
-            }
-        }
-
-        return $errors === count($this->errors);
-    }
-
     protected function validateInstance($data, $schema)
     {
         if ($name = $this->getInstanceName($data)) {
@@ -176,6 +161,23 @@ class Manager
 
         if (in_array($result, ['boolean', 'null'])) {
             $result = '';
+        }
+
+        return $result;
+    }
+
+    protected function checkType($type, $value, $required)
+    {
+        $result = gettype($value);
+
+        if ($required !== null) {
+
+            $types = (array) $required;
+
+            if (!in_array($result, $types)) {
+                $error = $this->getSchemaError(implode($types), $result);
+                throw new \RuntimeException($error);
+            }
         }
 
         return $result;

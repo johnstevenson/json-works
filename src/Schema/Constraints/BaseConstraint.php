@@ -50,14 +50,14 @@ abstract class BaseConstraint
         return $this->manager->get($schema, $key, $default);
     }
 
-    public function getValue($schema, $key, &$value, &$type)
+    public function getValue($schema, $key, &$value, &$type, $required = null)
     {
-        return $this->manager->getValue($schema, $key, $value, $type);
+        return $this->manager->getValue($schema, $key, $value, $type, $required);
     }
 
     protected function getSchemaError($expected, $value)
     {
-        $this->manager->getSchemaError($expected, $value);
+        return $this->manager->getSchemaError($expected, $value);
     }
 
     protected function validateChild($data, $schema, $key = null)

@@ -59,4 +59,22 @@ class UniqueArrayTest extends \PHPUnit_Framework_TestCase
         $value = [1, 'str', $obj1, false, $obj2];
         $this->assertFalse($this->comparer->uniqueArray($value));
     }
+
+    public function testArrayOfStringTrue()
+    {
+        $value = ['one', 'two', 'three', 'four', 'five'];
+        $this->assertTrue($this->comparer->uniqueArrayOfString($value));
+    }
+
+    public function testArrayOfStringFalse1()
+    {
+        $value = ['one', 'two', 'two', 'four', 'five'];
+        $this->assertFalse($this->comparer->uniqueArrayOfString($value));
+    }
+
+    public function testArrayOfStringFalse2()
+    {
+        $value = ['one', 'two', 2, 'four', 'five'];
+        $this->assertFalse($this->comparer->uniqueArrayOfString($value));
+    }
 }

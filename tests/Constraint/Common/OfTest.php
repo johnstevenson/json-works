@@ -15,13 +15,25 @@ class OfTest extends \JsonWorks\Tests\Base
         $this->of = new OfConstraint($manager);
     }
 
-    public function testInvalidSchemaArray()
+    public function testInvalidSchemaArray1()
     {
         $schema = '{
             "allOf": {
                 "type": "string",
                 "enum": ["none", "value"]
             }
+        }';
+
+        $data = 'value';
+
+        $this->setExpectedException('RuntimeException');
+        $this->of->check($data, $schema, 'allOf');
+    }
+
+    public function testInvalidSchemaArray2()
+    {
+        $schema = '{
+            "allOf": []
         }';
 
         $data = 'value';

@@ -12,9 +12,17 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 class TypeConstraint extends BaseConstraint
 {
-    protected function run($data, $type, $key = null)
+    protected $comparer;
+
+    public function __construct(Manager $manager)
     {
-        $types = (array) $type;
+        parent::__construct($manager);
+        $this->comparer = new Comparer();
+    }
+
+    protected function run($data, $schema, $key = null)
+    {
+        $types = (array) $schema;
         $result = false;
 
         foreach ($types as $type) {
@@ -31,6 +39,18 @@ class TypeConstraint extends BaseConstraint
 
     protected function checkType($data, $type)
     {
-        return $this->manager->jsonTypes->checkType($data, $type);
+        return $this->comparer->checkType($data, $type);
+    }
+
+    protected function checkSchema($schema)
+    {
+        $result = (array) $schema;
+
+        if (!$this->comparer->uniqueArrayOfString($schema)) {
+            $error = $this->getSchemaError('strings', 'mixed');
+            throw new \RuntimeException($error);
+        }
+
+        return $result;
     }
 }
