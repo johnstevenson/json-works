@@ -62,6 +62,7 @@ class MaxMinConstraint extends BaseConstraint
     * @param string $key
     * @param mixed $value Set by method
     * @return bool
+    * @throws RuntimeException
     */
     protected function getInteger($schema, $key, &$value)
     {
@@ -69,7 +70,7 @@ class MaxMinConstraint extends BaseConstraint
             return false;
         }
 
-        if (!$error = $this->checkInteger($value, $type)) {
+        if ($this->checkInteger($value, $type, $error)) {
             return true;
         }
 
@@ -83,7 +84,7 @@ class MaxMinConstraint extends BaseConstraint
     * @param string $type
     * @return string
     */
-    protected function checkInteger($value, $type)
+    protected function checkInteger($value, $type, &$error)
     {
         $error = '';
 
@@ -93,7 +94,7 @@ class MaxMinConstraint extends BaseConstraint
             $error = '>= 0';
         }
 
-        return $error;
+        return empty($error);
     }
 
     /**

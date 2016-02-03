@@ -79,6 +79,15 @@ class Manager
         return call_user_func_array([$this->constraints[$name], 'check'], $params);
     }
 
+    /**
+    * Fetches a value from the schema
+    *
+    * @param mixed $schema
+    * @param mixed $key
+    * @param mixed $value
+    * @param string $type Set by method
+    * @throws RuntimeException
+    */
     public function getValue($schema, $key, &$value, &$type)
     {
         if (is_object($schema)) {
@@ -128,7 +137,7 @@ class Manager
     {
         if (is_object($schema)) {
 
-            if ($result = count((array) $schema > 0)) {
+            if ($result = count((array) $schema) > 0) {
                 $this->path = $this->tokenizer->add($this->path, $key);
             }
 
