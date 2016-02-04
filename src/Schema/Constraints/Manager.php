@@ -2,23 +2,12 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-use JohnStevenson\JsonWorks\Utils;
-use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 use JohnStevenson\JsonWorks\Schema\ValidationException;
 
 class Manager
 {
-    /**
-    * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
-    */
-    protected $tokenizer;
-
-    /**
-    * @var JsonTypes
-    */
-    public $jsonTypes;
-
     public $path;
+    public $dataPath;
     protected $lax;
     public $errors;
     protected $constraints;
@@ -27,8 +16,8 @@ class Manager
     public function __construct($lax)
     {
         $this->lax = $lax;
-        $this->tokenizer = new Tokenizer();
-        $this->jsonTypes = new JsonTypes();
+
+        $this->dataPath = [];
         $this->errors = [];
         $this->constraints = [];
         $this->stopOnError = false;
@@ -41,31 +30,28 @@ class Manager
         }
 
         if ($this->check('common', [$data, $schema])) {
-            $this->validateInstance($data, $schema);
+            $this->check('instance', [$data, $schema]);
+        }
+
+        if ($key) {
+            array_pop($this->dataPath);
         }
     }
 
-    public function validateChild($data, $schema, $key = null)
+    public function testChild($data, $schema)
     {
-        $result = true;
-        $currentPath = $this->path;
         $currentStop = $this->stopOnError;
+        $this->stopOnError = true;
 
-        if (is_null($key)) {
-            try {
-                $this->stopOnError = true;
-                $this->validate($data, $schema);
-            } catch (ValidationException $e) {
-                $result = false;
-                array_pop($this->errors);
-            }
-        } else {
-            $this->validate($data, $schema, $key);
+        try {
+            $this->validate($data, $schema);
+            $result = true;
+        } catch (ValidationException $e) {
+            $result = false;
+            array_pop($this->errors);
         }
 
-        $this->path = $currentPath;
         $this->stopOnError = $currentStop;
-
         return $result;
     }
 
@@ -95,7 +81,7 @@ class Manager
 
             if ($result = property_exists($schema, $key)) {
                 $value = $schema->$key;
-                $type = $this->checkType($type, $value, $required);
+                $type = $this->checkType($value, $required);
             }
 
             return $result;
@@ -114,16 +100,6 @@ class Manager
         return $default;
     }
 
-    public function addError($message)
-    {
-        $path = $this->path ?: '#';
-        $this->errors[] = sprintf("Property: '%s'. Error: %s", $path, $message);
-
-        if ($this->stopOnError) {
-            throw new ValidationException();
-        }
-    }
-
     public function getSchemaError($expected, $value)
     {
         return sprintf(
@@ -135,38 +111,22 @@ class Manager
 
     protected function init($schema, $key)
     {
-        if (is_object($schema)) {
+        if (!is_object($schema)) {
+            $error = $this->getSchemaError('object', gettype($schema));
+            throw new \RuntimeException($error);
+        }
 
-            if ($result = count((array) $schema) > 0) {
-                $this->path = $this->tokenizer->add($this->path, $key);
+        if ($result = count((array) $schema) > 0) {
+
+            if ($key) {
+                $this->dataPath[] = $key;
             }
-
-            return $result;
-        }
-
-        $error = $this->getSchemaError('object', gettype($schema));
-        throw new \RuntimeException($error);
-    }
-
-    protected function validateInstance($data, $schema)
-    {
-        if ($name = $this->getInstanceName($data)) {
-            $this->check($name, [$data, $schema]);
-        }
-    }
-
-    protected function getInstanceName($data)
-    {
-        $result = $this->jsonTypes->getGeneric($data);
-
-        if (in_array($result, ['boolean', 'null'])) {
-            $result = '';
         }
 
         return $result;
     }
 
-    protected function checkType($type, $value, $required)
+    protected function checkType($value, $required)
     {
         $result = gettype($value);
 

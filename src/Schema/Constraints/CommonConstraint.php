@@ -10,17 +10,13 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-use JohnStevenson\JsonWorks\Schema\Constraints\Comparer;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
 class CommonConstraint extends BaseConstraint
 {
-    protected $comparer;
-
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
-        $this->comparer = new Comparer();
     }
 
     protected function run($data, $schema, $key = null)
@@ -34,11 +30,12 @@ class CommonConstraint extends BaseConstraint
             'not' => 'object'
         ];
 
-        foreach ($common as $key => $required) {
+        foreach ($schema as $key => $subSchema) {
 
-            if ($this->getValue($schema, $key, $subSchema, $type, $required)) {
-                $name = preg_match('/(?:Of|not)$/', $key) ? 'of' : $key;
-                $this->manager->check($name, [$data, $subSchema, $key]);
+            if (isset($common[$key])) {
+                $this->getValue($schema, $key, $subSchema, $type, $common[$key]);
+                //$name = preg_match('/(?:Of|not)$/', $key) ? 'of' : $key;
+                $this->manager->check($key, [$data, $subSchema, $key]);
             }
         }
     }

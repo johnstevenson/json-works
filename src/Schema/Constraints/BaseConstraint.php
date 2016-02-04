@@ -10,6 +10,8 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
+use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+use JohnStevenson\JsonWorks\Schema\ValidationException;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
 abstract class BaseConstraint
@@ -18,6 +20,11 @@ abstract class BaseConstraint
     * @var Manager
     */
     protected $manager;
+
+    /**
+    * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
+    */
+    protected $tokenizer;
 
     /**
     * @var integer
@@ -29,6 +36,7 @@ abstract class BaseConstraint
     public function __construct(Manager $manager)
     {
         $this->manager = $manager;
+        $this->tokenizer = new Tokenizer;
     }
 
     public function check($data, $schema, $key = null)
@@ -41,7 +49,14 @@ abstract class BaseConstraint
 
     protected function addError($error)
     {
-        $this->manager->addError($error);
+        $path = $this->tokenizer->encode($this->manager->dataPath) ?: '#';
+        //$path = $this->manager->path ?: '#';
+        $this->manager->errors[] = sprintf("Property: '%s'. Error: %s", $path, $error);
+
+        if ($this->manager->stopOnError) {
+            throw new ValidationException();
+        }
+
         $this->errorCount += 1;
     }
 
@@ -62,7 +77,7 @@ abstract class BaseConstraint
 
     protected function validateChild($data, $schema, $key = null)
     {
-        return $this->manager->validateChild($data, $schema, $key);
+        return $this->manager->validate($data, $schema, $key);
     }
 
     protected function match($regex, $string)

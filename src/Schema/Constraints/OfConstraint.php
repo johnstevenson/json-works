@@ -38,7 +38,7 @@ class OfConstraint extends BaseConstraint
 
         foreach ($schemas as $subSchema) {
 
-            if ($this->validateChild($data, $subSchema)) {
+            if ($this->manager->testChild($data, $subSchema)) {
                 ++$result;
 
                 if ($this->matchFirst) {
