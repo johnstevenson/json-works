@@ -7,14 +7,6 @@ use JohnStevenson\JsonWorks\Schema\Constraints\OfConstraint;
 
 class OfTest extends \JsonWorks\Tests\Base
 {
-    protected $of;
-
-    protected function setUp()
-    {
-        $manager = new Manager();
-        $this->of = new OfConstraint($manager);
-    }
-
     public function testInvalidSchemaArray1()
     {
         $schema = '{
@@ -27,7 +19,7 @@ class OfTest extends \JsonWorks\Tests\Base
         $data = 'value';
 
         $this->setExpectedException('RuntimeException');
-        $this->of->validate($data, $schema, 'allOf');
+        $this->validate($schema, $data);
     }
 
     public function testInvalidSchemaArray2()
@@ -39,7 +31,7 @@ class OfTest extends \JsonWorks\Tests\Base
         $data = 'value';
 
         $this->setExpectedException('RuntimeException');
-        $this->of->validate($data, $schema, 'allOf');
+        $this->validate($schema, $data);
     }
 
     public function testInvalidSchemaObject()
@@ -51,6 +43,6 @@ class OfTest extends \JsonWorks\Tests\Base
         $data = 'value';
 
         $this->setExpectedException('RuntimeException');
-        $this->of->validate($data, $schema, 'not');
+        $this->validate($schema, $data);
     }
 }

@@ -33,6 +33,18 @@ class JsonTypes
         return $type === $this->getGeneric($value);
     }
 
+    public function arrayOfType(array $data, $type)
+    {
+        foreach ($data as $value) {
+
+            if ($type !== $this->getGeneric($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     protected function isInteger($value)
     {
         // Large integers may be stored as a float (Issue:1). Note that data

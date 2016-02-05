@@ -19,8 +19,7 @@ class OfConstraint extends BaseConstraint
 
     public function validate($data, $schema, $key)
     {
-        $this->setDetails($key);
-        $schemas = $this->checkSchema($schema);
+        $schemas = $this->setDetails($schema, $key);
         $matches = $this->getMatches($data, $schemas);
 
         if (!$this->checkResult($key, $matches, count($schemas))) {
@@ -28,10 +27,12 @@ class OfConstraint extends BaseConstraint
         }
     }
 
-    protected function setDetails($key)
+    protected function setDetails($schema, $key)
     {
         $this->type = $key === 'not' ? 'object' : 'array';
         $this->matchFirst = in_array($key, ['anyOf', 'not']);
+
+        return $this->type === 'object' ? [$schema] : $schema;
     }
 
     protected function getMatches($data, $schemas)
@@ -81,26 +82,6 @@ class OfConstraint extends BaseConstraint
         }
 
         return $matches === 0;
-    }
-
-    protected function checkSchema($schema)
-    {
-        if ($this->type === gettype($schema)) {
-            return $this->type === 'object' ? [$schema] : $this->checkArray($schema);
-        }
-
-        $error = $this->getSchemaError($this->type, gettype($schema));
-        throw new \RuntimeException($error);
-    }
-
-    protected function checkArray(array $schema)
-    {
-        if (count($schema) > 0) {
-            return $schema;
-        }
-
-        $error = $this->getSchemaError('> 0', '0');
-        throw new \RuntimeException($error);
     }
 
     protected function getError($key)

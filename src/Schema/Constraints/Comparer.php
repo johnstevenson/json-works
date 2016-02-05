@@ -44,17 +44,6 @@ class Comparer extends JsonTypes
         return true;
     }
 
-    public function uniqueArrayOfString(array $data)
-    {
-        foreach ($data as $value) {
-            if ('string' !== gettype($value)) {
-                return false;
-            }
-        }
-
-        return $this->uniqueArray($data);
-    }
-
     protected function equalsArray($arr1, $arr2)
     {
         $count = count($arr1);

@@ -12,12 +12,12 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 class TypeConstraint extends BaseConstraint
 {
-    protected $comparer;
+    protected $jsonTypes;
 
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
-        $this->comparer = new Comparer();
+        $this->jsonTypes = new JsonTypes();
     }
 
     public function validate($data, $schema)
@@ -26,7 +26,7 @@ class TypeConstraint extends BaseConstraint
         $result = false;
 
         foreach ($types as $type) {
-            if ($result = $this->checkType($data, $type)) {
+            if ($result = $this->jsonTypes->checkType($data, $type)) {
                 break;
             }
         }
@@ -35,22 +35,5 @@ class TypeConstraint extends BaseConstraint
             $error = sprintf("value must be of type '%s'", implode(', ', $types));
             $this->addError($error);
         }
-    }
-
-    protected function checkType($data, $type)
-    {
-        return $this->comparer->checkType($data, $type);
-    }
-
-    protected function checkSchema($schema)
-    {
-        $result = (array) $schema;
-
-        if (!$this->comparer->uniqueArrayOfString($schema)) {
-            $error = $this->getSchemaError('strings', 'mixed');
-            throw new \RuntimeException($error);
-        }
-
-        return $result;
     }
 }

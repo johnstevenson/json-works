@@ -4,7 +4,7 @@ namespace JsonWorks\Tests\Constraint;
 
 use JohnStevenson\JsonWorks\Schema\Constraints\JsonTypes;
 
-class CheckTypeTest extends \JsonWorks\Tests\Base
+class JsonTypesTest extends \JsonWorks\Tests\Base
 {
     protected $jsonTypes;
 
@@ -137,5 +137,32 @@ class CheckTypeTest extends \JsonWorks\Tests\Base
 
         $result = $this->jsonTypes->checkType($value, $type);
         $this->assertFalse($result);
+    }
+
+    public function testArrayOfString()
+    {
+        $value = ['one', 'two', 'three'];
+        $type = 'string';
+
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertTrue($result, 'Testing success');
+
+        $value = ['one', true, 'three'];
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertFalse($result, 'Testing failure');
+    }
+
+    public function testArrayOfObject()
+    {
+        $object = new \stdClass();
+        $value = [$object, $object, $object];
+        $type = 'object';
+
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertTrue($result, 'Testing success');
+
+        $value = [$object, [], $object];
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertFalse($result, 'Testing failure');
     }
 }
