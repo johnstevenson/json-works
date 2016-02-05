@@ -15,16 +15,11 @@ class FormatConstraint extends BaseConstraint
     /**
     * The main method
     *
-    * @param mixed $data
-    * @param mixed $schema
-    * @param mixed $key
+    * @param string $data
+    * @param string $format
     */
-    public function validate($data, $schema)
+    public function validate($data, $format)
     {
-        if (!$this->getValue($schema, 'format', $format, $type, 'string')) {
-            return;
-        }
-
         if (!$this->checkKnownFormat($data, $format)) {
             $error = sprintf("Unknown format '%s'", $format);
             $this->addError($error);

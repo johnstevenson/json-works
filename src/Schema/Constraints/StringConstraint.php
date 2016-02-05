@@ -31,20 +31,25 @@ class StringConstraint extends BaseConstraint
         $this->maxMin->validate($data, $schema, 'minLength');
 
         // format
-        $this->format->validate($data, $schema);
-
-        // pattern
-        $this->checkPattern($data, $schema);
-    }
-
-    protected function checkPattern($data, $schema)
-    {
-        if (!$this->getValue($schema, 'pattern', $pattern, $type, 'string')) {
-            return;
+        if ($this->getString($schema, 'format', $format)) {
+            $this->format->validate($data, $format);
         }
 
+        // pattern
+        if ($this->getString($schema, 'pattern', $pattern)) {
+            $this->checkPattern($data, $pattern);
+        }
+    }
+
+    protected function checkPattern($data, $pattern)
+    {
         if (!$this->matchPattern($pattern, $data)) {
             $this->addError(sprintf('does not match pattern: %s', $pattern));
         }
+    }
+
+    protected function getString($schema, $key, &$value)
+    {
+        return $this->getValue($schema, $key, $value, $type, 'string');
     }
 }
