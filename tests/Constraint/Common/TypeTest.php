@@ -70,6 +70,18 @@ class TypeTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
+    public function testInvalidSchemaMixedTypes()
+    {
+        $schema = '{
+            "type": ["string", [], "number"]
+        }';
+
+        $data = 'two';
+
+        $this->setExpectedException('RuntimeException');
+        $this->validate($schema, $data);
+    }
+
     public function testInvalidSchemaEmpty()
     {
         $schema = '{
@@ -81,8 +93,6 @@ class TypeTest extends \JsonWorks\Tests\Base
         $this->setExpectedException('RuntimeException');
         $this->validate($schema, $data);
     }
-
-
 
     public function testInvalidSchemaDuplicates()
     {

@@ -45,11 +45,6 @@ class JsonTypes
         return true;
     }
 
-    public function getTypes()
-    {
-        return ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string'];
-    }
-
     protected function isInteger($value)
     {
         // Large integers may be stored as a float (Issue:1). Note that data

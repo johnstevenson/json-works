@@ -69,7 +69,7 @@ class BaseDocument
         return $this->formatter->toJson($this->data, $options);
     }
 
-    public function validate($lax = false)
+    public function validate()
     {
         if (!$this->schema) {
             return true;
@@ -79,8 +79,8 @@ class BaseDocument
             $this->validator = new Validator();
         }
 
-        if (!$result = $this->validator->check($this->data, $this->schema, $lax)) {
-            $this->lastError = $this->validator->error;
+        if (!$result = $this->validator->check($this->data, $this->schema)) {
+            $this->lastError = array_shift($this->validator->errors);
         }
 
         return $result;

@@ -3,26 +3,23 @@
 namespace JohnStevenson\JsonWorks\Schema;
 
 use JohnStevenson\JsonWorks\Schema\ValidationException;
+use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
 class Validator
 {
-    public $error;
-    protected $errors;
+    public $errors;
 
-    public function check($data, $model, $lax = false)
+    public function check($data, $model)
     {
-        $result = true;
-        $this->error = '';
-        $constraints = new Constraints\Manager();
+        $manager = new Manager();
 
         try {
-            $constraints->validate($data, $model->data);
+            $manager->validate($data, $model->data);
         } catch (ValidationException $e) {
-            $this->error = $e->getMessage();
-            $result = false;
         }
 
-        //return $result;
-        return empty($this->error) && empty($constraints->errors);
+        $this->errors = $manager->errors;
+
+        return empty($this->errors);
     }
 }
