@@ -45,24 +45,25 @@ class CommonConstraint extends BaseConstraint
 
             if (isset($common[$key])) {
                 $this->getValue($schema, $key, $subSchema, $type, $common[$key]);
-                $this->checkSchema($subSchema, $key, $common[$key]);
+                $this->checkSchema($subSchema, $key);
 
                 $this->check($data, $subSchema, $key);
             }
         }
     }
 
-    protected function checkSchema($schema, $key, $required)
+    protected function checkSchema(&$schema, $key)
     {
-        if ($key === 'type') {
-            $schema = (array) $schema;
-        }
-
-        if (!is_array($schema)) {
+        if ($key === 'not') {
             return;
         }
 
-        $this->checkArrayCount($schema);
+        if ($key === 'type') {
+            $schema = (array) $schema;
+        } else {
+            $this->checkArrayCount($schema);
+        }
+
         $this->checkArrayValues($schema, $key);
     }
 
@@ -90,26 +91,19 @@ class CommonConstraint extends BaseConstraint
     {
         switch ($key) {
             case 'enum':
+                $this->checkUnique($schema);
                 break;
             case 'type':
-                $this->checkTypes($schema);
+                $this->checkUnique($schema);
+                $this->checkArrayTypes($schema, 'string');
                 break;
             default:
                 $this->checkArrayTypes($schema, 'object');
         }
     }
 
-    protected function checkTypes(array $schema)
+    protected function checkUnique(array $schema)
     {
-        $this->checkArrayTypes($schema, 'string');
-
-        $types = ['array', 'boolean', 'integer', 'null', 'number', 'object', 'string'];
-
-        if ($unknown = array_diff($schema, $types)) {
-            $error = $this->getSchemaError(implode('|', $types), implode('', $unknown));
-            throw new \RuntimeException($error);
-        }
-
         if (!$this->comparer->uniqueArray($schema)) {
             $error = $this->getSchemaError('unique', 'duplicates');
             throw new \RuntimeException($error);

@@ -12,28 +12,55 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 class TypeConstraint extends BaseConstraint
 {
+    /**
+    * @var JsonTypes
+    */
     protected $jsonTypes;
+
+    /**
+    * @var array
+    */
+    protected $types;
 
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
         $this->jsonTypes = new JsonTypes();
+
+        $this->types = [
+            'array',
+            'boolean',
+            'integer',
+            'null',
+            'number',
+            'object',
+            'string'
+        ];
     }
 
-    public function validate($data, $schema)
+    public function validate($data, array $schema)
     {
-        $types = (array) $schema;
-        $result = false;
+        if (empty($schema)) {
+            return;
+        }
 
-        foreach ($types as $type) {
-            if ($result = $this->jsonTypes->checkType($data, $type)) {
-                break;
+        $this->checkSchema($schema);
+
+        foreach ($schema as $type) {
+            if ($this->jsonTypes->checkType($data, $type)) {
+                return;
             }
         }
 
-        if (!$result) {
-            $error = sprintf("value must be of type '%s'", implode(', ', $types));
-            $this->addError($error);
+        $error = sprintf("value must be of type '%s'", implode('|', $schema));
+        $this->addError($error);
+    }
+
+    protected function checkSchema($schema)
+    {
+        if ($unknown = array_diff($schema, $this->types)) {
+            $error = $this->getSchemaError(implode('|', $this->types), implode('', $unknown));
+            throw new \RuntimeException($error);
         }
     }
 }
