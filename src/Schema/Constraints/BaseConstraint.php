@@ -57,8 +57,10 @@ abstract class BaseConstraint
         return $this->manager->getSchemaError($expected, $value);
     }
 
-    protected function match($regex, $string)
+    protected function matchPattern($pattern, $string)
     {
-        return preg_match('{'.$regex.'}', $string, $match);
+        $regex = sprintf('#%s#', str_replace('#', '\\#', $pattern));
+
+        return (bool) preg_match($regex, $string);
     }
 }

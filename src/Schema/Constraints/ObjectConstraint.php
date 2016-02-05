@@ -70,7 +70,7 @@ class ObjectConstraint extends BaseConstraint
         foreach ($setCopy as $key => $value) {
 
             foreach ($pp as $regex => $val) {
-                if ($this->match($regex, $key)) {
+                if ($this->matchPattern($regex, $key)) {
                     unset($set[$key]);
                     break;
                 }
@@ -100,7 +100,7 @@ class ObjectConstraint extends BaseConstraint
             }
 
             foreach ($pp as $regex => $val) {
-                if ($this->match($regex, $key)) {
+                if ($this->matchPattern($regex, $key)) {
                     $child[] = $val;
                 }
             }
