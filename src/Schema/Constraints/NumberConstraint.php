@@ -14,38 +14,84 @@ class NumberConstraint extends BaseConstraint
 {
     public function validate($data, $schema)
     {
-        # maximum
-        if (isset($schema->maximum)) {
-            $max = $schema->maximum;
+        // maximum
+        $this->checkMaxMin($data, $schema, 'maximum');
 
-            if ($exclusive = $this->get($schema, 'exclusiveMaximum', false)) {
-                $valid = $data < $max;
-            } else {
-                $valid = $data <= $max;
-            }
 
-            if (!$valid) {
-                $error = 'value must be less than ';
-                $error .= $exclusive ? 'or equal to ' : '';
-                $this->addError($error.$max);
-            }
+        // minimum
+        $this->checkMaxMin($data, $schema, 'minimum');
+    }
+
+    protected function checkMaxMin($data, $schema, $key)
+    {
+        $exclusiveKey = sprintf('exclusive%s', ucfirst($key));
+        $method = sprintf('compare%s', ucfirst($key));
+        $exclusive = $this->getExclusive($schema, $exclusiveKey);
+
+        if ($this->getNumber($schema, $key, false, $value)) {
+            $this->$method($data, $value, $exclusive);
+        } elseif ($exclusive) {
+            $error = $this->getSchemaError($key, '');
+            throw new \RuntimeException($error);
+        }
+    }
+
+    protected function getNumber($schema, $key, $positiveNonZero, &$value)
+    {
+        if (!$this->getValue($schema, $key, $value, $type, ['double', 'integer'])) {
+            return false;
         }
 
-        # minimum
-        if (isset($schema->minimum)) {
-            $min = $schema->minimum;
-
-            if ($exclusive = $this->get($schema, 'exclusiveMinimum', false)) {
-                $valid = $data > $min;
-            } else {
-                $valid = $data >= $min;
-            }
-
-            if (!$valid) {
-                $error = 'value must be greater than ';
-                $error .= $exclusive ? '' : 'or equal to ';
-                $this->addError($error.$min);
-            }
+        if (!$positiveNonZero || $value > 0) {
+            return true;
         }
+
+        $error = $this->getSchemaError('> 0', $value);
+        throw new \RuntimeException($error);
+    }
+
+    protected function getExclusive($schema, $key)
+    {
+        return $this->getValue($schema, $key, $value, $type, 'boolean');
+    }
+
+    protected function compareMaximum($data, $maximum, $exclusive)
+    {
+        if ($exclusive) {
+            $result = $data < $maximum;
+        } else {
+            $result = $this->precisionCompare($data, $maximum) <= 0;
+        }
+
+        if (!$result) {
+            $this->setError($maximum, true, $exclusive);
+        }
+    }
+
+    protected function compareMinimum($data, $minimum, $exclusive)
+    {
+        if ($exclusive) {
+            $result = $data > $minimum;
+        } else {
+            $result = $this->precisionCompare($data, $minimum) >= 0;
+        }
+
+        if (!$result) {
+            $this->setError($minimum, false, $exclusive);
+        }
+    }
+
+    protected function precisionCompare($value1, $value2)
+    {
+        return bccomp(strval($value1), strval($value2), 16);
+    }
+
+    protected function setError($value, $max, $exclusive)
+    {
+        $caption = $max ? 'less' : 'greater';
+        $equals = $exclusive ? 'or equal to ' : '';
+        $error = sprintf("value must be %s than %s'%f'", $caption, $equals, $value);
+
+        $this->addError($error);
     }
 }
