@@ -16,6 +16,7 @@ class Validator
         try {
             $manager->validate($data, $model->data);
         } catch (ValidationException $e) {
+            // The exception is thrown to stop validation
         }
 
         $this->errors = $manager->errors;
