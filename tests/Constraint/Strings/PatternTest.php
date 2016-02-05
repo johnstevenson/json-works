@@ -33,4 +33,20 @@ class PatternTest extends \JsonWorks\Tests\Base
 
         $this->assertFalse($this->validate($schema, $data));
     }
+
+    public function testInvalidSchemaNotString()
+    {
+        $schema = '{
+            "properties": {
+                "test": {"pattern": 7}
+            }
+        }';
+
+        $data = '{
+            "test": "test"
+        }';
+
+        $this->setExpectedException('RuntimeException');
+        $this->validate($schema, $data);
+    }
 }

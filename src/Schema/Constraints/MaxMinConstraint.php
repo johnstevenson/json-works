@@ -18,6 +18,11 @@ class MaxMinConstraint extends BaseConstraint
     protected $max;
 
     /**
+    * @var bool
+    */
+    protected $length;
+
+    /**
     * @var string
     */
     protected $caption;
@@ -36,10 +41,10 @@ class MaxMinConstraint extends BaseConstraint
         }
 
         $this->setValues($data, $key);
-        $count = count((array) $data);
+        $count = $this->length ? mb_strlen($data) : count((array) $data);
 
         if (!$this->compare($count, $value)) {
-            $this->setError($value);
+            $this->setError($count, $value);
         }
     }
 
@@ -52,7 +57,12 @@ class MaxMinConstraint extends BaseConstraint
     protected function setValues($data, $key)
     {
         $this->max = (bool) preg_match('/^max/', $key);
-        $this->caption = is_object($data) ? 'properties' : 'elements';
+
+        if ($this->length = (bool) preg_match('/Length$/', $key)) {
+            $this->caption = 'characters';
+        } else {
+            $this->caption = is_object($data) ? 'properties' : 'elements';
+        }
     }
 
     /**
@@ -95,14 +105,14 @@ class MaxMinConstraint extends BaseConstraint
     *
     * @param integer $value
     */
-    protected function setError($value)
+    protected function setError($count, $value)
     {
         if ($this->max) {
-            $error = "has too many %d, maximum '%d'";
+            $error = "has too many %s [%d], maximum is '%d'";
         } else {
-            $error = "has too few %d, minimum '%d'";
+            $error = "has too few %s [%d], minimum is '%d'";
         }
 
-        $this->addError(sprintf($error, $this->caption, $value));
+        $this->addError(sprintf($error, $this->caption, $count, $value));
     }
 }
