@@ -15,25 +15,30 @@ class NumberConstraint extends BaseConstraint
     public function validate($data, $schema)
     {
         // maximum
-        $this->checkMaxMin($data, $schema, 'maximum');
+        $this->checkMaxMin($data, $schema, 'maximum', true);
 
 
         // minimum
-        $this->checkMaxMin($data, $schema, 'minimum');
+        $this->checkMaxMin($data, $schema, 'minimum', false);
     }
 
-    protected function checkMaxMin($data, $schema, $key)
+    protected function checkMaxMin($data, $schema, $key, $max)
     {
         $exclusiveKey = sprintf('exclusive%s', ucfirst($key));
-        $method = sprintf('compare%s', ucfirst($key));
         $exclusive = $this->getExclusive($schema, $exclusiveKey);
 
         if ($this->getNumber($schema, $key, false, $value)) {
-            $this->$method($data, $value, $exclusive);
+            $this->compare($data, $value, $exclusive, $max);
+
         } elseif ($exclusive) {
             $error = $this->getSchemaError($key, '');
             throw new \RuntimeException($error);
         }
+    }
+
+    protected function getExclusive($schema, $key)
+    {
+        return $this->getValue($schema, $key, $value, $type, 'boolean');
     }
 
     protected function getNumber($schema, $key, $positiveNonZero, &$value)
@@ -50,43 +55,27 @@ class NumberConstraint extends BaseConstraint
         throw new \RuntimeException($error);
     }
 
-    protected function getExclusive($schema, $key)
+    protected function compare($data, $value, $exclusive, $max)
     {
-        return $this->getValue($schema, $key, $value, $type, 'boolean');
+        if (!$this->precisionCompare($data, $value, $exclusive, $max)) {
+            $this->setError($value, $exclusive, $max);
+        }
     }
 
-    protected function compareMaximum($data, $maximum, $exclusive)
+    protected function precisionCompare($data, $value, $exclusive, $max)
     {
-        if ($exclusive) {
-            $result = $data < $maximum;
+        $comp = bccomp(strval($data), strval($value), 16);
+
+        if ($max) {
+            $result = $exclusive ? $comp < 0 : $comp <= 0;
         } else {
-            $result = $this->precisionCompare($data, $maximum) <= 0;
+            $result = $exclusive ? $comp > 0 : $comp >= 0;
         }
 
-        if (!$result) {
-            $this->setError($maximum, true, $exclusive);
-        }
+        return $result;
     }
 
-    protected function compareMinimum($data, $minimum, $exclusive)
-    {
-        if ($exclusive) {
-            $result = $data > $minimum;
-        } else {
-            $result = $this->precisionCompare($data, $minimum) >= 0;
-        }
-
-        if (!$result) {
-            $this->setError($minimum, false, $exclusive);
-        }
-    }
-
-    protected function precisionCompare($value1, $value2)
-    {
-        return bccomp(strval($value1), strval($value2), 16);
-    }
-
-    protected function setError($value, $max, $exclusive)
+    protected function setError($value, $exclusive, $max)
     {
         $caption = $max ? 'less' : 'greater';
         $equals = $exclusive ? 'or equal to ' : '';
