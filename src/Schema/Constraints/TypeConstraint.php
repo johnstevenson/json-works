@@ -20,7 +20,7 @@ class TypeConstraint extends BaseConstraint
         $this->comparer = new Comparer();
     }
 
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema)
     {
         $types = (array) $schema;
         $result = false;

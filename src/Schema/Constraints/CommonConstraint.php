@@ -14,12 +14,15 @@ use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
 class CommonConstraint extends BaseConstraint
 {
-    public function __construct(Manager $manager)
+    public function validate($data, $schema)
     {
-        parent::__construct($manager);
+        $errors = count($this->manager->errors);
+        $this->run($data, $schema);
+
+        return count($this->manager->errors) === $errors;
     }
 
-    protected function run($data, $schema, $key = null)
+    protected function run($data, $schema)
     {
         $common = [
             'enum' => 'array',
@@ -34,9 +37,22 @@ class CommonConstraint extends BaseConstraint
 
             if (isset($common[$key])) {
                 $this->getValue($schema, $key, $subSchema, $type, $common[$key]);
-                //$name = preg_match('/(?:Of|not)$/', $key) ? 'of' : $key;
-                $this->manager->check($key, [$data, $subSchema, $key]);
+
+
+                $this->checkCommon($data, $subSchema, $key);
             }
+        }
+    }
+
+    protected function checkCommon($data, $subSchema, $key)
+    {
+        $name = in_array($key, ['enum', 'type']) ? $key : 'of';
+        $validator = $this->manager->factory($name);
+
+        if ($name === 'of') {
+            $validator->validate($data, $subSchema, $key);
+        } else {
+            $validator->validate($data, $subSchema);
         }
     }
 }

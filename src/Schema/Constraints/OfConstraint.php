@@ -10,12 +10,14 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
+use JohnStevenson\JsonWorks\Schema\ValidationException;
+
 class OfConstraint extends BaseConstraint
 {
     protected $type;
     protected $matchFirst;
 
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema, $key)
     {
         $this->setDetails($key);
         $schemas = $this->checkSchema($schema);
@@ -38,7 +40,7 @@ class OfConstraint extends BaseConstraint
 
         foreach ($schemas as $subSchema) {
 
-            if ($this->manager->testChild($data, $subSchema)) {
+            if ($this->testChild($data, $subSchema)) {
                 ++$result;
 
                 if ($this->matchFirst) {
@@ -47,6 +49,23 @@ class OfConstraint extends BaseConstraint
             }
         }
 
+        return $result;
+    }
+
+    protected function testChild($data, $schema)
+    {
+        $currentStop = $this->manager->stopOnError;
+        $this->manager->stopOnError = true;
+
+        try {
+            $this->manager->validate($data, $schema);
+            $result = true;
+        } catch (ValidationException $e) {
+            $result = false;
+            array_pop($this->manager->errors);
+        }
+
+        $this->manager->stopOnError = $currentStop;
         return $result;
     }
 

@@ -29,7 +29,7 @@ class MaxMinConstraint extends BaseConstraint
     * @param mixed $schema
     * @param mixed $key
     */
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema, $key)
     {
         if (!$this->getInteger($schema, $key, $value)) {
             return;

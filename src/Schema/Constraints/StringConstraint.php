@@ -12,7 +12,7 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 class StringConstraint extends BaseConstraint
 {
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema)
     {
         # maxLength
         if (isset($schema->maxLength)) {

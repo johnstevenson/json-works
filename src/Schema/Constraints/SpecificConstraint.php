@@ -12,7 +12,7 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
-class InstanceConstraint extends BaseConstraint
+class SpecificConstraint extends BaseConstraint
 {
     /**
     * @var JsonTypes
@@ -25,10 +25,11 @@ class InstanceConstraint extends BaseConstraint
         $this->jsonTypes = new JsonTypes();
     }
 
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema)
     {
         if ($name = $this->getInstanceName($data)) {
-            $this->manager->check($name, [$data, $schema]);
+            $validator = $this->manager->factory($name);
+            $validator->validate($data, $schema);
         }
     }
 

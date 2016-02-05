@@ -12,7 +12,7 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 class NumberConstraint extends BaseConstraint
 {
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema)
     {
         # maximum
         if (isset($schema->maximum)) {

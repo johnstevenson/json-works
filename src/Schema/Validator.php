@@ -13,7 +13,7 @@ class Validator
     {
         $result = true;
         $this->error = '';
-        $constraints = new Constraints\Manager($lax);
+        $constraints = new Constraints\Manager();
 
         try {
             $constraints->validate($data, $model->data);

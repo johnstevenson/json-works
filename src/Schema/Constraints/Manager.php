@@ -2,21 +2,16 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-use JohnStevenson\JsonWorks\Schema\ValidationException;
-
 class Manager
 {
-    public $path;
     public $dataPath;
-    protected $lax;
     public $errors;
-    protected $constraints;
     public $stopOnError;
 
-    public function __construct($lax)
-    {
-        $this->lax = $lax;
+    protected $constraints;
 
+    public function __construct()
+    {
         $this->dataPath = [];
         $this->errors = [];
         $this->constraints = [];
@@ -25,44 +20,29 @@ class Manager
 
     public function validate($data, $schema, $key = null)
     {
-        if (!$this->init($schema, $key)) {
-            return;
+        $this->checkType($schema, 'object');
+        $this->dataPath[] = strval($key);
+
+        // Check commmon types first
+        $common = $this->factory('common');
+
+        if ($common->validate($data, $schema)) {
+
+            $specific = $this->factory('specific');
+            $specific->validate($data, $schema);
         }
 
-        if ($this->check('common', [$data, $schema])) {
-            $this->check('instance', [$data, $schema]);
-        }
-
-        if ($key) {
-            array_pop($this->dataPath);
-        }
+        array_pop($this->dataPath);
     }
 
-    public function testChild($data, $schema)
-    {
-        $currentStop = $this->stopOnError;
-        $this->stopOnError = true;
-
-        try {
-            $this->validate($data, $schema);
-            $result = true;
-        } catch (ValidationException $e) {
-            $result = false;
-            array_pop($this->errors);
-        }
-
-        $this->stopOnError = $currentStop;
-        return $result;
-    }
-
-    public function check($name, array $params)
+    public function factory($name)
     {
         if (!isset($this->constraints[$name])) {
             $class = sprintf('\%s\%sConstraint', __NAMESPACE__, ucfirst($name));
             $this->constraints[$name] = new $class($this);
         }
 
-        return call_user_func_array([$this->constraints[$name], 'check'], $params);
+        return $this->constraints[$name];
     }
 
     /**
@@ -107,23 +87,6 @@ class Manager
             $expected,
             $value
         );
-    }
-
-    protected function init($schema, $key)
-    {
-        if (!is_object($schema)) {
-            $error = $this->getSchemaError('object', gettype($schema));
-            throw new \RuntimeException($error);
-        }
-
-        if ($result = count((array) $schema) > 0) {
-
-            if ($key) {
-                $this->dataPath[] = $key;
-            }
-        }
-
-        return $result;
     }
 
     protected function checkType($value, $required)

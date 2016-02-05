@@ -23,13 +23,17 @@ class ObjectConstraint extends BaseConstraint
         $this->maxMin = new MaxMinConstraint($manager);
     }
 
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema)
     {
+        if (0 === count((array) $schema)) {
+            return;
+        }
+
         // maxProperties
-        $this->maxMin->check($data, $schema, 'maxProperties');
+        $this->maxMin->validate($data, $schema, 'maxProperties');
 
         # minProperties
-        $this->maxMin->check($data, $schema, 'minProperties');
+        $this->maxMin->validate($data, $schema, 'minProperties');
 
         if (isset($schema->required)) {
             foreach ((array) $schema->required as $name) {
@@ -106,7 +110,7 @@ class ObjectConstraint extends BaseConstraint
             }
 
             foreach ($child as $subSchema) {
-                $this->validateChild($value, $subSchema, $key);
+                $this->manager->validate($value, $subSchema, $key);
             }
         }
     }

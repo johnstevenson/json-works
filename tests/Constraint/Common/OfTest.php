@@ -11,7 +11,7 @@ class OfTest extends \JsonWorks\Tests\Base
 
     protected function setUp()
     {
-        $manager = new Manager(false);
+        $manager = new Manager();
         $this->of = new OfConstraint($manager);
     }
 
@@ -27,7 +27,7 @@ class OfTest extends \JsonWorks\Tests\Base
         $data = 'value';
 
         $this->setExpectedException('RuntimeException');
-        $this->of->check($data, $schema, 'allOf');
+        $this->of->validate($data, $schema, 'allOf');
     }
 
     public function testInvalidSchemaArray2()
@@ -39,7 +39,7 @@ class OfTest extends \JsonWorks\Tests\Base
         $data = 'value';
 
         $this->setExpectedException('RuntimeException');
-        $this->of->check($data, $schema, 'allOf');
+        $this->of->validate($data, $schema, 'allOf');
     }
 
     public function testInvalidSchemaObject()
@@ -51,6 +51,6 @@ class OfTest extends \JsonWorks\Tests\Base
         $data = 'value';
 
         $this->setExpectedException('RuntimeException');
-        $this->of->check($data, $schema, 'not');
+        $this->of->validate($data, $schema, 'not');
     }
 }

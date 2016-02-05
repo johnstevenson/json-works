@@ -26,13 +26,13 @@ class ArrayConstraint extends BaseConstraint
         $this->maxMin = new MaxMinConstraint($manager);
     }
 
-    protected function run($data, $schema, $key = null)
+    public function validate($data, $schema)
     {
         // maxItems
-        $this->maxMin->check($data, $schema, 'maxItems');
+        $this->maxMin->validate($data, $schema, 'maxItems');
 
         // minItems
-        $this->maxMin->check($data, $schema, 'minItems');
+        $this->maxMin->validate($data, $schema, 'minItems');
 
         // uniqueItems
         if ($this->get($schema, 'uniqueItems', false)) {
@@ -82,7 +82,7 @@ class ArrayConstraint extends BaseConstraint
                 continue;
             }
 
-            $this->validateChild($data[$i], $subSchema, strval($i));
+            $this->manager->validate($data[$i], $subSchema, strval($i));
         }
     }
 }

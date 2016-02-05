@@ -23,7 +23,7 @@ class EnumConstraint extends BaseConstraint
         $this->comparer = new Comparer();
     }
 
-    protected function run($data, $enum, $key = null)
+    public function validate($data, $enum)
     {
         if (!$this->checkEnum($data, $enum)) {
             $error = sprintf("'value not found in enum '%s'", json_encode($enum));
