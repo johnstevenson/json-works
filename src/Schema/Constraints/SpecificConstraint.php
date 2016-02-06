@@ -10,12 +10,13 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
+use JohnStevenson\JsonWorks\Schema\JsonTypes;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
 class SpecificConstraint extends BaseConstraint
 {
     /**
-    * @var JsonTypes
+    * @var \JohnStevenson\JsonWorks\Schema\JsonTypes
     */
     protected $jsonTypes;
 

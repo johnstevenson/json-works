@@ -10,7 +10,7 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-use JohnStevenson\JsonWorks\Schema\Constraints\Comparer;
+use JohnStevenson\JsonWorks\Schema\Comparer;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 use JohnStevenson\JsonWorks\Schema\Constraints\MaxMinConstraint;
 

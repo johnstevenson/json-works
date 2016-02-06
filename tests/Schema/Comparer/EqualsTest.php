@@ -1,8 +1,8 @@
 <?php
 
-namespace JsonWorks\Tests\Constraint\Comparer;
+namespace JsonWorks\Tests\Schema\Comparer;
 
-use JohnStevenson\JsonWorks\Schema\Constraints\Comparer;
+use JohnStevenson\JsonWorks\Schema\Comparer;
 
 class EqualsTest extends \PHPUnit_Framework_TestCase
 {

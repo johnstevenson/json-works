@@ -2,11 +2,14 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
+use JohnStevenson\JsonWorks\Schema\DataChecker;
+
 class Manager
 {
     public $dataPath;
     public $errors;
     public $stopOnError;
+    public $dataChecker;
 
     protected $constraints;
 
@@ -16,11 +19,12 @@ class Manager
         $this->errors = [];
         $this->constraints = [];
         $this->stopOnError = false;
+        $this->dataChecker = new DataChecker($this);
     }
 
     public function validate($data, $schema, $key = null)
     {
-        $this->checkType($schema, 'object');
+        $this->dataChecker->checkType($schema, 'object');
         $this->dataPath[] = strval($key);
 
         // Check commmon types first
@@ -51,17 +55,16 @@ class Manager
     * @param mixed $schema
     * @param mixed $key
     * @param mixed $value
-    * @param string $type Set by method
     * @param mixed $required
     * @throws RuntimeException
     */
-    public function getValue($schema, $key, &$value, &$type, $required = null)
+    public function getValue($schema, $key, &$value, $required = null)
     {
         if (is_object($schema)) {
 
             if ($result = property_exists($schema, $key)) {
                 $value = $schema->$key;
-                $type = $this->checkType($value, $required);
+                $this->dataChecker->checkType($value, $required);
             }
 
             return $result;
@@ -73,7 +76,7 @@ class Manager
 
     public function get($schema, $key, $default = null)
     {
-        if ($this->getValue($schema, $key, $value, $type)) {
+        if ($this->getValue($schema, $key, $value)) {
             return $value;
         }
 
@@ -87,22 +90,5 @@ class Manager
             $expected,
             $value
         );
-    }
-
-    protected function checkType($value, $required)
-    {
-        $result = gettype($value);
-
-        if ($required !== null) {
-
-            $types = (array) $required;
-
-            if (!in_array($result, $types)) {
-                $error = $this->getSchemaError(implode($types), $result);
-                throw new \RuntimeException($error);
-            }
-        }
-
-        return $result;
     }
 }

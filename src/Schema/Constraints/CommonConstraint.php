@@ -14,12 +14,12 @@ use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
 class CommonConstraint extends BaseConstraint
 {
-    protected $comparer;
+    protected $dataChecker;
 
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
-        $this->comparer = new Comparer();
+        $this->dataChecker = $this->manager->dataChecker;
     }
 
     public function validate($data, $schema)
@@ -44,7 +44,7 @@ class CommonConstraint extends BaseConstraint
         foreach ($schema as $key => $subSchema) {
 
             if (isset($common[$key])) {
-                $this->getValue($schema, $key, $subSchema, $type, $common[$key]);
+                $this->getValue($schema, $key, $subSchema, $common[$key]);
                 $this->checkSchema($subSchema, $key);
 
                 $this->check($data, $subSchema, $key);
@@ -54,17 +54,13 @@ class CommonConstraint extends BaseConstraint
 
     protected function checkSchema(&$schema, $key)
     {
-        if ($key === 'not') {
-            return;
-        }
-
         if ($key === 'type') {
             $schema = (array) $schema;
-        } else {
-            $this->checkArrayCount($schema);
         }
 
-        $this->checkArrayValues($schema, $key);
+        if ($key !== 'not') {
+            $this->dataChecker->checkArray($schema, $key);
+        }
     }
 
     protected function check($data, $subSchema, $key)
@@ -76,45 +72,6 @@ class CommonConstraint extends BaseConstraint
             $validator->validate($data, $subSchema, $key);
         } else {
             $validator->validate($data, $subSchema);
-        }
-    }
-
-    protected function checkArrayCount(array $schema)
-    {
-        if (count($schema) <= 0) {
-            $error = $this->getSchemaError('> 0', '0');
-            throw new \RuntimeException($error);
-        }
-    }
-
-    protected function checkArrayValues(array $schema, $key)
-    {
-        switch ($key) {
-            case 'enum':
-                $this->checkUnique($schema);
-                break;
-            case 'type':
-                $this->checkUnique($schema);
-                $this->checkArrayTypes($schema, 'string');
-                break;
-            default:
-                $this->checkArrayTypes($schema, 'object');
-        }
-    }
-
-    protected function checkUnique(array $schema)
-    {
-        if (!$this->comparer->uniqueArray($schema)) {
-            $error = $this->getSchemaError('unique', 'duplicates');
-            throw new \RuntimeException($error);
-        }
-    }
-
-    protected function checkArrayTypes(array $schema, $type)
-    {
-        if (!$this->comparer->arrayOfType($schema, $type)) {
-            $error = $this->getSchemaError($type, 'mixed');
-            throw new \RuntimeException($error);
         }
     }
 }

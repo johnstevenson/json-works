@@ -29,19 +29,7 @@ class ObjectConstraint extends BaseConstraint
             return;
         }
 
-        // maxProperties
-        $this->maxMin->validate($data, $schema, 'maxProperties');
-
-        # minProperties
-        $this->maxMin->validate($data, $schema, 'minProperties');
-
-        if (isset($schema->required)) {
-            foreach ((array) $schema->required as $name) {
-                if (!isset($data->$name)) {
-                    $this->addError(sprintf("is missing required property '%s'", $name));
-                }
-            }
-        }
+        $this->checkCommon($data, $schema);
 
         # additionalProperties
         $additional = $this->get($schema, 'additionalProperties', true);
@@ -52,6 +40,39 @@ class ObjectConstraint extends BaseConstraint
 
         $this->validateObjectChildren($data, $schema, $additional);
     }
+
+    protected function checkCommon($data, $schema)
+    {
+        // maxProperties
+        $this->maxMin->validate($data, $schema, 'maxProperties');
+
+        // minProperties
+        $this->maxMin->validate($data, $schema, 'minProperties');
+
+        if ($this->getRequired($schema, $required)) {
+            $this->checkRequired($data, $required);
+        }
+    }
+
+    protected function checkRequired($data, array $required)
+    {
+        foreach ($required as $name) {
+
+            if (!property_exists($data, $name)) {
+                $this->addError(sprintf("is missing required property '%s'", $name));
+            }
+        }
+    }
+
+    protected function getRequired($schema, &$value)
+    {
+        if ($result = $this->getValue($schema, 'required', $value, 'array')) {
+            $this->manager->dataChecker->checkArray($value, 'required');
+        }
+
+        return $result;
+    }
+
 
     protected function validateObjectWork($data, $schema)
     {

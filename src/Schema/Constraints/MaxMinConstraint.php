@@ -76,7 +76,7 @@ class MaxMinConstraint extends BaseConstraint
     */
     protected function getInteger($schema, $key, &$value)
     {
-        if (!$this->getValue($schema, $key, $value, $type, 'integer')) {
+        if (!$this->getValue($schema, $key, $value, 'integer')) {
             return false;
         }
 

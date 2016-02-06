@@ -50,6 +50,6 @@ class StringConstraint extends BaseConstraint
 
     protected function getString($schema, $key, &$value)
     {
-        return $this->getValue($schema, $key, $value, $type, 'string');
+        return $this->getValue($schema, $key, $value, 'string');
     }
 }

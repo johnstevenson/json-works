@@ -55,12 +55,12 @@ class NumberConstraint extends BaseConstraint
 
     protected function getExclusive($schema, $key)
     {
-        return $this->getValue($schema, $key, $value, $type, 'boolean');
+        return $this->getValue($schema, $key, $value, 'boolean');
     }
 
     protected function getNumber($schema, $key, $positiveNonZero, &$value)
     {
-        if (!$this->getValue($schema, $key, $value, $type, ['double', 'integer'])) {
+        if (!$this->getValue($schema, $key, $value, ['number', 'integer'])) {
             return false;
         }
 

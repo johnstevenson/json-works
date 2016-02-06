@@ -1,8 +1,8 @@
 <?php
 
-namespace JsonWorks\Tests\Constraint;
+namespace JsonWorks\Tests\Schema;
 
-use JohnStevenson\JsonWorks\Schema\Constraints\JsonTypes;
+use JohnStevenson\JsonWorks\Schema\JsonTypes;
 
 class JsonTypesTest extends \JsonWorks\Tests\Base
 {
@@ -137,6 +137,32 @@ class JsonTypesTest extends \JsonWorks\Tests\Base
 
         $result = $this->jsonTypes->checkType($value, $type);
         $this->assertFalse($result);
+    }
+
+    public function testArrayOfInteger()
+    {
+        $value = [100, -3, 4];
+        $type = 'integer';
+
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertTrue($result, 'Testing success');
+
+        $value = [100, -3, 4.78];
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertFalse($result, 'Testing failure');
+    }
+
+    public function testArrayOfNumber()
+    {
+        $value = [100, -3, 4.78];
+        $type = 'number';
+
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertTrue($result, 'Testing success');
+
+        $value = [100, null, 4.78];
+        $result = $this->jsonTypes->arrayOfType($value, $type);
+        $this->assertFalse($result, 'Testing failure');
     }
 
     public function testArrayOfString()

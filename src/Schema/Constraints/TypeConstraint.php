@@ -10,10 +10,12 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
+use JohnStevenson\JsonWorks\Schema\JsonTypes;
+
 class TypeConstraint extends BaseConstraint
 {
     /**
-    * @var JsonTypes
+    * @var \JohnStevenson\JsonWorks\Schema\JsonTypes
     */
     protected $jsonTypes;
 
