@@ -123,4 +123,20 @@ class MinimumTest extends \JsonWorks\Tests\Base
 
         $this->assertFalse($this->validate($schema, $data));
     }
+
+    public function testInvalidSchemaExclusiveNoMinimum()
+    {
+        $schema = '{
+            "properties": {
+                "test": {"exclusiveMaximum": true}
+            }
+        }';
+
+        $data = '{
+            "test": 5.4
+        }';
+
+        $this->setExpectedException('RuntimeException');
+        $this->validate($schema, $data);
+    }
 }

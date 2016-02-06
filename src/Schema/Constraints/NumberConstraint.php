@@ -17,9 +17,11 @@ class NumberConstraint extends BaseConstraint
         // maximum
         $this->checkMaxMin($data, $schema, 'maximum', true);
 
-
         // minimum
         $this->checkMaxMin($data, $schema, 'minimum', false);
+
+        // multipleOf
+        $this->checkMultipleOf($data, $schema);
     }
 
     protected function checkMaxMin($data, $schema, $key, $max)
@@ -33,6 +35,21 @@ class NumberConstraint extends BaseConstraint
         } elseif ($exclusive) {
             $error = $this->getSchemaError($key, '');
             throw new \RuntimeException($error);
+        }
+    }
+
+    protected function checkMultipleOf($data, $schema)
+    {
+        if (!$this->getNumber($schema, 'multipleOf', true, $multipleOf)) {
+            return;
+        }
+
+        $quotient = bcdiv(strval($data), strval($multipleOf), 16);
+        $intqt = (int) $quotient;
+
+        if (bccomp(strval($quotient), strval($intqt), 16) !== 0) {
+            $error = sprintf("value must be a multiple of '%f'", $multipleOf);
+            $this->addError($error);
         }
     }
 
@@ -57,9 +74,16 @@ class NumberConstraint extends BaseConstraint
 
     protected function compare($data, $value, $exclusive, $max)
     {
-        if (!$this->precisionCompare($data, $value, $exclusive, $max)) {
-            $this->setError($value, $exclusive, $max);
+        if ($this->precisionCompare($data, $value, $exclusive, $max)) {
+            return;
         }
+
+        // format the error
+        $caption = $max ? 'less' : 'greater';
+        $equals = $exclusive ? 'or equal to ' : '';
+        $error = sprintf("value must be %s than %s'%f'", $caption, $equals, $value);
+
+        $this->addError($error);
     }
 
     protected function precisionCompare($data, $value, $exclusive, $max)
@@ -73,14 +97,5 @@ class NumberConstraint extends BaseConstraint
         }
 
         return $result;
-    }
-
-    protected function setError($value, $exclusive, $max)
-    {
-        $caption = $max ? 'less' : 'greater';
-        $equals = $exclusive ? 'or equal to ' : '';
-        $error = sprintf("value must be %s than %s'%f'", $caption, $equals, $value);
-
-        $this->addError($error);
     }
 }
