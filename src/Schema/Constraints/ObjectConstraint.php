@@ -31,14 +31,11 @@ class ObjectConstraint extends BaseConstraint
 
         $this->checkCommon($data, $schema);
 
-        # additionalProperties
-        $additional = $this->get($schema, 'additionalProperties', true);
+        $this->checkAllProperties($data, $schema, $children, $additional);
 
-        if (false === $additional) {
-            $this->validateObjectWork($data, $schema);
+        foreach ($children as $child) {
+            $this->manager->validate($child['data'], $child['schema'], $child['key']);
         }
-
-        $this->validateObjectChildren($data, $schema, $additional);
     }
 
     protected function checkCommon($data, $schema)
@@ -49,14 +46,19 @@ class ObjectConstraint extends BaseConstraint
         // minProperties
         $this->maxMin->validate($data, $schema, 'minProperties');
 
-        if ($this->getRequired($schema, $required)) {
-            $this->checkRequired($data, $required);
-        }
+        // required
+        $this->checkRequired($data, $schema);
     }
 
-    protected function checkRequired($data, array $required)
+    protected function checkRequired($data, $schema)
     {
-        foreach ($required as $name) {
+        if (!$this->getValue($schema, 'required', $value, 'array')) {
+            return;
+        }
+
+        $this->manager->dataChecker->checkArray($value, 'required');
+
+        foreach ($value as $name) {
 
             if (!property_exists($data, $name)) {
                 $this->addError(sprintf("is missing required property '%s'", $name));
@@ -64,74 +66,81 @@ class ObjectConstraint extends BaseConstraint
         }
     }
 
-    protected function getRequired($schema, &$value)
+    protected function checkAllProperties($data, $schema, &$children, &$additional)
     {
-        if ($result = $this->getValue($schema, 'required', $value, 'array')) {
-            $this->manager->dataChecker->checkArray($value, 'required');
+        $set = (array) $data;
+        $children = [];
+
+        if (!$this->getValue($schema, 'additionalProperties', $additional, ['object', 'boolean'])) {
+            $additional = true;
+        }
+
+        $this->parseProperties($schema, $set, $children);
+        $this->parsePatternProperties($schema, $set, $children);
+
+        if (!empty($set)) {
+
+            if (!$additional) {
+                $this->addError('contains unspecified additional properties');
+            } elseif (is_object($additional)) {
+                $this->mergeAdditional($set, $additional);
+            }
+        }
+    }
+
+    protected function getSchemaProperties($schema, $key, &$value)
+    {
+        if ($result = $this->getValue($schema, $key, $value, 'object')) {
+            $this->manager->dataChecker->checkObject($value, 'object');
         }
 
         return $result;
     }
 
-
-    protected function validateObjectWork($data, $schema)
+    protected function parseProperties($schema, array &$set, array &$children)
     {
-        $set = (array) $data;
-        $p = $this->get($schema, 'properties', new \stdClass());
+        if (!$this->getSchemaProperties($schema, 'properties', $p)) {
+            return;
+        }
 
-        foreach ($p as $key => $value) {
-            if (isset($set[$key])) {
+        foreach ($p as $key => $schema) {
+
+            if (array_key_exists($key, $set)) {
+                $children[]= ['data' => $set[$key], 'schema' => $schema, 'key' => $key];
                 unset($set[$key]);
             }
         }
+    }
 
-        $pp = $this->get($schema, 'patternProperties', new \stdClass());
-        $setCopy = $set;
-
-        foreach ($setCopy as $key => $value) {
-
-            foreach ($pp as $regex => $val) {
-                if ($this->matchPattern($regex, $key)) {
-                    unset($set[$key]);
-                    break;
-                }
-            }
+    protected function parsePatternProperties($schema, array &$set, array &$children)
+    {
+        if (!$this->getSchemaProperties($schema, 'patternProperties', $pp)) {
+            return;
         }
 
-        if (!empty($set)) {
-            $this->addError('contains unspecified additional properties');
+        foreach ($pp as $regex => $schema) {
+            $this->checkPattern($regex, $schema, $set, $children);
         }
     }
 
-    protected function validateObjectChildren($data, $schema, $additional)
+    protected function mergeAdditional(array $set, $additional)
     {
-        if (true === $additional) {
-            $additional = new \stdClass();
+        foreach ($set as $key => $value) {
+            $children[]= ['data' => $value, 'schema' => $additional, 'key' => $key];
         }
+    }
 
-        $p = $this->get($schema, 'properties', new \stdClass());
-        $pp = $this->get($schema, 'patternProperties', new \stdClass());
+    protected function checkPattern($regex, $schema, array &$set, array &$children)
+    {
+        $copy = $set;
 
-        foreach ($data as $key => $value) {
+        foreach ($copy as $key => $value) {
 
-            $child = array();
+            $matchKey = $key !== '_empty_' ? $key : '';
 
-            if (isset($p->$key)) {
-                $child[] = $p->$key;
-            }
-
-            foreach ($pp as $regex => $val) {
-                if ($this->matchPattern($regex, $key)) {
-                    $child[] = $val;
-                }
-            }
-
-            if (empty($child) && $additional) {
-                $child[] = $additional;
-            }
-
-            foreach ($child as $subSchema) {
-                $this->manager->validate($value, $subSchema, $key);
+            if ($this->matchPattern($regex, $matchKey)) {
+                $children[]= ['data' => $value, 'schema' => $schema, 'key' => $key];
+                unset($set[$key]);
             }
         }
     }

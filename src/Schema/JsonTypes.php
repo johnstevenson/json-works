@@ -72,8 +72,6 @@ class JsonTypes
     */
     public function arrayOfType(array $data, $type)
     {
-        $method = $type === 'integer' ? 'getSpecific' : 'getGeneric';
-
         foreach ($data as $value) {
 
             if (!$this->checkType($value, $type)) {

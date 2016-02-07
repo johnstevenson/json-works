@@ -24,7 +24,10 @@ class Manager
 
     public function validate($data, $schema, $key = null)
     {
-        $this->dataChecker->checkType($schema, 'object');
+        if ($this->dataChecker->emptySchema($schema)) {
+            return;
+        }
+
         $this->dataPath[] = strval($key);
 
         // Check commmon types first

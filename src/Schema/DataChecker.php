@@ -48,6 +48,23 @@ class DataChecker
         $this->checkArrayValues($schema, $key);
     }
 
+    public function checkObject($schema, $type)
+    {
+        foreach ($schema as $key => $value) {
+            if (!$this->comparer->checkType($value, $type)) {
+                $error = $this->manager->getSchemaError($type, 'mixed');
+                throw new \RuntimeException($error);
+            }
+        }
+    }
+
+    public function emptySchema($schema)
+    {
+        $this->checkType($schema, 'object');
+
+        return count((array) $schema) === 0;
+    }
+
     protected function checkArrayCount(array $schema)
     {
         if (count($schema) <= 0) {
