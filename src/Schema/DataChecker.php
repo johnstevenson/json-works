@@ -48,9 +48,9 @@ class DataChecker
         $this->checkArrayValues($schema, $key);
     }
 
-    public function checkObject($schema, $type)
+    public function checkContainerTypes($schema, $type)
     {
-        foreach ($schema as $key => $value) {
+        foreach ($schema as $value) {
             if (!$this->comparer->checkType($value, $type)) {
                 $error = $this->manager->getSchemaError($type, 'mixed');
                 throw new \RuntimeException($error);
@@ -81,7 +81,7 @@ class DataChecker
 
         if ($key !== 'enum') {
             $type = in_array($key, ['type', 'required']) ? 'string' : 'object';
-            $this->checkArrayTypes($schema, $type);
+            $this->checkContainerTypes($schema, $type);
         }
     }
 
@@ -89,14 +89,6 @@ class DataChecker
     {
         if (!$this->comparer->uniqueArray($schema)) {
             $error = $this->manager->getSchemaError('unique', 'duplicates');
-            throw new \RuntimeException($error);
-        }
-    }
-
-    protected function checkArrayTypes(array $schema, $type)
-    {
-        if (!$this->comparer->arrayOfType($schema, $type)) {
-            $error = $this->manager->getSchemaError($type, 'mixed');
             throw new \RuntimeException($error);
         }
     }
