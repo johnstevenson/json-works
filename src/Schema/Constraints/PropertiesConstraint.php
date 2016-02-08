@@ -10,7 +10,7 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-class ContainerConstraint extends BaseConstraint
+class PropertiesConstraint extends BaseConstraint
 {
     /**
     * @var object|bool
@@ -27,11 +27,10 @@ class ContainerConstraint extends BaseConstraint
     *
     * @param mixed $data
     * @param mixed $schema
-    * @param string $key
     */
-    public function validate($data, $schema, $key)
+    public function validate($data, $schema)
     {
-        $this->additional = $this->getAdditional($schema, $key);
+        $this->additional = $this->getAdditional($schema);
         $this->children = [];
 
         $this->checkProperties($data, $schema);
@@ -41,16 +40,11 @@ class ContainerConstraint extends BaseConstraint
         }
     }
 
-    protected function getAdditional($schema, $key)
+    protected function getAdditional($schema)
     {
-        $key = sprintf('additional%s', ucfirst($key));
-        $this->getValue($schema, $key, $value, ['object', 'boolean']);
+        $this->getValue($schema, 'additionalProperties', $value, ['object', 'boolean']);
 
-        if (is_bool($value)) {
-            return $value === false ? $value : new \stdClass();
-        } else {
-            return is_object($value) ? $value : new \stdClass();
-        }
+        return $value;
     }
 
     protected function checkProperties($data, $schema)
@@ -60,7 +54,7 @@ class ContainerConstraint extends BaseConstraint
         $this->parseProperties($schema, $set);
         $this->parsePatternProperties($schema, $set);
 
-        if (!$this->additional && !empty($set)) {
+        if (false === $this->additional && !empty($set)) {
             $this->addError('contains unspecified additional properties');
         }
 

@@ -11,78 +11,60 @@
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 use JohnStevenson\JsonWorks\Schema\Comparer;
+use JohnStevenson\JsonWorks\Schema\Constraints\ItemsConstraint;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 use JohnStevenson\JsonWorks\Schema\Constraints\MaxMinConstraint;
 
 class ArrayConstraint extends BaseConstraint
 {
     protected $comparer;
+    protected $items;
     protected $maxMin;
 
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
         $this->comparer = new Comparer();
+        $this->items = new ItemsConstraint($manager);
         $this->maxMin = new MaxMinConstraint($manager);
     }
 
     public function validate($data, $schema)
+    {
+        // max and min
+        $this->checkMaxMin($data, $schema);
+
+        // uniqueItems
+        $this->checkUnique($data, $schema);
+
+        $this->items->validate($data, $schema);
+    }
+
+    protected function checkMaxMin($data, $schema)
     {
         // maxItems
         $this->maxMin->validate($data, $schema, 'maxItems');
 
         // minItems
         $this->maxMin->validate($data, $schema, 'minItems');
+    }
 
-        // uniqueItems
-        if ($this->get($schema, 'uniqueItems', false)) {
+    protected function checkUnique($data, $schema)
+    {
+        if ($this->isUnique($schema)) {
+
             if (!$this->comparer->uniqueArray($data)) {
                 $this->addError('contains duplicate values');
             }
         }
-
-        # items
-        $items = $this->get($schema, 'items', array());
-
-        # additionalItems
-        $additional = $this->get($schema, 'additionalItems', true);
-
-        if (false === $additional && is_array($items)) {
-            if (count($data) > count($items)) {
-                $this->addError('contains more elements than are allowed');
-            }
-        }
-
-        $this->validateChildren($data, $items, $additional);
     }
 
-    protected function validateChildren($data, $items, $additional)
+    protected function isUnique($schema)
     {
-        if (null === $items) {
-            $items = new \stdClass();
+        if ($this->getValue($schema, 'uniqueItems', $value, 'boolean')) {
+            return $value;
         }
 
-        if (true === $additional) {
-            $additional = new \stdClass();
-        }
-
-        $single = is_object($items);
-        $dataCount = count($data);
-        $itemsCount = !$single ? count($items) : 0;
-
-        for ($i = 0; $i < $dataCount; ++$i) {
-
-            if ($single) {
-                $subSchema = $items;
-            } elseif ($i < $itemsCount) {
-                $subSchema = $items[$i];
-            } elseif ($additional) {
-                $subSchema = $additional;
-            } else {
-                continue;
-            }
-
-            $this->manager->validate($data[$i], $subSchema, strval($i));
-        }
+        return false;
     }
 }

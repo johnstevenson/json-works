@@ -10,43 +10,40 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
-use JohnStevenson\JsonWorks\Schema\Constraints\ContainerConstraint;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 use JohnStevenson\JsonWorks\Schema\Constraints\MaxMinConstraint;
+use JohnStevenson\JsonWorks\Schema\Constraints\PropertiesConstraint;
 
 class ObjectConstraint extends BaseConstraint
 {
     protected $maxMin;
-    protected $container;
+    protected $properties;
 
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
         $this->maxMin = new MaxMinConstraint($manager);
-        $this->container = new ContainerConstraint($manager);
+        $this->properties = new PropertiesConstraint($manager);
     }
 
     public function validate($data, $schema)
     {
-        if (0 === count((array) $schema)) {
-            return;
-        }
+        // max and min
+        $this->checkMaxMin($data, $schema);
 
-        $this->checkCommon($data, $schema);
+        // required
+        $this->checkRequired($data, $schema);
 
-        $this->container->validate($data, $schema, 'properties');
+        $this->properties->validate($data, $schema);
     }
 
-    protected function checkCommon($data, $schema)
+    protected function checkMaxMin($data, $schema)
     {
         // maxProperties
         $this->maxMin->validate($data, $schema, 'maxProperties');
 
         // minProperties
         $this->maxMin->validate($data, $schema, 'minProperties');
-
-        // required
-        $this->checkRequired($data, $schema);
     }
 
     protected function checkRequired($data, $schema)
