@@ -20,8 +20,7 @@ class ItemsConstraint extends BaseConstraint
     */
     public function validate($data, $schema)
     {
-        $this->getItemValue($schema, 'items', $items);
-        $this->getItemValue($schema, 'additionalItems', $additional);
+        $this->getItemValues($schema, $items, $additional);
 
         if (is_object($items)) {
             $this->validateObjectItems($data, $items);
@@ -31,19 +30,17 @@ class ItemsConstraint extends BaseConstraint
         }
     }
 
-    protected function getItemValue($schema, $key, &$value)
+    protected function getItemValues($schema, &$items, &$additional)
     {
-        $value = null;
-        $items = $key === 'items';
+        $items = null;
+        $this->getValue($schema, 'items', $items, ['array', 'object']);
 
-        $required = ['object'];
-        $required[] = $items ? 'array' : 'boolean';
-
-        if (!$this->getValue($schema, $key, $value, $required)) {
-            if ($items) {
-                $value = [];
-            }
+        if ($items === null) {
+            $items = [];
         }
+
+        $additional = null;
+        $this->getValue($schema, 'additionalItems', $additional, ['boolean', 'object']);
     }
 
     protected function validateObjectItems($data, $schema)

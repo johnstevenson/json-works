@@ -109,6 +109,54 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
+    public function testRequiredEmptyArray()
+    {
+        $schema = '{
+            "required": []
+        }';
+
+        $data = '{
+            "prop1": 1,
+            "prop2": 2,
+            "prop3": 3
+        }';
+
+        $this->setExpectedException('RuntimeException');
+        $this->validate($schema, $data);
+    }
+
+    public function testRequiredNotStringArray()
+    {
+        $schema = '{
+            "required": ["prop1", 0, "prop3"]
+        }';
+
+        $data = '{
+            "prop1": 1,
+            "prop2": 2,
+            "prop3": 3
+        }';
+
+        $this->setExpectedException('RuntimeException');
+        $this->validate($schema, $data);
+    }
+
+    public function testRequiredNotUniqueArray()
+    {
+        $schema = '{
+            "required": ["prop1", "prop3", "prop1", "prop3"]
+        }';
+
+        $data = '{
+            "prop1": 1,
+            "prop2": 2,
+            "prop3": 3
+        }';
+
+        $this->setExpectedException('RuntimeException');
+        $this->validate($schema, $data);
+    }
+
     public function testAdditionalNotObjectOrBoolean()
     {
         $schema = '{
