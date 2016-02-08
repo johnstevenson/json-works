@@ -13,31 +13,6 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 class ItemsConstraint extends BaseConstraint
 {
     /**
-    * @var object|bool
-    */
-    protected $additionalItems;
-
-    /**
-    * @var array
-    */
-    protected $data;
-
-    /**
-    * @ var object|array
-    */
-    protected $items;
-
-    /**
-    * @var integer
-    */
-    protected $dataCount;
-
-    /**
-    * @var integer
-    */
-    protected $itemsCount;
-
-    /**
     * The main method
     *
     * @param mixed $data
@@ -45,72 +20,69 @@ class ItemsConstraint extends BaseConstraint
     */
     public function validate($data, $schema)
     {
-        $this->setValues($data, $schema);
+        $this->getItemValue($schema, 'items', $items);
+        $this->getItemValue($schema, 'additionalItems', $additional);
 
-        if (is_object($this->items)) {
-            $this->validateObjectItems($this->items);
+        if (is_object($items)) {
+            $this->validateObjectItems($data, $items);
         } else {
-            $this->checkArrayItems();
-            $this->validateArrayItems();
+            $this->checkArrayItems($data, $items, $additional);
+            $this->validateArrayItems($data, $items, $additional);
         }
     }
 
-    protected function setValues($data, $schema)
+    protected function getItemValue($schema, $key, &$value)
     {
-        $this->data = $data;
-        $this->dataCount = count($this->data);
+        $value = null;
+        $items = $key === 'items';
 
-        $this->getItemValues($schema);
-        $this->itemsCount = is_array($this->items) ? count($this->items) : 0;
-    }
+        $required = ['object'];
+        $required[] = $items ? 'array' : 'boolean';
 
-    protected function getItemValues($schema)
-    {
-        $values = [
-            'additionalItems' => ['boolean', 'object'],
-            'items' => ['array', 'object']
-        ];
-
-        foreach ($values as $key => $required) {
-            $this->$key = null;
-            $this->getValue($schema, $key, $this->$key, $required);
-        }
-
-        if ($this->items === null) {
-            $this->items = [];
+        if (!$this->getValue($schema, $key, $value, $required)) {
+            if ($items) {
+                $value = [];
+            }
         }
     }
 
-    protected function validateObjectItems($schema, $start = 0)
+    protected function validateObjectItems($data, $schema)
     {
-        for ($i = $start; $i < $this->dataCount; ++$i) {
-            $this->manager->validate($this->data[$i], $schema, strval($i));
+        $key = 0;
+
+        foreach ($data as $value) {
+            $this->manager->validate($value, $schema, strval($key));
+            ++$key;
         }
     }
 
-    protected function checkArrayItems()
+    protected function checkArrayItems($data, $items, $additional)
     {
-        if (false === $this->additionalItems) {
-            if ($this->dataCount > $this->itemsCount) {
+        if (false === $additional) {
+            if (count($data) > count($items)) {
                 $this->addError('contains more elements than are allowed');
             }
         }
     }
 
-    protected function validateArrayItems()
+    protected function validateArrayItems($data, $items, $additional)
     {
-        for ($i = 0; $i < $this->dataCount; ++$i) {
+        $key = 0;
+        $itemsCount = count($items);
 
-            if ($i < $this->itemsCount) {
-                $this->manager->validate($this->data[$i], $this->items[$i], strval($i));
+        foreach ($data as $value) {
+
+            if ($key < $itemsCount) {
+                $this->manager->validate($value, $items[$key], strval($key));
             } else {
 
-                if (is_object($this->additionalItems)) {
-                    $this->validateObjectItems($this->additionalItems, $i);
+                if (is_object($additional)) {
+                    $this->validateObjectItems(array_slice($data, $key), $additional);
                 }
-
                 break;
             }
+
+            ++$key;
         }
     }
 }

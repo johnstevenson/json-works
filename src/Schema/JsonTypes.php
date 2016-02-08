@@ -93,7 +93,7 @@ class JsonTypes
     */
     protected function isInteger($value)
     {
-        return is_integer($value) || (is_float($value) && $value === floor($value));
+        return is_integer($value) || (is_float($value) && abs($value) >= PHP_INT_MAX);
     }
 
     /**

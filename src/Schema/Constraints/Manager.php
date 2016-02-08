@@ -77,15 +77,6 @@ class Manager
         throw new \RuntimeException($error);
     }
 
-    public function get($schema, $key, $default = null)
-    {
-        if ($this->getValue($schema, $key, $value)) {
-            return $value;
-        }
-
-        return $default;
-    }
-
     public function getSchemaError($expected, $value)
     {
         return sprintf(

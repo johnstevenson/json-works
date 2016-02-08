@@ -13,11 +13,6 @@ namespace JohnStevenson\JsonWorks\Schema\Constraints;
 class PropertiesConstraint extends BaseConstraint
 {
     /**
-    * @var object|bool
-    */
-    protected $additional;
-
-    /**
     * @var array
     */
     protected $children;
@@ -30,10 +25,10 @@ class PropertiesConstraint extends BaseConstraint
     */
     public function validate($data, $schema)
     {
-        $this->additional = $this->getAdditional($schema);
+        $additional = $this->getAdditional($schema);
         $this->children = [];
 
-        $this->checkProperties($data, $schema);
+        $this->checkProperties($data, $schema, $additional);
 
         foreach ($this->children as $child) {
             $this->manager->validate($child['data'], $child['schema'], $child['key']);
@@ -47,18 +42,18 @@ class PropertiesConstraint extends BaseConstraint
         return $value;
     }
 
-    protected function checkProperties($data, $schema)
+    protected function checkProperties($data, $schema, $additional)
     {
         $set = (array) $data;
 
         $this->parseProperties($schema, $set);
         $this->parsePatternProperties($schema, $set);
 
-        if (false === $this->additional && !empty($set)) {
+        if (false === $additional && !empty($set)) {
             $this->addError('contains unspecified additional properties');
         }
 
-        $this->mergeAdditional($set);
+        $this->mergeAdditional($set, $additional);
     }
 
     protected function parseProperties($schema, array &$set)
@@ -96,12 +91,12 @@ class PropertiesConstraint extends BaseConstraint
         return $result;
     }
 
-    protected function mergeAdditional(array $set)
+    protected function mergeAdditional(array $set, $additional)
     {
-        if (is_object($this->additional)) {
+        if (is_object($additional)) {
 
             foreach ($set as $key => $data) {
-                $this->addChild($data, $this->additional, $key);
+                $this->addChild($data, $additional, $key);
             }
         }
     }

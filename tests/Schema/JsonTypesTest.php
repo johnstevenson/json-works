@@ -85,9 +85,18 @@ class JsonTypesTest extends \JsonWorks\Tests\Base
         $this->assertTrue($result);
     }
 
-    public function testIntegerArbitrarilyLarge()
+    public function testIntegerLargeAsDouble()
     {
         $value = PHP_INT_MAX + 100;
+        $type = 'integer';
+
+        $result = $this->jsonTypes->checkType($value, $type);
+        $this->assertTrue($result);
+    }
+
+    public function testIntegerLargeAsDoubleNegative()
+    {
+        $value = ~PHP_INT_MAX - 100;
         $type = 'integer';
 
         $result = $this->jsonTypes->checkType($value, $type);
@@ -115,6 +124,15 @@ class JsonTypesTest extends \JsonWorks\Tests\Base
     public function testFloatNotInteger()
     {
         $value = 21.2;
+        $type = 'integer';
+
+        $result = $this->jsonTypes->checkType($value, $type);
+        $this->assertFalse($result);
+    }
+
+    public function testFloatCouldBeInteger()
+    {
+        $value = 21.0;
         $type = 'integer';
 
         $result = $this->jsonTypes->checkType($value, $type);

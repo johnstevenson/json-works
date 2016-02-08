@@ -8,7 +8,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
     {
         $schema = '{}';
 
-        $data = array(1, 2);
+        $data = [1, 2];
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -19,7 +19,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": true
         }';
 
-        $data = array(1, 2);
+        $data = [1, 2];
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -33,7 +33,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": false
         }';
 
-        $data = array(1, 2);
+        $data = [1, 2];
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -44,7 +44,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": {}
         }';
 
-        $data = array(1, 2);
+        $data = [1, 2];
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -56,7 +56,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": false
         }';
 
-        $data = array(1, 2);
+        $data = [1, 2];
 
         $this->assertFalse($this->validate($schema, $data));
     }
@@ -68,7 +68,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": false
         }';
 
-        $data = '[]';
+        $data = [];
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -80,7 +80,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": false
         }';
 
-        $data = '[ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ]';
+        $data = [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ];
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -92,7 +92,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": false
         }';
 
-        $data = '[ 1, 2, 3 ]';
+        $data = [1, 2, 3];
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -104,7 +104,7 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
             "additionalItems": false
         }';
 
-        $data = '[ 1, 2, 3, 4 ]';
+        $data = [1, 2, 3, 4];
 
         $this->assertFalse($this->validate($schema, $data));
     }

@@ -42,11 +42,6 @@ abstract class BaseConstraint
         }
     }
 
-    public function get($schema, $key, $default = null)
-    {
-        return $this->manager->get($schema, $key, $default);
-    }
-
     public function getValue($schema, $key, &$value, $required = null)
     {
         return $this->manager->getValue($schema, $key, $value, $required);
