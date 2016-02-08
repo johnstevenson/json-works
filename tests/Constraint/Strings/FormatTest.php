@@ -185,7 +185,7 @@ class FormatTest extends \JsonWorks\Tests\Base
         $this->assertFalse($this->validate($schema, $data), 'Testing: '.$data);
     }
 
-    public function testUnknownInvalid()
+    public function testFormatUnknown()
     {
         $schema = '{
             "format": "my-format"
@@ -194,17 +194,5 @@ class FormatTest extends \JsonWorks\Tests\Base
         $data = 'test';
 
         $this->assertFalse($this->validate($schema, $data), 'Testing: '.$data);
-    }
-
-    public function testInvalidSchemaNotString()
-    {
-        $schema = '{
-            "format": {}
-        }';
-
-        $data = 'test';
-
-        $this->setExpectedException('RuntimeException');
-        $this->validate($schema, $data);
     }
 }

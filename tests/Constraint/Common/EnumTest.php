@@ -29,40 +29,4 @@ class EnumTest extends \JsonWorks\Tests\Base
         $data = '{"name1": "value1"}';
         $this->assertFalse($this->validate($schema, $data), 'Invalid');
     }
-
-    public function testInvalidSchemaWrongType()
-    {
-        $schema = '{
-            "enum": {}
-        }';
-
-        $data = 'two';
-
-        $this->setExpectedException('RuntimeException');
-        $this->validate($schema, $data);
-    }
-
-    public function testInvalidSchemaEmpty()
-    {
-        $schema = '{
-            "enum": []
-        }';
-
-        $data = 'two';
-
-        $this->setExpectedException('RuntimeException');
-        $this->validate($schema, $data);
-    }
-
-    public function testInvalidSchemaDuplicates()
-    {
-        $schema = '{
-            "enum": ["one", "one", "three"]
-        }';
-
-        $data = 'two';
-
-        $this->setExpectedException('RuntimeException');
-        $this->validate($schema, $data);
-    }
 }

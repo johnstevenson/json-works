@@ -63,36 +63,4 @@ class MultipleOfTest extends \JsonWorks\Tests\Base
 
         $this->assertFalse($this->validate($schema, $data));
     }
-
-    public function testInvalidSchemaMultipleOfZero()
-    {
-        $schema = '{
-            "properties": {
-                "test": {"multipleOf": 0}
-            }
-        }';
-
-        $data = '{
-            "test": 5.4
-        }';
-
-        $this->setExpectedException('RuntimeException');
-        $this->validate($schema, $data);
-    }
-
-    public function testInvalidSchemaMultipleOfNegative()
-    {
-        $schema = '{
-            "properties": {
-                "test": {"multipleOf": -0.87532}
-            }
-        }';
-
-        $data = '{
-            "test": 5.4
-        }';
-
-        $this->setExpectedException('RuntimeException');
-        $this->validate($schema, $data);
-    }
 }

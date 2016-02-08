@@ -56,6 +56,14 @@ abstract class BaseConstraint
     {
         $regex = sprintf('#%s#', str_replace('#', '\\#', $pattern));
 
+        // important to suppress any errors so we can throw an execption
+        $result = @preg_match($regex, $string);
+
+        if (false === $result) {
+            $error = $this->getSchemaError('valid regex', $pattern);
+            throw new \RuntimeException($error);
+        }
+
         return (bool) preg_match($regex, $string);
     }
 }
