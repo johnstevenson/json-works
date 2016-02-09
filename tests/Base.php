@@ -20,12 +20,11 @@ class Base extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $schema = new \JohnStevenson\JsonWorks\Schema\Model($schema);
         $validator = new \JohnStevenson\JsonWorks\Schema\Validator();
         return $validator->check($data, $schema);
     }
 
-    protected function getDocument($schema, $data, $noException = false)
+    protected function getDocument($schema, $data)
     {
         $schema = $this->getSchemaObject($schema);
         $data = $data ?: null;
@@ -38,17 +37,14 @@ class Base extends \PHPUnit_Framework_TestCase
         }
 
         $document = new \JohnStevenson\JsonWorks\Document();
-        $document->loadData($data, $noException);
-        $document->loadSchema($schema, $noException);
+        $document->loadData($data);
+        $document->loadSchema($schema);
         return $document;
     }
 
     protected function getSchema($schema)
     {
-        $schema = $this->getSchemaObject($schema);
-        $schema = new \JohnStevenson\JsonWorks\Schema\Model($schema);
-
-        return $schema->data;
+        return $this->getSchemaObject($schema);
     }
 
     protected function callMethod($obj, $name, $args = [])

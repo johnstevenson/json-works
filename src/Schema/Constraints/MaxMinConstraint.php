@@ -84,7 +84,7 @@ class MaxMinConstraint extends BaseConstraint
             return true;
         }
 
-        $error = $this->getSchemaError('>= 0', $value);
+        $error = $this->formatError('>= 0', $value);
         throw new \RuntimeException($error);
     }
 

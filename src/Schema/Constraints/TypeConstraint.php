@@ -61,7 +61,7 @@ class TypeConstraint extends BaseConstraint
     protected function checkSchema(array $schema)
     {
         if ($unknown = array_diff($schema, $this->types)) {
-            $error = $this->getSchemaError(implode('|', $this->types), implode('', $unknown));
+            $error = $this->formatError(implode('|', $this->types), implode('', $unknown));
             throw new \RuntimeException($error);
         }
     }

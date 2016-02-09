@@ -47,9 +47,9 @@ abstract class BaseConstraint
         return $this->manager->getValue($schema, $key, $value, $required);
     }
 
-    protected function getSchemaError($expected, $value)
+    protected function formatError($expected, $value)
     {
-        return $this->manager->getSchemaError($expected, $value);
+        return $this->manager->dataChecker->formatError($expected, $value);
     }
 
     protected function matchPattern($pattern, $string)
@@ -60,7 +60,7 @@ abstract class BaseConstraint
         $result = @preg_match($regex, $string);
 
         if (false === $result) {
-            $error = $this->getSchemaError('valid regex', $pattern);
+            $error = $this->formatError('valid regex', $pattern);
             throw new \RuntimeException($error);
         }
 

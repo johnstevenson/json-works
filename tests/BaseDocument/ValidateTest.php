@@ -9,9 +9,6 @@ class ValidateTest extends \JsonWorks\Tests\Base
     public function testRainbowIssue()
     {
         $schema = '{
-           "$schema": "http://json-schema.org/draft-04/schema#",
-           "title": "Experiment",
-           "description": "Testing recursive objects",
            "type": "object",
            "properties": {
                "root" : {
@@ -39,20 +36,19 @@ class ValidateTest extends \JsonWorks\Tests\Base
 
         $data = '{
             "root" : [
-                "some-tree-heading",
+                "tree-heading1",
                 [
-                    "some-tree-deeper-heading",
+                    "tree-heading2",
                     [
-                        "some-even-deeper-heading",
+                        "tree-heading3",
                         [
-                            "the-deepest-heading"
+                            "deepest-heading"
                         ]
                     ]
                 ]
             ]
         }';
 
-        //$this->assertTrue($this->validate($schema, $data));
-        $this->markTestIncomplete('Needs more work');
+        $this->assertTrue($this->validate($schema, $data));
     }
 }

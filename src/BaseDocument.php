@@ -12,7 +12,6 @@ namespace JohnStevenson\JsonWorks;
 
 use JohnStevenson\JsonWorks\Helpers\Formatter;
 use JohnStevenson\JsonWorks\Helpers\Loader;
-use JohnStevenson\JsonWorks\Schema\Model;
 use JohnStevenson\JsonWorks\Schema\Validator;
 
 /**
@@ -48,8 +47,7 @@ class BaseDocument
     public function loadSchema($schema)
     {
         $loader = new Loader();
-        $data = $loader->loadSchema($schema);
-        $this->schema = new Model($data);
+        $this->schema = $loader->loadSchema($schema);
     }
 
     public function tidy($order = false)
@@ -57,7 +55,7 @@ class BaseDocument
         $this->data = $this->formatter->prune($this->data);
 
         if ($order && $this->schema) {
-            $this->data = $this->formatter->order($this->data, $this->schema->data);
+            $this->data = $this->formatter->order($this->data, $this->schema);
         }
     }
 

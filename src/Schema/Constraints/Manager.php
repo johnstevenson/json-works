@@ -3,6 +3,7 @@
 namespace JohnStevenson\JsonWorks\Schema\Constraints;
 
 use JohnStevenson\JsonWorks\Schema\DataChecker;
+use JohnStevenson\JsonWorks\Schema\Resolver;
 
 class Manager
 {
@@ -10,20 +11,24 @@ class Manager
     public $errors;
     public $stopOnError;
     public $dataChecker;
+    public $resolver;
 
     protected $constraints;
 
-    public function __construct()
+    public function __construct(Resolver $resolver)
     {
+        $this->resolver = $resolver;
         $this->dataPath = [];
         $this->errors = [];
         $this->constraints = [];
         $this->stopOnError = false;
-        $this->dataChecker = new DataChecker($this);
+        $this->dataChecker = new DataChecker();
     }
 
     public function validate($data, $schema, $key = null)
     {
+        $schema = $this->setValue($schema);
+
         if ($this->dataChecker->emptySchema($schema)) {
             return;
         }
@@ -66,23 +71,24 @@ class Manager
         if (is_object($schema)) {
 
             if ($result = property_exists($schema, $key)) {
-                $value = $schema->$key;
+                $value = $this->setValue($schema->$key);
                 $this->dataChecker->checkType($value, $required);
             }
 
             return $result;
         }
 
-        $error = $this->getSchemaError('object', gettype($schema));
+        $error = $this->dataChecker->formatError('object', gettype($schema));
         throw new \RuntimeException($error);
     }
 
-    public function getSchemaError($expected, $value)
+    protected function setValue($schema)
     {
-        return sprintf(
-            "Invalid schema value: expected '%s', got '%s'",
-            $expected,
-            $value
-        );
+        if ($this->dataChecker->checkForRef($schema, $ref)) {
+            $schema = $this->resolver->getRef($ref);
+            $this->dataChecker->checkType($schema, 'object');
+        }
+
+        return $schema;
     }
 }

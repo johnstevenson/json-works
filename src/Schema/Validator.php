@@ -2,6 +2,7 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
+use JohnStevenson\JsonWorks\Schema\Resolver;
 use JohnStevenson\JsonWorks\Schema\ValidationException;
 use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
@@ -9,12 +10,13 @@ class Validator
 {
     public $errors;
 
-    public function check($data, $model)
+    public function check($data, $schema)
     {
-        $manager = new Manager();
+        $resolver = new Resolver($schema);
+        $manager = new Manager($resolver);
 
         try {
-            $manager->validate($data, $model->data);
+            $manager->validate($data, $schema);
         } catch (ValidationException $e) {
             // The exception is thrown to stop validation
         }

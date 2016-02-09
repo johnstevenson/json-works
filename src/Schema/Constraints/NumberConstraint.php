@@ -33,7 +33,7 @@ class NumberConstraint extends BaseConstraint
             $this->compare($data, $value, $exclusive, $max);
 
         } elseif ($exclusive) {
-            $error = $this->getSchemaError($key, '');
+            $error = $this->formatError($key, '');
             throw new \RuntimeException($error);
         }
     }
@@ -68,7 +68,7 @@ class NumberConstraint extends BaseConstraint
             return true;
         }
 
-        $error = $this->getSchemaError('> 0', $value);
+        $error = $this->formatError('> 0', $value);
         throw new \RuntimeException($error);
     }
 

@@ -11,16 +11,13 @@
 namespace JohnStevenson\JsonWorks\Schema;
 
 use JohnStevenson\JsonWorks\Schema\Comparer;
-use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
 
 class DataChecker
 {
     protected $comparer;
-    protected $manager;
 
-    public function __construct(Manager $manager)
+    public function __construct()
     {
-        $this->manager = $manager;
         $this->comparer = new Comparer();
     }
 
@@ -33,7 +30,7 @@ class DataChecker
             $types = (array) $required;
 
             if (!in_array($type, $types)) {
-                $error = $this->manager->getSchemaError(implode('|', $types), $type);
+                $error = $this->formatError(implode('|', $types), $type);
                 throw new \RuntimeException($error);
             }
         }
@@ -52,7 +49,7 @@ class DataChecker
     {
         foreach ($schema as $value) {
             if (!$this->comparer->checkType($value, $type)) {
-                $error = $this->manager->getSchemaError($type, 'mixed');
+                $error = $this->formatError($type, 'mixed');
                 throw new \RuntimeException($error);
             }
         }
@@ -65,10 +62,29 @@ class DataChecker
         return count((array) $schema) === 0;
     }
 
+    public function checkForRef($schema, &$ref)
+    {
+        if ($result = is_object($schema) && property_exists($schema, '$ref')) {
+            $ref = $schema->{'$ref'};
+            $this->checkType($ref, 'string');
+        }
+
+        return $result;
+    }
+
+    public function formatError($expected, $value)
+    {
+        return sprintf(
+            "Invalid schema value: expected '%s', got '%s'",
+            $expected,
+            $value
+        );
+    }
+
     protected function checkArrayCount(array $schema)
     {
         if (count($schema) <= 0) {
-            $error = $this->manager->getSchemaError('> 0', '0');
+            $error = $this->formatError('> 0', '0');
             throw new \RuntimeException($error);
         }
     }
@@ -88,7 +104,7 @@ class DataChecker
     protected function checkUnique(array $schema)
     {
         if (!$this->comparer->uniqueArray($schema)) {
-            $error = $this->manager->getSchemaError('unique', 'duplicates');
+            $error = $this->formatError('unique', 'duplicates');
             throw new \RuntimeException($error);
         }
     }

@@ -7,14 +7,10 @@ class PatternTest extends \JsonWorks\Tests\Base
     public function testValid()
     {
         $schema = '{
-            "properties": {
-                "test": {"pattern": "es"}
-            }
+            "pattern": "es"
         }';
 
-        $data = '{
-            "test": "test"
-        }';
+        $data = 'test';
 
         $this->assertTrue($this->validate($schema, $data));
     }
@@ -22,31 +18,11 @@ class PatternTest extends \JsonWorks\Tests\Base
     public function testInvalid()
     {
         $schema = '{
-            "properties": {
-                "test": {"pattern": "ts"}
-            }
+            "pattern": "ts"
         }';
 
-        $data = '{
-            "test": "test"
-        }';
+        $data = 'test';
 
         $this->assertFalse($this->validate($schema, $data));
-    }
-
-    public function testInvalidSchemaNotString()
-    {
-        $schema = '{
-            "properties": {
-                "test": {"pattern": 7}
-            }
-        }';
-
-        $data = '{
-            "test": "test"
-        }';
-
-        $this->setExpectedException('RuntimeException');
-        $this->validate($schema, $data);
     }
 }
