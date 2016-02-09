@@ -22,6 +22,11 @@ class Resolver
     */
     protected $refs = [];
 
+    /**
+    * @var array
+    */
+    protected $parents;
+
     public function __construct($schema)
     {
         $this->dataChecker = new DataChecker;
@@ -32,6 +37,8 @@ class Resolver
 
     public function getRef($ref)
     {
+        $this->parents = [];
+
         return $this->getReference($ref);
     }
 
@@ -46,26 +53,17 @@ class Resolver
         }
     }
 
-    protected function getReference($ref, $parents = [])
+    protected function getReference($ref)
     {
         if ($schema = $this->checkRef($ref, $doc, $path)) {
             return $schema;
         }
 
-        if (in_array($ref, $parents)) {
+        if (in_array($ref, $this->parents)) {
             throw new \RuntimeException('Circular reference to $ref '.$ref);
         }
-        $data = $this->refs[$doc]['#'];
 
-        if ($this->finder->find($path, $data, $schema, $error)) {
-
-            if ($this->dataChecker->checkForRef($schema, $childRef)) {
-                $parents[] = $ref;
-                $schema = $this->getReference($childRef, $parents);
-            }
-
-            $this->addRef($doc, $path, $schema);
-
+        if ($schema = $this->find($ref, $doc, $path)) {
             return $schema;
         }
 
@@ -74,15 +72,37 @@ class Resolver
 
     protected function checkRef($ref, &$doc, &$path)
     {
-        $parts = explode('#', $ref, 2);
-
-        $doc = $parts[0] ?: '/';
-        $path = $parts[1] ?: '#';
+        $this->splitRef($ref, $doc, $path);
 
         if (empty($this->refs[$doc])) {
             // fetch and load the data
         } elseif (!empty($this->refs[$doc][$path])) {
             return $this->refs[$doc][$path];
+        }
+    }
+
+    protected function splitRef($ref, &$doc, &$path)
+    {
+        $parts = explode('#', $ref, 2);
+
+        $doc = $parts[0] ?: '/';
+        $path = $parts[1] ?: '#';
+    }
+
+    protected function find($ref, $doc, $path)
+    {
+        $data = $this->refs[$doc]['#'];
+
+        if ($this->finder->find($path, $data, $schema, $error)) {
+
+            if ($this->dataChecker->checkForRef($schema, $childRef)) {
+                $this->parents[] = $ref;
+                $schema = $this->getReference($childRef);
+            }
+
+            $this->addRef($doc, $path, $schema);
+
+            return $schema;
         }
     }
 }

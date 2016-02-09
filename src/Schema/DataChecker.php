@@ -64,7 +64,7 @@ class DataChecker
 
     public function checkForRef($schema, &$ref)
     {
-        if ($result = is_object($schema) && property_exists($schema, '$ref')) {
+        if ($result = (is_object($schema) && property_exists($schema, '$ref'))) {
             $ref = $schema->{'$ref'};
             $this->checkType($ref, 'string');
         }
