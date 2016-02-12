@@ -2,8 +2,6 @@
 
 namespace JsonWorks\Tests\BaseDocument;
 
-use JohnStevenson\JsonWorks\BaseDocument;
-
 class ValidateTest extends \JsonWorks\Tests\Base
 {
     public function testRainbowIssue()

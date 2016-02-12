@@ -53,6 +53,11 @@ class Target
     public $element;
 
     /**
+    * @var string
+    */
+    public $foundPath = '';
+
+    /**
     * @var mixed
     */
     public $parent;
@@ -68,6 +73,11 @@ class Target
     public $error = '';
 
     /**
+    * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
+    */
+    public $tokenizer;
+
+    /**
     * Constructor
     *
     * @param string $path
@@ -78,9 +88,9 @@ class Target
         $this->path = $path;
         $this->error =& $error;
 
-        $tokenizer = new Tokenizer();
+        $this->tokenizer = new Tokenizer();
 
-        if (!$tokenizer->decode($this->path, $this->tokens)) {
+        if (!$this->tokenizer->decode($this->path, $this->tokens)) {
             $this->invalid = true;
             $this->setError(Error::ERR_PATH_KEY);
         }
@@ -126,10 +136,22 @@ class Target
     }
 
     /**
+    * Add a token to the found path
+    *
+    * @api
+    * @param string $token
+    */
+    public function setFoundPath($token)
+    {
+        $this->foundPath = $this->tokenizer->add($this->foundPath, $token);
+    }
+
+    /**
     * Sets element and error if not already set
     *
     * @api
     * @param bool $found If the element has been found
+    * @param mixed $element
     */
     public function setResult($found, &$element)
     {

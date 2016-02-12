@@ -96,7 +96,7 @@ class Finder
                 return false;
             }
 
-            array_shift($tokens);
+            $this->target->setFoundPath(array_shift($tokens));
         }
 
         return true;

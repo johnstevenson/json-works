@@ -27,7 +27,7 @@ class LoadingTest extends \JsonWorks\Tests\Base
         $filename = $this->getFixturePath('schema.json');
 
         try {
-            $document->loadSchema($filename);
+            $document->loadSchema($filename, $filename);
             $result = true;
         } catch (\RuntimeException $e) {
             $result = false;

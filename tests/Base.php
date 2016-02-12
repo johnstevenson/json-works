@@ -2,25 +2,16 @@
 
 namespace JsonWorks\Tests;
 
+use JohnStevenson\JsonWorks\Schema\Validator;
+
 class Base extends \PHPUnit_Framework_TestCase
 {
     protected function validate($schema, $data)
     {
         $schema = $this->getSchemaObject($schema);
+        $data = $this->getValidData($data);
 
-        if (is_string($data)) {
-
-            $data = trim($data);
-
-            if (preg_match('#^\{(.*)\}$#s', $data) || preg_match('#^\[(.*)\]$#s', $data)) {
-                $data = json_decode($data);
-                if (null === $data) {
-                    throw new \InvalidArgumentException('Test not run, $data not valid json');
-                }
-            }
-        }
-
-        $validator = new \JohnStevenson\JsonWorks\Schema\Validator();
+        $validator = new Validator($schema);
         return $validator->check($data, $schema);
     }
 
@@ -53,6 +44,23 @@ class Base extends \PHPUnit_Framework_TestCase
         $method = $class->getMethod($name);
         $method->setAccessible(true);
         return $method->invokeArgs($obj, $args);
+    }
+
+    protected function getValidData($data)
+    {
+        if (is_string($data)) {
+
+            $data = trim($data);
+
+            if (preg_match('#^\{(.*)\}$#s', $data) || preg_match('#^\[(.*)\]$#s', $data)) {
+                $data = json_decode($data);
+                if (null === $data) {
+                    throw new \InvalidArgumentException('Test not run, $data not valid json');
+                }
+            }
+        }
+
+        return $data;
     }
 
     protected function getSchemaObject($schema)

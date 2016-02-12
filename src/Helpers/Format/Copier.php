@@ -20,17 +20,12 @@ class Copier extends BaseFormat
     *
     * @internal
     * @param mixed $data
-    * @param callable|null $callback Optional callback function
     * @return mixed
     */
-    public function run($data, $callback = null)
+    public function run($data)
     {
-        if ($callback) {
-            $data = call_user_func_array($callback, array($data));
-        }
-
         if ($this->isContainer($data, $object)) {
-            return $this->copyContainer($data, $object, $callback);
+            return $this->copyContainer($data, $object);
         }
 
         return $data;
@@ -41,15 +36,14 @@ class Copier extends BaseFormat
     *
     * @param object|array $data The data to copy
     * @param bool $object Whether the result should be an object
-    * @param callable|null $callback An optional callback
     * @return object|array An unreferenced copy
     */
-    protected function copyContainer($data, $object, $callback)
+    protected function copyContainer($data, $object)
     {
         $result = [];
 
         foreach ($data as $key => $value) {
-            $result[$key] = $this->run($value, $callback);
+            $result[$key] = $this->run($value);
         }
 
         return $this->formatContainer($result, $object);

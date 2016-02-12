@@ -24,14 +24,12 @@ class ResolverTest extends \JsonWorks\Tests\Base
     public function testSingle()
     {
         $schema = '{
-            "type" : "object",
-            "properties":
-            {
+            "type": "object",
+            "properties": {
                 "prop1": {"$ref": "#/definitions/alphanum"},
                 "prop2": {"$ref": "#/definitions/alphanum"}
             },
-            "definitions":
-            {
+            "definitions": {
                 "alphanum": {
                     "oneOf": [ {"type": "string"}, {"type": "number"} ]
                 }
@@ -52,14 +50,12 @@ class ResolverTest extends \JsonWorks\Tests\Base
     public function testSingleEncoded()
     {
         $schema = '{
-            "type" : "object",
-            "properties":
-            {
+            "type": "object",
+            "properties": {
                 "prop1": {"$ref": "#/definitions/alpha~1num"},
                 "prop2": {}
             },
-            "definitions":
-            {
+            "definitions": {
                 "alpha/num": {
                     "oneOf": [ {"type": "string"}, {"type": "number"} ]
                 }
@@ -79,9 +75,8 @@ class ResolverTest extends \JsonWorks\Tests\Base
     public function testInvalidRefType()
     {
         $schema = '{
-            "type" : "object",
-            "properties":
-            {
+            "type": "object",
+            "properties": {
                 "prop1": {"$ref": 8},
                 "prop2": {}
             }
@@ -98,9 +93,8 @@ class ResolverTest extends \JsonWorks\Tests\Base
     public function testNotFound()
     {
         $schema = '{
-            "type" : "object",
-            "properties":
-            {
+            "type": "object",
+            "properties": {
                 "prop1": {"$ref": "#/definitions/alphanum"},
                 "prop2": {}
             }
@@ -144,14 +138,12 @@ class ResolverTest extends \JsonWorks\Tests\Base
     public function testCircular()
     {
         $schema = '{
-            "type" : "object",
-            "properties":
-            {
+            "type": "object",
+            "properties": {
                 "prop1": {"$ref": "#/definitions/alphanum"},
                 "prop2": {}
             },
-            "definitions":
-            {
+            "definitions": {
                 "alphanum": {"$ref": "#/properties/prop1"}
             }
         }';
@@ -167,7 +159,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
     public function testCompound()
     {
         $schema = '{
-            "type" : "object",
+            "type": "object",
             "properties": {
                 "prop1": {"$ref": "#/definitions/prop"},
                 "prop2": {"$ref": "#/properties/prop1"}
@@ -207,7 +199,6 @@ class ResolverTest extends \JsonWorks\Tests\Base
     public function testCompoundCircular()
     {
         $schema = '{
-            "type" : "object",
             "properties": {
                 "prop1": {"$ref": "#/definitions/prop"},
                 "prop2": {"$ref": "#/properties/prop1"}
@@ -236,5 +227,98 @@ class ResolverTest extends \JsonWorks\Tests\Base
 
         $this->setExpectedException('RuntimeException', 'Circular reference');
         $this->validate($schema, $data);
+    }
+
+    public function testAnotherCompound()
+    {
+        $schema = '{
+            "properties": {
+                "a": { "$ref": "#/a" },
+                "b": { "$ref": "#/b" },
+                "c": {
+                    "properties": {
+                        "milk": { "$ref": "#/c" }
+                    }
+                }
+            },
+            "a": {
+                "properties": {
+                    "milk": {
+                        "enum": ["cow", "goat", "yak"]
+                    },
+                    "eggs": {
+                        "enum": ["bird", "chicken", "goose"]
+                    }
+                }
+            },
+            "b": { "$ref": "#/a" },
+            "c": { "$ref": "#/b/properties/milk" }
+        }';
+
+        $data = '{
+            "a": {
+                "milk": "cow",
+                "eggs": "bird"
+            },
+            "b": {
+                "milk": "goat",
+                "eggs": "goose"
+            },
+            "c": {
+                "milk": "yak"
+            }
+        }';
+
+        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+    }
+
+    public function testAnotherCompound2()
+    {
+        $schema = '{
+            "properties": {
+                "a": {
+                    "properties": {
+                        "milk": {
+                            "enum": ["cow", "goat", "yak"]
+                        },
+                        "eggs": {
+                            "enum": ["bird", "chicken", "goose"]
+                        }
+                    }
+                },
+                "b": { "$ref": "#/properties/a" },
+                "c": {
+                    "properties": {
+                        "milk": { "$ref": "#/properties/b/properties/milk" }
+                    }
+                }
+            }
+        }';
+
+        $data = '{
+            "a": {
+                "milk": "cow",
+                "eggs": "bird"
+            },
+            "b": {
+                "milk": "goat",
+                "eggs": "goose"
+            },
+            "c": {
+                "milk": "yak"
+            }
+        }';
+
+        $data = $this->fromJson($data);
+
+        foreach ($data as $key => $value) {
+            $msg = sprintf('Testing success with data property: %s', $key);
+
+            $prop = (object) [$key => $value];
+
+            $this->assertTrue($this->validate($schema, $prop), 'Testing success, full data');
+        }
+
+        $this->assertTrue($this->validate($schema, $data), 'Testing success, full data');
     }
 }

@@ -11,17 +11,18 @@ class Manager
     public $errors;
     public $stopOnError;
     public $dataChecker;
-    public $resolver;
 
     protected $constraints;
+    protected $resolver;
 
-    public function __construct(Resolver $resolver)
+    public function __construct(Resolver $resolver, $stopOnError)
     {
         $this->resolver = $resolver;
+        $this->stopOnError = $stopOnError;
+
         $this->dataPath = [];
         $this->errors = [];
         $this->constraints = [];
-        $this->stopOnError = false;
         $this->dataChecker = new DataChecker();
     }
 

@@ -20,8 +20,9 @@ use JohnStevenson\JsonWorks\Schema\Validator;
 class BaseDocument
 {
     public $data;
-    public $schema;
     public $lastError;
+    protected $schema;
+    protected $schemaPath = '';
 
     /**
     * @var Helpers\Formatter
@@ -44,10 +45,11 @@ class BaseDocument
         $this->data = $loader->loadData($data);
     }
 
-    public function loadSchema($schema)
+    public function loadSchema($data, $basePath = '')
     {
         $loader = new Loader();
-        $this->schema = $loader->loadSchema($schema);
+        $this->schema = $loader->loadSchema($data, $filename);
+        $this->schemaPath = $basePath;
     }
 
     public function tidy($order = false)
@@ -57,6 +59,11 @@ class BaseDocument
         if ($order && $this->schema) {
             $this->data = $this->formatter->order($this->data, $this->schema);
         }
+    }
+
+    public function getData()
+    {
+        return $this->data;
     }
 
     public function toJson($pretty)
@@ -74,11 +81,11 @@ class BaseDocument
         }
 
         if (!$this->validator) {
-            $this->validator = new Validator();
+            $this->validator = new Validator($this->schema);
         }
 
         if (!$result = $this->validator->check($this->data, $this->schema)) {
-            $this->lastError = array_shift($this->validator->errors);
+            $this->lastError = $this->validator->getErrors(1);
         }
 
         return $result;

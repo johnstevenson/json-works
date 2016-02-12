@@ -7,155 +7,190 @@ use JohnStevenson\JsonWorks\Helpers\Loader;
 class LoaderTest extends \JsonWorks\Tests\Base
 {
     protected $loader;
+    protected $resource;
 
     protected function setUp()
     {
         $this->loader = new Loader();
     }
 
-    protected function runAllInvalidTypesTest($loadFunc)
+    protected function tearDown()
     {
-        $tests = [
-            'true' => true,
-            'false' => false,
-            'integer' => 100,
-            'double' => 3.142,
-            'resource' => fopen(__FILE__, 'r'),
+        if ($this->resource) {
+            fclose($this->resource);
+        }
+    }
+
+    protected function callLoader($loadType, $data)
+    {
+        switch ($loadType) {
+            case Loader::TYPE_DOCUMENT:
+                return $this->loader->loadData($data);
+            case Loader::TYPE_SCHEMA:
+                return $this->loader->loadSchema($data, $file);
+            case Loader::TYPE_PATCH:
+                return $this->loader->loadPatch($data);
+            default:
+                $msg = sprintf("Unknown load type '%s', test not run", $loadType);
+                throw new \InvalidArgumentException($msg);
+        }
+    }
+
+    protected function getResource()
+    {
+        if (!$this->resource) {
+            $this->resource = fopen(__FILE__, 'r');
+        }
+
+        return $this->resource;
+    }
+
+    protected function getAllData($keysOnly = false)
+    {
+        $data = [
+            'object'    => new \stdClass(),
+            'array'     => [],
+            'true'      => true,
+            'false'     => false,
+            'null'      => null,
+            'string'    => 'hello',
+            'integer'   => 100,
+            'double'    => 3.142
         ];
 
+        return $keysOnly ? array_keys($data) : $data;
+    }
+
+    protected function runInvalidTypesTest($loadType, $valid)
+    {
+        $tests = $this->getAllData();
+
+        foreach ($valid as $key) {
+            unset($tests[$key]);
+        }
+
+        $tests['resource'] = $this->getResource();
+
         foreach ($tests as $type => $data) {
-            $this->runInvalidTypeTest($loadFunc, $type, $data);
-        }
+            $msg = sprintf("%s test invalid '%s'", $loadType, $type);
 
-        fclose($tests['resource']);
+            try {
+                $this->callLoader($loadType, $data);
+                $this->fail('Exception not raised for '.$msg);
+            } catch (\RuntimeException $e) {
+                $this->assertContains('ERR_BAD_INPUT', $e->getMessage(), $msg);
+            }
+        }
     }
 
-    protected function runInvalidTypeTest($loadFunc, $type, $data)
+    protected function runValidTypesTest($loadType, array $valid)
     {
-        $msg = sprintf("%s test invalid '%s'", $loadFunc, $type);
+        $allData = $this->getAllData();
+        $tests = [];
 
-        try {
-            $this->loader->{$loadFunc}($data);
-        } catch (\RuntimeException $e) {
-            $this->assertContains('ERR_BAD_INPUT', $e->getMessage(), $msg);
-            return;
+        foreach ($valid as $key) {
+            $tests[$key] = $allData[$key];
         }
 
-        $this->fail('Exception not raised for '.$msg);
+        foreach ($tests as $type => $data) {
+
+            try {
+                $this->callLoader($loadType, $data);
+                $result = true;
+            } catch (\RuntimeException $e) {
+                $result = false;
+            }
+
+            $msg = sprintf("%s test valid '%s'", $loadType, $type);
+            $this->assertTrue($result, $msg);
+        }
     }
 
-    protected function runValidTypeTest($loadFunc, $type, $data)
+    protected function runInvalidFilesTest($loadType)
+    {
+        $tests = [
+            'invalid.json'  => 'ERR_BAD_INPUT',
+            'empty.json'    => 'ERR_BAD_INPUT',
+            'nofile.json'   => 'ERR_NOT_FOUND'
+        ];
+
+        foreach ($tests as $file => $errMsg) {
+            $msg = sprintf("%s test invalid file '%s'", $loadType, $file);
+
+            try {
+                $filename = $this->getFixturePath($file);
+                $this->callLoader($loadType, $filename);
+                $this->fail('Exception not raised for '.$msg);
+            } catch (\RuntimeException $e) {
+                $this->assertContains($errMsg, $e->getMessage(), $msg);
+            }
+        }
+    }
+
+    protected function runValidFileTest($loadType, $file)
     {
         try {
-            $this->loader->{$loadFunc}($data);
+            $filename = $this->getFixturePath($file);
+            $this->callLoader($loadType, $filename);
             $result = true;
         } catch (\RuntimeException $e) {
             $result = false;
         }
 
-        $msg = sprintf("%s test valid '%s'", $loadFunc, $type);
-        $this->assertTrue($result, $msg);
-    }
-
-    protected function runInvalidFileTest($loadFunc, $file)
-    {
-        $msg = sprintf("%s test invalid file '%s'", $loadFunc, $file);
-
-        try {
-            $filename = $this->getFixturePath($file);
-            $this->loader->{$loadFunc}($filename);
-        } catch (\RuntimeException $e) {
-            $this->assertContains('ERR_BAD_INPUT', $e->getMessage(), $msg);
-            return;
-        }
-
-        $this->fail('Exception not raised for '.$msg);
-    }
-
-    protected function runMissingFileTest($loadFunc)
-    {
-        $file = 'nofile.json';
-
-        $msg = sprintf("%s test missing file '%s'", $loadFunc, $file);
-
-        try {
-            $filename = $this->getFixturePath($file);
-            $this->loader->{$loadFunc}($filename);
-        } catch (\RuntimeException $e) {
-            $this->assertContains('ERR_NOT_FOUND', $e->getMessage(), $msg);
-            return;
-        }
-
-        $this->fail('Exception not raised for '.$msg);
-    }
-
-    protected function runValidFileTest($loadFunc, $file)
-    {
-        try {
-            $filename = $this->getFixturePath($file);
-            $this->loader->{$loadFunc}($filename);
-            $result = true;
-        } catch (\RuntimeException $e) {
-            $result = false;
-        }
-
-        $msg = sprintf("%s test valid file '%s'", $loadFunc, $file);
+        $msg = sprintf("%s test valid file '%s'", $loadType, $file);
         $this->assertTrue($result, $msg);
     }
 
     public function testLoadDataTypes()
     {
-        $this->runValidTypeTest('loadData', 'object', new \stdClass());
-        $this->runValidTypeTest('loadData', 'array', []);
-        $this->runValidTypeTest('loadData', 'null', null);
+        $loadType = Loader::TYPE_DOCUMENT;
 
-        $this->runAllInvalidTypesTest('loadData');
+        // everything is valid
+        $valid = $this->getAllData(true);
+
+        $this->runValidTypesTest($loadType, $valid);
+        $this->runInvalidTypesTest($loadType, $valid);
     }
 
     public function testLoadDataFiles()
     {
-        $this->runValidFileTest('loadData', 'pretty.json');
+        $loadType = Loader::TYPE_DOCUMENT;
 
-        $this->runInvalidFileTest('loadData', 'invalid.json');
-        $this->runInvalidFileTest('loadData', 'empty.json');
-        $this->runMissingFileTest('loadData');
+        $this->runValidFileTest($loadType, 'pretty.json');
+        $this->runInvalidFilesTest($loadType);
     }
 
     public function testLoadSchemaTypes()
     {
-        $this->runValidTypeTest('loadSchema', 'object', new \stdClass());
+        $loadType = Loader::TYPE_SCHEMA;
+        $valid = ['object'];
 
-        $this->runInvalidTypeTest('loadSchema', 'array', []);
-        $this->runInvalidTypeTest('loadSchema', 'null', null);
-
-        $this->runAllInvalidTypesTest('loadSchema');
+        $this->runValidTypesTest($loadType, $valid);
+        $this->runInvalidTypesTest($loadType, $valid);
     }
 
     public function testLoadSchemaFiles()
     {
-        $this->runValidFileTest('loadSchema', 'schema.json');
+        $loadType = Loader::TYPE_SCHEMA;
 
-        $this->runInvalidFileTest('loadSchema', 'invalid.json');
-        $this->runInvalidFileTest('loadSchema', 'empty.json');
-        $this->runMissingFileTest('loadSchema');
+        $this->runValidFileTest($loadType, 'schema.json');
+        $this->runInvalidFilesTest($loadType);
     }
 
     public function testLoadPatchTypes()
     {
-        $this->runValidTypeTest('loadPatch', 'array', []);
+        $loadType = Loader::TYPE_PATCH;
+        $valid = ['array'];
 
-        $this->runInvalidTypeTest('loadPatch', 'object', new \stdClass());
-        $this->runInvalidTypeTest('loadPatch', 'null', null);
-
-        $this->runAllInvalidTypesTest('loadPatch');
+        $this->runValidTypesTest($loadType, $valid);
+        $this->runInvalidTypesTest($loadType, $valid);
     }
 
     public function testLoadPatchFiles()
     {
-        $this->runValidFileTest('loadPatch', 'patch.json');
+        $loadType = Loader::TYPE_PATCH;
 
-        $this->runInvalidFileTest('loadPatch', 'invalid.json');
-        $this->runInvalidFileTest('loadPatch', 'empty.json');
-        $this->runMissingFileTest('loadPatch');
+        $this->runValidFileTest($loadType, 'patch.json');
+        $this->runInvalidFilesTest($loadType);
     }
 }

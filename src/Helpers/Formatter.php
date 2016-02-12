@@ -40,16 +40,15 @@ class Formatter
     *
     * @api
     * @param mixed $data
-    * @param callable|null $callback Optional callback function
     * @return mixed
     */
-    public function copy($data, $callback = null)
+    public function copy($data)
     {
         if (!$this->copier) {
             $this->copier = new Copier();
         }
 
-        return $this->copier->run($data, $callback);
+        return $this->copier->run($data);
     }
 
     /**

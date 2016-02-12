@@ -18,9 +18,11 @@ use JohnStevenson\JsonWorks\Helpers\Formatter;
 */
 class Loader
 {
-    const TYPE_DOCUMENT = 0;
-    const TYPE_SCHEMA = 1;
-    const TYPE_PATCH = 2;
+    const TYPE_DOCUMENT = 'LOAD_TYPE_DOCUMENT';
+    const TYPE_SCHEMA = 'LOAD_TYPE_SCHEMA';
+    const TYPE_PATCH = 'LOAD_TYPE_PATCH';
+
+    protected $file;
 
     /**
     * Processes input to be used as a document
@@ -28,7 +30,7 @@ class Loader
     * The input can be:
     *   - a json string, passed to json_decode
     *   - a .json filename, passed to file_get_contents then json_decode
-    *   - an object, class, array or null
+    *   - an object, class, array or scalar
     *
     * @api
     * @param mixed $input
@@ -36,14 +38,7 @@ class Loader
     */
     public function loadData($input)
     {
-        $data = $this->processInput($input, self::TYPE_DOCUMENT);
-
-        if (!is_string($input)) {
-            $formatter = new Formatter();
-            $data = $formatter->copy($input);
-        }
-
-        return $data;
+        return $this->processInput($input, self::TYPE_DOCUMENT);
     }
 
     /**
@@ -77,11 +72,16 @@ class Loader
     *
     * @api
     * @param mixed $input
+    * @param string $file Set by method if a file
     * @return object
     */
-    public function loadSchema($input)
+    public function loadSchema($input, &$file)
     {
-        return $this->processInput($input, self::TYPE_SCHEMA);
+        $this->file = false;
+        $data = $this->processInput($input, self::TYPE_SCHEMA);
+        $file = $this->file;
+
+        return $data;
     }
 
     /**
@@ -95,6 +95,9 @@ class Loader
     {
         if (is_string($data)) {
             $data = $this->processStringInput($data);
+        } else {
+            $formatter = new Formatter();
+            $data = $formatter->copy($data);
         }
 
         $this->checkData($data, $type);
@@ -111,10 +114,17 @@ class Loader
     protected function processStringInput($input)
     {
         if (pathinfo($input, PATHINFO_EXTENSION) === 'json') {
+            $this->file = true;
             $input = $this->getDataFromFile($input);
         }
 
         return $this->decodeJson($input);
+    }
+
+    protected function isFile($input)
+    {
+        $parts = parse_url($input);
+
     }
 
     /**
@@ -154,7 +164,7 @@ class Loader
                 $valid = $dataType === 'array';
                 break;
             default:
-                $valid = in_array($dataType, ['object', 'array', 'NULL']);
+                $valid = $dataType !== 'resource';
         }
 
         if (!$valid) {
@@ -169,26 +179,42 @@ class Loader
     * This function normalizes pre PHP7 behaviour to report an error with
     * an empty string
     *
-    * @param string $json
+    * @param string $value
     * @return mixed
     * @throws \RuntimeException
     */
-    protected function decodeJson($json)
+    protected function decodeJson($value)
     {
-        $result = null;
+        $result = $value;
+        $errCode = 0;
 
-        if (!strlen($json)) {
-            $code = JSON_ERROR_SYNTAX;
-        } else {
-            $result = json_decode($json);
-            $code = json_last_error();
+        if ($this->checkJson($value, $errCode)) {
+            $result = json_decode($value);
+            $errCode = json_last_error();
         }
 
-        if ($code) {
-            throw new \RuntimeException($this->getJsonError($code));
+        if ($errCode) {
+            throw new \RuntimeException($this->getJsonError($errCode));
         }
 
         return $result;
+    }
+
+    protected function checkJson(&$value, &$errCode)
+    {
+        $value = trim($value);
+        $object = '#^\\{(?:.*)\\}$#s';
+        $array = '#^\\[(?:.*)\\]$#s';
+
+        if (preg_match($object, $value) || preg_match($array, $value)) {
+            return true;
+        }
+
+        if (!strlen($value)) {
+            $errCode = JSON_ERROR_SYNTAX;
+        }
+
+        return false;
     }
 
     /**
