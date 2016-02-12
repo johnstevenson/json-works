@@ -84,8 +84,8 @@ class BaseDocument
             $this->validator = new Validator($this->schema);
         }
 
-        if (!$result = $this->validator->check($this->data, $this->schema)) {
-            $this->lastError = $this->validator->getErrors(1);
+        if (!$result = $this->validator->check($this->data)) {
+            $this->lastError = $this->validator->getErrors(true);
         }
 
         return $result;

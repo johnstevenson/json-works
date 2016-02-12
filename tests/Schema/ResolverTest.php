@@ -269,6 +269,15 @@ class ResolverTest extends \JsonWorks\Tests\Base
             }
         }';
 
+        $data = $this->fromJson($data);
+
+        foreach ($data as $key => $value) {
+            $msg = sprintf('Testing success with data property: %s', $key);
+            $prop = (object) [$key => $value];
+
+            $this->assertTrue($this->validate($schema, $prop), $msg);
+        }
+
         $this->assertTrue($this->validate($schema, $data), 'Testing success');
     }
 
@@ -313,12 +322,51 @@ class ResolverTest extends \JsonWorks\Tests\Base
 
         foreach ($data as $key => $value) {
             $msg = sprintf('Testing success with data property: %s', $key);
-
             $prop = (object) [$key => $value];
 
-            $this->assertTrue($this->validate($schema, $prop), 'Testing success, full data');
+            $this->assertTrue($this->validate($schema, $prop), $msg);
         }
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success, full data');
+        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+    }
+
+    public function testAnotherCompound3()
+    {
+        $schema = '{
+            "properties": {
+                "a": {
+                    "properties": {
+                        "milk": {
+                            "enum": ["cow", "goat", "yak"]
+                        },
+                        "eggs": {
+                            "enum": ["bird", "chicken", "goose"]
+                        }
+                    }
+                },
+                "b": { "$ref": "#/properties/a" },
+                "c": {
+                    "properties": {
+                        "milk": { "$ref": "#/properties/b/properties/milk" }
+                    }
+                }
+            }
+        }';
+
+        $schema = $this->fromJson($schema);
+
+        $resolver = new \JohnStevenson\JsonWorks\Schema\Resolver($schema, '');
+
+        $ref = '#/properties/a';
+        $expected = $schema->properties->a;
+
+        $result = $resolver->getRef($ref);
+        $this->assertEquals($expected, $result);
+
+        $ref = '#/properties/b/properties/milk';
+        $expected = $schema->properties->a->properties->milk;
+
+        $result = $resolver->getRef($ref);
+        $this->assertEquals($expected, $result);
     }
 }

@@ -113,7 +113,7 @@ class Loader
     */
     protected function processStringInput($input)
     {
-        if (pathinfo($input, PATHINFO_EXTENSION) === 'json') {
+        if ($this->isFile($input)) {
             $this->file = true;
             $input = $this->getDataFromFile($input);
         }
@@ -123,8 +123,7 @@ class Loader
 
     protected function isFile($input)
     {
-        $parts = parse_url($input);
-
+        return pathinfo($input, PATHINFO_EXTENSION) === 'json';
     }
 
     /**
