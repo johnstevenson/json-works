@@ -9,12 +9,12 @@ class LoaderTest extends \JsonWorks\Tests\Base
     protected $loader;
     protected $resource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new Loader();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->resource) {
             fclose($this->resource);
@@ -78,7 +78,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
                 $this->callLoader($loadType, $data);
                 $this->fail('Exception not raised for '.$msg);
             } catch (\RuntimeException $e) {
-                $this->assertContains('ERR_BAD_INPUT', $e->getMessage(), $msg);
+                $this->assertStringContainsString('ERR_BAD_INPUT', $e->getMessage(), $msg);
             }
         }
     }
@@ -122,7 +122,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
                 $this->callLoader($loadType, $filename);
                 $this->fail('Exception not raised for '.$msg);
             } catch (\RuntimeException $e) {
-                $this->assertContains($errMsg, $e->getMessage(), $msg);
+                $this->assertStringContainsString($errMsg, $e->getMessage(), $msg);
             }
         }
     }

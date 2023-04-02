@@ -4,11 +4,11 @@ namespace JsonWorks\Tests\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\Error;
 
-class ErrorTest extends \PHPUnit_Framework_TestCase
+class ErrorTest extends \PHPUnit\Framework\TestCase
 {
     protected $error;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->error = new Error();
     }

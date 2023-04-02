@@ -16,7 +16,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -32,7 +32,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -48,7 +48,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -64,7 +64,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -80,7 +80,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -96,7 +96,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 }

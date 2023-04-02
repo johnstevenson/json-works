@@ -2,5 +2,4 @@ vendor/
 *.lock
 *phpunit.xml
 !phpunit.xml.dist
-*phpcs.xml
-!phpcs.xml.dist
+.phpunit.result.cache

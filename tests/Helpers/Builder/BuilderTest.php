@@ -90,7 +90,7 @@ class BuilderTest extends \JsonWorks\Tests\Base
 
         $result = $this->runBuilder($data, $path, $value);
         $this->assertFalse($result, 'Testing method returns false');
-        $this->assertContains('ERR_PATH_KEY', $this->error, 'Testing error is set');
+        $this->assertStringContainsString('ERR_PATH_KEY', $this->error, 'Testing error is set');
     }
 
     public function testObjectSingleLevel()
@@ -144,7 +144,7 @@ class BuilderTest extends \JsonWorks\Tests\Base
 
         $result = $this->runBuilder($data, $path, $value);
         $this->assertFalse($result, 'Testing method returns false');
-        $this->assertContains('ERR_PATH_KEY', $this->error, 'Testing error is set');
+        $this->assertStringContainsString('ERR_PATH_KEY', $this->error, 'Testing error is set');
     }
 
     public function testObjectMultiLevel()

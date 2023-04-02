@@ -18,4 +18,4 @@ if (!file_exists($autoloader)) {
 }
 
 $loader = require $autoloader;
-$loader->addPsr4('JsonWorks\\Tests\\', __DIR__);
+//$loader->addPsr4('JsonWorks\\Tests\\', __DIR__);

@@ -83,7 +83,7 @@ class GetValueTest extends \JsonWorks\Tests\Base
 
         $path = '/prop2/collection';
         $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
-        $this->assertInternalType('array', $value);
+        $this->assertIsArray($value);
 
         $path = '/prop2/collection/1/lastName';
         $expected = 'Bloggs';

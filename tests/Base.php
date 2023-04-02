@@ -4,7 +4,7 @@ namespace JsonWorks\Tests;
 
 use JohnStevenson\JsonWorks\Schema\Validator;
 
-class Base extends \PHPUnit_Framework_TestCase
+class Base extends \PHPUnit\Framework\TestCase
 {
     protected function validate($schema, $data)
     {
@@ -13,6 +13,23 @@ class Base extends \PHPUnit_Framework_TestCase
 
         $validator = new Validator($schema);
         return $validator->check($data, $schema);
+    }
+
+    protected function validateEx($schema, $data, string $message = '')
+    {
+        $schema = $this->getSchemaObject($schema);
+        $data = $this->getValidData($data);
+
+        $validator = new Validator($schema);
+
+        if (!$result = $validator->check($data, $schema)) {
+            $error = $validator->getErrors(true);
+            if ($message) {
+                $message = sprintf('%s:%s', $message, $error);
+            }
+        }
+
+        return [$result, $message];
     }
 
     protected function getDocument($schema, $data)

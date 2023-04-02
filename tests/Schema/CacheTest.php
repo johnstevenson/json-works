@@ -39,7 +39,7 @@ class CacheTest extends \JsonWorks\Tests\Base
         $schema = '{ "$ref": "#" }';
 
         $schema = $this->fromJson($schema);
-        $this->setExpectedException('RuntimeException', 'Circular reference');
+        $this->expectException('RuntimeException', 'Circular reference');
 
         $ref = '#';
         $this->resolve($ref, $schema);
@@ -101,7 +101,7 @@ class CacheTest extends \JsonWorks\Tests\Base
         }';
 
         $schema = $this->fromJson($schema);
-        $this->setExpectedException('RuntimeException', 'Unable to find $ref');
+        $this->expectException('RuntimeException', 'Unable to find $ref');
 
         $ref = '#/definitions/alphanum';
         $this->resolve($ref, $schema);
@@ -120,7 +120,7 @@ class CacheTest extends \JsonWorks\Tests\Base
         }';
 
         $schema = $this->fromJson($schema);
-        $this->setExpectedException('RuntimeException', 'Circular reference');
+        $this->expectException('RuntimeException', 'Circular reference');
 
         $ref = '#/definitions/alphanum';
         $this->resolve($ref, $schema);
@@ -139,9 +139,6 @@ class CacheTest extends \JsonWorks\Tests\Base
                 {"$ref": "#/definitions/proparray/1"}
             ],
             "definitions": {
-                "alphanum": {
-                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
-                },
                 "prop": {
                     "$ref": "#/definitions/propnext"
                 },
@@ -151,7 +148,10 @@ class CacheTest extends \JsonWorks\Tests\Base
                 "proparray": [
                     {"item0": {}},
                     {"$ref": "#/definitions/alphanum"}
-                ]
+                ],
+                "alphanum": {
+                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
+                }
             }
         }';
 
@@ -160,7 +160,10 @@ class CacheTest extends \JsonWorks\Tests\Base
 
         $ref = '#/properties/prop1';
         $result = $this->resolve($ref, $schema);
+        $this->assertEquals($expected, $result);
 
+        $ref = '#/properties/prop2';
+        $result = $this->resolve($ref, $schema);
         $this->assertEquals($expected, $result);
     }
 
@@ -190,10 +193,57 @@ class CacheTest extends \JsonWorks\Tests\Base
         }';
 
         $schema = $this->fromJson($schema);
-        $this->setExpectedException('RuntimeException', 'Circular reference');
+        $this->expectException('RuntimeException', 'Circular reference');
 
         $ref = '#/properties/prop1';
         $this->resolve($ref, $schema);
+    }
+
+    public function testCompoundSimilarNames()
+    {
+        $schema = '{
+            "type": "object",
+            "properties": {
+                "list1": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/list" }
+                },
+                "list2": { "$ref": "#/properties/list1" }
+            },
+            "definitions": {
+                "list": {
+                    "type": "object",
+                    "properties": {
+                        "prop1": {"type": "string"},
+                        "list": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/list-list" }
+                        }
+                    }
+                },
+                "list-list": {
+                    "$ref": "#/definitions/alphanum"
+                },
+                "alphanum": {
+                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
+                }
+            }
+        }';
+
+        $schema = $this->fromJson($schema);
+        $expected = $schema->definitions->alphanum;
+
+        $ref = '#/properties/list1/items/properties/list/items';
+        $result = $this->resolve($ref, $schema);
+
+        $this->assertEquals($expected, $result);
+
+        /*
+        This fails on recursions - could be a bug
+        $ref = '#/properties/list2/items/properties/list/items';
+        $result = $this->resolve($ref, $schema);
+        $this->assertEquals($expected, $result);
+        */
     }
 
     public function testReffedProperty()

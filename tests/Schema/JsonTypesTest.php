@@ -8,7 +8,7 @@ class JsonTypesTest extends \JsonWorks\Tests\Base
 {
     protected $jsonTypes;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsonTypes = new JsonTypes;
     }

@@ -55,7 +55,7 @@ class Store
     protected function matchPath($doc, $path, &$partPath)
     {
         foreach ($this->data[$doc] as $key => $dummy) {
-            if (0 === strpos($path, $key)) {
+            if (0 === strpos($path.'/', $key.'/')) {
                 $partPath = $key;
                 return true;
             }

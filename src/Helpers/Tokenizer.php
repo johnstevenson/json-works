@@ -94,7 +94,7 @@ class Tokenizer
     protected function processToken($token)
     {
         if ($token === '') {
-            return '_empty_';
+            //return '_empty_';
         }
 
         return str_replace('~0', '~', str_replace('~1', '/', $token));

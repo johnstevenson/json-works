@@ -53,7 +53,7 @@ class TargetTest extends \JsonWorks\Tests\Base
         $target = new Target('invalid/key', $error);
 
         $this->assertTrue($target->invalid);
-        $this->assertContains('ERR_PATH_KEY', $target->error);
+        $this->assertStringContainsString('ERR_PATH_KEY', $target->error);
     }
 
     public function testSetArray()
@@ -118,7 +118,7 @@ class TargetTest extends \JsonWorks\Tests\Base
 
         $target->setResult(false, $element);
 
-        $this->assertContains('ERR_NOT_FOUND', $target->error);
+        $this->assertStringContainsString('ERR_NOT_FOUND', $target->error);
     }
 
     public function testSetResultFalsePreservesExistingError()
@@ -132,6 +132,6 @@ class TargetTest extends \JsonWorks\Tests\Base
         // set result
         $target->setResult(false, $element);
 
-        $this->assertContains('ERR_PATH_KEY', $target->error);
+        $this->assertStringContainsString('ERR_PATH_KEY', $target->error);
     }
 }

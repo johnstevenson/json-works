@@ -15,7 +15,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -30,7 +30,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -45,7 +45,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -60,7 +60,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -75,7 +75,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -90,7 +90,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -105,7 +105,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -121,7 +121,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop3": 3
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -137,7 +137,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop3": 3
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -153,7 +153,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop3": 3
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -168,7 +168,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -185,7 +185,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -204,7 +204,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -221,7 +221,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 
@@ -240,7 +240,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->validate($schema, $data);
     }
 }

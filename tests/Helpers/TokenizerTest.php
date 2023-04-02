@@ -4,11 +4,11 @@ namespace JsonWorks\Tests\Helpers;
 
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
-class TokenizerTest extends \PHPUnit_Framework_TestCase
+class TokenizerTest extends \PHPUnit\Framework\TestCase
 {
     protected $tokenizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenizer = new Tokenizer();
     }

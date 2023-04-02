@@ -8,7 +8,7 @@ class ArrayKeyTest extends \JsonWorks\Tests\Base
 {
     protected $finder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->finder = new Finder();
     }

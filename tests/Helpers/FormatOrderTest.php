@@ -8,7 +8,7 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
 {
     protected $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = new Formatter();
     }

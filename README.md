@@ -30,18 +30,18 @@ which will give you the following json:
 
 ```
 {
-	"path": {
-		"to": {
-			"nested": {
-				"array": [
-					{
-                        "firstName": "Fred",
-                        "lastName": "Blogg"
-                    }
-				]
-			}
-		}
-	}
+  "path": {
+    "to": {
+      "nested": {
+        "array": [
+            {
+              "firstName": "Fred",
+              "lastName": "Blogg"
+            }
+        ]
+      }
+    }
+  }
 }
 ```
 
@@ -69,12 +69,12 @@ to end up with:
 
 ```
 {
-	"users": [
-		{
-            "firstName": "Fred",
-            "lastName": "Bloggs"
-        }
-	]
+  "users": [
+    {
+      "firstName": "Fred",
+      "lastName": "Bloggs"
+    }
+  ]
 }
 ```
 
@@ -90,12 +90,12 @@ Json-Works includes an implementation of [JSON Schema][schema], version 4. This 
 
 ```
 {
-    "items": {
-        "properties": {
-            "firstName": {"type": "string"},
-			"lastName": {"type": "string"}
-        },
-        "required": ["firstName", "lastName"]
+  "items": {
+    "properties": {
+      "firstName": {"type": "string"},
+      "lastName": {"type": "string"}
+    },
+      "required": ["firstName", "lastName"]
     }
 }
 ```

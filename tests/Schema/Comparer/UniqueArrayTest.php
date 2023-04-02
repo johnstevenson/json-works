@@ -4,11 +4,11 @@ namespace JsonWorks\Tests\Schema\Comparer;
 
 use JohnStevenson\JsonWorks\Schema\Comparer;
 
-class UniqueArrayTest extends \PHPUnit_Framework_TestCase
+class UniqueArrayTest extends \PHPUnit\Framework\TestCase
 {
     protected $comparer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->comparer = new Comparer();
     }

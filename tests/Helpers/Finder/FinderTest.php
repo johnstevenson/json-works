@@ -10,7 +10,7 @@ class FinderTest extends \JsonWorks\Tests\Base
 {
     protected $finder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->finder = new Finder();
     }
@@ -96,7 +96,9 @@ class FinderTest extends \JsonWorks\Tests\Base
             }
         }');
 
-        $expected =& $data->prop1->_empty_[1];
+        $empty = '';
+        //$expected =& $data->prop1->_empty_[1];
+        $expected =& $data->prop1->$empty[1];
 
         $path = '/prop1//1';
         $target = new Target($path, $error);
@@ -110,7 +112,8 @@ class FinderTest extends \JsonWorks\Tests\Base
 
         // check parent
         $msg = 'Testing parent';
-        $expected =& $data->prop1->_empty_;
+        //$expected =& $data->prop1->_empty_;
+        $expected =& $data->prop1->$empty;
         $this->assertTrue($this->sameRef($expected, $target->parent), $msg);
         $this->assertEquals('1', $target->childKey, $msg);
     }
@@ -133,7 +136,7 @@ class FinderTest extends \JsonWorks\Tests\Base
         $msg = 'Testing result';
         $this->assertFalse($result, $msg);
         $this->assertTrue($this->sameRef($expected, $target->element), $msg);
-        $this->assertContains('ERR_NOT_FOUND', $target->error, $msg);
+        $this->assertStringContainsString('ERR_NOT_FOUND', $target->error, $msg);
 
         // check parent, will be the same as element
         $msg = 'Testing parent';
@@ -159,7 +162,7 @@ class FinderTest extends \JsonWorks\Tests\Base
         $msg = 'Testing result';
         $this->assertFalse($result, $msg);
         $this->assertTrue($this->sameRef($expected, $target->element), $msg);
-        $this->assertContains('ERR_PATH_KEY', $target->error, $msg);
+        $this->assertStringContainsString('ERR_PATH_KEY', $target->error, $msg);
         $this->assertTrue($target->invalid);
 
         // check parent, will be the same as element
@@ -231,7 +234,7 @@ class FinderTest extends \JsonWorks\Tests\Base
 
         // check result
         $this->assertFalse($result);
-        $this->assertContains('ERR_NOT_FOUND', $error);
+        $this->assertStringContainsString('ERR_NOT_FOUND', $error);
 
         // check passed-in $element has not been modified
         $this->assertEquals($expected, $element);
@@ -253,7 +256,7 @@ class FinderTest extends \JsonWorks\Tests\Base
 
         // check result
         $this->assertFalse($result);
-        $this->assertContains('ERR_PATH_KEY', $error);
+        $this->assertStringContainsString('ERR_PATH_KEY', $error);
 
         // check passed-in $element has not been modified
         $this->assertEquals($expected, $element);
@@ -275,7 +278,7 @@ class FinderTest extends \JsonWorks\Tests\Base
 
         // check result
         $this->assertFalse($result);
-        $this->assertContains('ERR_PATH_KEY', $error);
+        $this->assertStringContainsString('ERR_PATH_KEY', $error);
 
         // check passed-in $element has not been modified
         $this->assertEquals($expected, $element);
@@ -319,7 +322,7 @@ class FinderTest extends \JsonWorks\Tests\Base
         ];
 
         foreach ($tests as $pointer => $expected) {
-            $msg = 'Testing ' . (strlen($pointer) ? $pointer : 'empty key');
+            $msg = 'Testing ' . (strlen($pointer) ? "'{$pointer}'" : 'empty key');
             $result = $this->finder->find($pointer, $data, $element, $error);
             $this->assertTrue($result, $msg);
             $this->assertEquals($expected, $element, $msg);

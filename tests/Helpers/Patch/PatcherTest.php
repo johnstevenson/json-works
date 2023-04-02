@@ -8,7 +8,7 @@ class PatcherTest extends \JsonWorks\Tests\Base
 {
     protected $patcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->patcher = new Patcher();
     }

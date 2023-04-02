@@ -86,7 +86,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->setExpectedException('RuntimeException', 'Invalid schema value');
+        $this->expectException('RuntimeException', 'Invalid schema value');
         $this->validate($schema, $data);
     }
 
@@ -104,7 +104,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->setExpectedException('RuntimeException', 'Unable to find $ref');
+        $this->expectException('RuntimeException', 'Unable to find $ref');
         $this->validate($schema, $data);
     }
 
@@ -152,7 +152,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->setExpectedException('RuntimeException', 'Circular reference');
+        $this->expectException('RuntimeException', 'Circular reference');
         $this->validate($schema, $data);
     }
 
@@ -225,8 +225,52 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->setExpectedException('RuntimeException', 'Circular reference');
+        $this->expectException('RuntimeException', 'Circular reference');
         $this->validate($schema, $data);
+    }
+
+    public function testCompoundSimilarNames()
+    {
+        $schema = '{
+            "type": "object",
+            "properties": {
+                "list1": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/list" }
+                },
+                "list2": { "$ref": "#/properties/list1" }
+            },
+            "definitions": {
+                "list": {
+                    "type": "object",
+                    "properties": {
+                        "prop1": {"type": "string"},
+                        "list": {
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/list-list" }
+                        }
+                    }
+                },
+                "list-list": {
+                    "$ref": "#/definitions/alphanum"
+                },
+                "alphanum": {
+                    "oneOf": [ {"type": "string"}, {"type": "number"} ]
+                }
+            }
+        }';
+
+        $data = json_decode('{
+            "list1": [ { "prop1": "string one", "list": [ "one", 1]} ],
+            "list2": [ { "prop1": "string two", "list": [ "two", 2]} ]
+        }');
+
+        list($result, $error) = $this->validateEx($schema, $data, 'Testing success');
+        $this->assertTrue($result, $error);
+
+        $data->list1[0]->list = ['one', false];
+        list($result, $error) = $this->validateEx($schema, $data, 'Testing failure');
+        $this->assertFalse($result, $error);
     }
 
     public function testAnotherCompound()
