@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Common;
 
 class AllOfTest extends \JsonWorks\Tests\Base
 {
-    public function testDataValid()
+    public function testDataValid(): void
     {
         $schema = '{
             "allOf": [
@@ -14,10 +14,10 @@ class AllOfTest extends \JsonWorks\Tests\Base
         }';
 
         $data = 'value';
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataInvalid()
+    public function testDataInvalid(): void
     {
         $schema = '{
             "allOf": [
@@ -27,10 +27,10 @@ class AllOfTest extends \JsonWorks\Tests\Base
         }';
 
         $data = 'other';
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testValid()
+    public function testValid(): void
     {
         $schema = '{
             "properties": {
@@ -48,10 +48,10 @@ class AllOfTest extends \JsonWorks\Tests\Base
         }';
 
         $data = '{"prop1": 5}';
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testInvalid()
+    public function testInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -69,6 +69,6 @@ class AllOfTest extends \JsonWorks\Tests\Base
         }';
 
         $data = '{"prop1": 6}';
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

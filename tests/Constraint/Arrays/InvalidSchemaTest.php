@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Arrays;
 
 class InvalidSchemaTest extends \JsonWorks\Tests\Base
 {
-    public function testMinItemsNotInteger1()
+    public function testMinItemsNotInteger1(): void
     {
         $schema = '{
             "minItems": "1"
@@ -16,7 +16,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMinItemsNotInteger2()
+    public function testMinItemsNotInteger2(): void
     {
         $schema = '{
             "minItems": 1.0
@@ -28,7 +28,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMinItemsNegative()
+    public function testMinItemsNegative(): void
     {
         $schema = '{
             "minItems": -7
@@ -40,7 +40,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxItemsNotInteger1()
+    public function testMaxItemsNotInteger1(): void
     {
         $schema = '{
             "maxItems": "2"
@@ -52,7 +52,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxItemsNotInteger2()
+    public function testMaxItemsNotInteger2(): void
     {
         $schema = '{
             "maxItems": 2.0
@@ -64,7 +64,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxItemsNegative()
+    public function testMaxItemsNegative(): void
     {
         $schema = '{
             "maxItems": -7
@@ -76,7 +76,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testAdditionalNotObjectOrBoolean()
+    public function testAdditionalNotObjectOrBoolean(): void
     {
         $schema = '{
             "additionalItems": 1
@@ -88,7 +88,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testItemsNotArrayOrObject()
+    public function testItemsNotArrayOrObject(): void
     {
         $schema = '{
             "items": true
@@ -100,7 +100,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testItemsArrayValueNotObject()
+    public function testItemsArrayValueNotObject(): void
     {
         $schema = '{
             "items": [

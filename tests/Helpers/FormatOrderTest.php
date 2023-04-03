@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers;
 
@@ -6,24 +6,24 @@ use JohnStevenson\JsonWorks\Helpers\Formatter;
 
 class FormatOrderTest extends \JsonWorks\Tests\Base
 {
-    protected $formatter;
+    protected Formatter $formatter;
 
     protected function setUp(): void
     {
         $this->formatter = new Formatter();
     }
 
-    public function testNoData()
+    public function testNoData(): void
     {
         $schema = $this->getSchema(null);
         $data = '';
         $expected = '';
 
         $result = $this->formatter->order(json_decode($data), $schema);
-        $this->assertEquals(json_decode($expected), $result);
+        self::assertEquals(json_decode($expected), $result);
     }
 
-    public function testObjectSimple()
+    public function testObjectSimple(): void
     {
         $schema = '{
             "properties": {
@@ -51,19 +51,19 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         }';
 
         $schema = $this->getSchema($schema);
-        $data = $this->fromJson($data);
+        $data = $this->objectFromJson($data);
         $expected = $this->getExpectedJson($expected);
 
         $msg = 'Testing with schema';
         $result = json_encode($this->formatter->order($data, $schema));
-        $this->assertEquals($expected, $result, $msg);
+        self::assertEquals($expected, $result, $msg);
 
         $msg = 'Testing no schema';
         $result = json_encode($this->formatter->order($data, null));
-        $this->assertEquals($expected, $result, $msg);
+        self::assertEquals($expected, $result, $msg);
     }
 
-    public function testArraySimple()
+    public function testArraySimple(): void
     {
         $schema = '{
             "items": {
@@ -105,19 +105,19 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         }]';
 
         $schema = $this->getSchema($schema);
-        $data = $this->fromJson($data);
+        $data = $this->arrayFromJson($data);
         $expected = $this->getExpectedJson($expected);
 
         $msg = 'Testing with schema';
         $result = json_encode($this->formatter->order($data, $schema));
-        $this->assertEquals($expected, $result, $msg);
+        self::assertEquals($expected, $result, $msg);
 
         $msg = 'Testing no schema';
         $result = json_encode($this->formatter->order($data, null));
-        $this->assertEquals($expected, $result, $msg);
+        self::assertEquals($expected, $result, $msg);
     }
 
-    public function testNested()
+    public function testNested(): void
     {
         $schema = '{
             "properties": {
@@ -192,15 +192,15 @@ class FormatOrderTest extends \JsonWorks\Tests\Base
         }';
 
         $schema = $this->getSchema($schema);
-        $data = $this->fromJson($data);
+        $data = $this->objectFromJson($data);
         $expected = $this->getExpectedJson($expected);
 
         $msg = 'Testing with schema';
         $result = json_encode($this->formatter->order($data, $schema));
-        $this->assertEquals($expected, $result, $msg);
+        self::assertEquals($expected, $result, $msg);
 
         $msg = 'Testing no schema';
         $result = json_encode($this->formatter->order($data, null));
-        $this->assertEquals($expected, $result, $msg);
+        self::assertEquals($expected, $result, $msg);
     }
 }

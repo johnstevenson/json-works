@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,16 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
+
+use \stdClass;
 
 use JohnStevenson\JsonWorks\Schema\ValidationException;
 
 class OfConstraint extends BaseConstraint
 {
-    protected $type;
-    protected $matchFirst;
+    protected string $type;
+    protected bool $matchFirst;
 
-    public function validate($data, $schema, $key)
+    /**
+     * @param mixed $data
+     * @param object|array<mixed> $schema
+     */
+    public function validate($data, $schema, string $key): void
     {
         $schemas = $this->setDetails($schema, $key);
         $matches = $this->getMatches($data, $schemas);
@@ -27,15 +34,23 @@ class OfConstraint extends BaseConstraint
         }
     }
 
-    protected function setDetails($schema, $key)
+    /**
+     * @param object|array<mixed> $schema
+     * @return array<object>
+     */
+    protected function setDetails($schema, string $key): array
     {
         $this->type = $key === 'not' ? 'object' : 'array';
-        $this->matchFirst = in_array($key, ['anyOf', 'not']);
+        $this->matchFirst = in_array($key, ['anyOf', 'not'], true);
 
         return $this->type === 'object' ? [$schema] : $schema;
     }
 
-    protected function getMatches($data, $schemas)
+    /**
+     * @param mixed $data
+     * @param array<object> $schemas
+     */
+    protected function getMatches($data, array $schemas): int
     {
         $result = 0;
 
@@ -53,7 +68,10 @@ class OfConstraint extends BaseConstraint
         return $result;
     }
 
-    protected function testChild($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    protected function testChild($data, stdClass $schema): bool
     {
         $currentStop = $this->manager->stopOnError;
         $this->manager->stopOnError = true;
@@ -67,10 +85,11 @@ class OfConstraint extends BaseConstraint
         }
 
         $this->manager->stopOnError = $currentStop;
+
         return $result;
     }
 
-    protected function checkResult($key, $matches, $schemaCount)
+    protected function checkResult(string $key, int $matches, int $schemaCount): bool
     {
         switch ($key) {
             case 'allOf':
@@ -84,7 +103,7 @@ class OfConstraint extends BaseConstraint
         return $matches === 0;
     }
 
-    protected function getError($key)
+    protected function getError(string $key): string
     {
         if ($key === 'not') {
             return 'must not validate against this schema';

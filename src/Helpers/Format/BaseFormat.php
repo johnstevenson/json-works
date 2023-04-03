@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -18,21 +18,19 @@ class BaseFormat
     /**
     * Returns true if the data is an object or array
     *
-    * The $object param is set and reports if $data is either an object or an
+    * The $isObject param is set and reports if $data is either an object or an
     * associative array
     *
-    * @param mixed $data The data to check
-    * @param bool $object Set by the method
-    * @return bool
+    * @param object|array<mixed>|mixed $data The data to check
     */
-    protected function isContainer($data, &$object)
+    protected function isContainer($data, ?bool &$isObject): bool
     {
-        if ($object = is_object($data)) {
+        if ($isObject = is_object($data)) {
             return true;
         }
 
         if (is_array($data)) {
-            $object = $this->isAssociative($data);
+            $isObject = $this->isAssociative($data);
             return true;
         }
 
@@ -42,11 +40,14 @@ class BaseFormat
     /**
     * Determines if an array is associative
     *
-    * @param array $data
-    * @return bool
+    * @param array<mixed> $data
     */
-    protected function isAssociative(array $data)
+    protected function isAssociative(array $data): bool
     {
+        if (function_exists('array_is_list')) {
+            return !array_is_list($data);
+        }
+
         foreach ($data as $key => $value) {
             if ($key !== (int) $key) {
                 return true;
@@ -59,12 +60,11 @@ class BaseFormat
     /**
     * Casts a value as an object if required
     *
-    * @param object|array $data
-    * @param bool $object
-    * @return object|array
+    * @param object|array<mixed> $data
+    * @return object|array<mixed>
     */
-    protected function formatContainer($data, $object)
+    protected function formatContainer($data, bool $isObject)
     {
-        return $object ? (object) $data: $data;
+        return $isObject ? (object) $data: $data;
     }
 }

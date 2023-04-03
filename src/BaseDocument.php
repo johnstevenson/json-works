@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -10,6 +10,8 @@
 
 namespace JohnStevenson\JsonWorks;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Helpers\Formatter;
 use JohnStevenson\JsonWorks\Helpers\Loader;
 use JohnStevenson\JsonWorks\Schema\Validator;
@@ -19,54 +21,55 @@ use JohnStevenson\JsonWorks\Schema\Validator;
 */
 class BaseDocument
 {
+    /** @var mixed */
     public $data;
-    public $lastError;
-    protected $schema;
-    protected $schemaPath = '';
+    public string $lastError = '';
+    protected ?stdClass $schema = null;
 
-    /**
-    * @var Helpers\Formatter
-    */
-    protected $formatter;
-
-    /**
-    * @var Schema\Validator
-    */
-    protected $validator;
+    protected Formatter $formatter;
+    protected ?Validator $validator = null;
 
     public function __construct()
     {
         $this->formatter = new Formatter();
     }
 
-    public function loadData($data)
+    /**
+     * @param mixed $data
+     */
+    public function loadData($data): void
     {
         $loader = new Loader();
         $this->data = $loader->loadData($data);
     }
 
-    public function loadSchema($data, $basePath = '')
+    /**
+     * @param mixed $data
+     */
+    public function loadSchema($data): void
     {
         $loader = new Loader();
-        $this->schema = $loader->loadSchema($data, $filename);
-        $this->schemaPath = $basePath;
+        $this->schema = $loader->loadSchema($data);
     }
 
-    public function tidy($order = false)
+    public function tidy(bool $order = false): void
     {
         $this->data = $this->formatter->prune($this->data);
 
-        if ($order && $this->schema) {
+        if ($order && $this->schema !== null) {
             $this->data = $this->formatter->order($this->data, $this->schema);
         }
     }
 
+    /**
+     * @return mixed $data
+     */
     public function getData()
     {
         return $this->data;
     }
 
-    public function toJson($pretty)
+    public function toJson(bool $pretty): string
     {
         $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         $options |= $pretty ? JSON_PRETTY_PRINT : 0;
@@ -74,13 +77,13 @@ class BaseDocument
         return $this->formatter->toJson($this->data, $options);
     }
 
-    public function validate()
+    public function validate(): bool
     {
-        if (!$this->schema) {
+        if ($this->schema === null) {
             return true;
         }
 
-        if (!$this->validator) {
+        if ($this->validator === null) {
             $this->validator = new Validator($this->schema);
         }
 

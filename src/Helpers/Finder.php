@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -18,27 +18,19 @@ use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 */
 class Finder
 {
-    /**
-    * @var Patch\Target
-    */
-    protected $target;
-
-    /**
-    * @var mixed
-    */
+    /** @var mixed */
     protected $element;
+    protected Target $target;
 
     /**
     * Returns true if an element is found
     *
     * @api
-    * @param string $path
     * @param mixed $data
     * @param mixed $element Set by method if found
     * @param string $error Set by method
-    * @return bool
     */
-    public function find($path, $data, &$element, &$error)
+    public function find(string $path, $data, &$element, &$error): bool
     {
         $target = new Target($path, $error);
 
@@ -54,10 +46,8 @@ class Finder
     *
     * @api
     * @param mixed $data
-    * @param Target $target Modified by method
-    * @return bool
     */
-    public function get(&$data, Target $target)
+    public function get(&$data, Target $target): bool
     {
         $this->element =& $data;
         $this->target = $target;
@@ -66,7 +56,9 @@ class Finder
             return false;
         }
 
-        if (!$found = empty($target->tokens)) {
+        $found = Utils::arrayIsEmpty($target->tokens);
+
+        if (!$found) {
             $found = $this->search($target->tokens);
         }
 
@@ -78,13 +70,12 @@ class Finder
     /**
     * Returns true if the element is found
     *
-    * @param array $tokens Modified by method
-    * @return bool
+    * @param array<string> $tokens Modified by method
     */
-    protected function search(array &$tokens)
+    protected function search(array &$tokens): bool
     {
         // tokens is guaranteed not empty
-        while (!empty($tokens)) {
+        while (Utils::arrayNotEmpty($tokens)) {
             $token = $tokens[0];
 
             if (count($tokens) === 1) {
@@ -106,11 +97,8 @@ class Finder
     * Returns true if a token is found at the current data root
     *
     * A reference to the value is placed in $this->element
-    *
-    * @param string $token
-    * @return bool
     */
-    protected function findContainer($token)
+    protected function findContainer(string $token): bool
     {
         $found = false;
 
@@ -130,10 +118,8 @@ class Finder
     * Returns true if the token is an existing array key
     *
     * Sets $this->element to reference the value
-    * @param string $token
-    * @return bool
-    */
-    protected function findArray($token)
+     */
+    protected function findArray(string $token): bool
     {
 
         if (!$this->isArrayKey($token, $index)) {
@@ -152,12 +138,11 @@ class Finder
     * Returns true if the token is an existing object property key
     *
     * Sets $this->element to reference the value
-    * @param string $token
-    * @return bool
     */
-    protected function findObject($token)
+    protected function findObject(string $token): bool
     {
         if ($result = property_exists($this->element, $token)) {
+            // @phpstan-ignore-next-line
             $this->element = &$this->element->$token;
         }
 
@@ -168,15 +153,16 @@ class Finder
     * Returns true if the token is a valid array key
     *
     * @api
-    * @param string $token
     * @param mixed $index Set to an integer on success
     */
-    protected function isArrayKey($token, &$index)
+    protected function isArrayKey(string $token, &$index): bool
     {
-        if ($result = preg_match('/^((0)|([1-9]\d*))$/', $token)) {
+        $result = Utils::isMatch('/^((0)|([1-9]\d*))$/', $token);
+
+        if ($result) {
             $index = (int) $token;
         }
 
-        return (bool) $result;
+        return $result;
     }
 }

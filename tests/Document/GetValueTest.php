@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Document;
 
 class GetValueTest extends \JsonWorks\Tests\Base
 {
-    public function testFromObject()
+    public function testFromObject(): void
     {
         $schema = null;
 
@@ -21,14 +21,14 @@ class GetValueTest extends \JsonWorks\Tests\Base
         $expected = 'prop11 value';
 
         $result = $document->getValue($path);
-        $this->assertEquals($expected, $result, 'Testing success: '.$path);
+        self::assertEquals($expected, $result, 'Testing success: '.$path);
 
         $path = '/prop1/prop111';
         $result = $document->getValue($path);
-        $this->assertNull($result, 'Testing fail: '.$path);
+        self::assertNull($result, 'Testing fail: '.$path);
     }
 
-    public function testFromArray()
+    public function testFromArray(): void
     {
         $schema = null;
 
@@ -44,15 +44,15 @@ class GetValueTest extends \JsonWorks\Tests\Base
 
         $path = '/1/1/2';
         $expected = 'item112 value';
-        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
-        $this->assertEquals($expected, $value);
+        self::assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
+        self::assertEquals($expected, $value);
 
         $path = '/0/3';
-        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
-        $this->assertNull($value);
+        self::assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
+        self::assertNull($value);
     }
 
-    public function testFromMixed()
+    public function testFromMixed(): void
     {
         $schema = null;
 
@@ -78,34 +78,34 @@ class GetValueTest extends \JsonWorks\Tests\Base
         // success tests
         $path = '/prop1/firstName';
         $expected = 'Fred';
-        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
-        $this->assertEquals($expected, $value);
+        self::assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
+        self::assertEquals($expected, $value);
 
         $path = '/prop2/collection';
-        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
-        $this->assertIsArray($value);
+        self::assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
+        self::assertIsArray($value);
 
         $path = '/prop2/collection/1/lastName';
         $expected = 'Bloggs';
-        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
-        $this->assertEquals($expected, $value);
+        self::assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
+        self::assertEquals($expected, $value);
 
         $path = '/prop2/collection/3/1/firstName';
         $expected = 'Harry';
-        $this->assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
-        $this->assertEquals($expected, $value);
+        self::assertTrue($document->hasValue($path, $value), 'Testing success: '.$path);
+        self::assertEquals($expected, $value);
 
         // fail tests
         $path = '/prop1/lastName';
-        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
-        $this->assertNull($value);
+        self::assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
+        self::assertNull($value);
 
         $path = '/prop2/collection/0/lastName';
-        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
-        $this->assertNull($value);
+        self::assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
+        self::assertNull($value);
 
         $path = '/prop2/collection/3/0/firstName';
-        $this->assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
-        $this->assertNull($value);
+        self::assertFalse($document->hasValue($path, $value), 'Testing fail: '.$path);
+        self::assertNull($value);
     }
 }

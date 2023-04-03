@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Common;
 
 class TypeTest extends \JsonWorks\Tests\Base
 {
-    public function testSimpleValid()
+    public function testSimpleValid(): void
     {
         $schema = '{
             "type": ["string", "array", "number"]
@@ -12,10 +12,10 @@ class TypeTest extends \JsonWorks\Tests\Base
 
         $data = [];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testSimpleInvalid()
+    public function testSimpleInvalid(): void
     {
         $schema = '{
             "type": ["string", "array", "number"]
@@ -23,10 +23,10 @@ class TypeTest extends \JsonWorks\Tests\Base
 
         $data = false;
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testCompoundValid()
+    public function testCompoundValid(): void
     {
         $schema = '{
             "type": "object"
@@ -34,10 +34,10 @@ class TypeTest extends \JsonWorks\Tests\Base
 
         $data = '{"name": "value"}';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testCompoundInvalid()
+    public function testCompoundInvalid(): void
     {
         $schema = '{
             "type": "array"
@@ -45,16 +45,16 @@ class TypeTest extends \JsonWorks\Tests\Base
 
         $data = '{"name1": "value1"}';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testEmptyArrayValid()
+    public function testEmptyArrayValid(): void
     {
         $schema = '{
             "type": []
         }';
 
         $data = 'two';
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 }

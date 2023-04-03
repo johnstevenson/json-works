@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,22 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
+
+use \stdClass;
+
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
 class PropertiesConstraint extends BaseConstraint
 {
-    /**
-    * @var array
-    */
-    protected $children;
+    /** @var array<object> */
+    protected array $children;
 
     /**
-    * The main method
-    *
     * @param mixed $data
-    * @param mixed $schema
     */
-    public function validate($data, $schema)
+    public function validate($data, stdClass $schema): void
     {
         $additional = $this->getAdditional($schema);
         $this->children = [];
@@ -35,54 +35,69 @@ class PropertiesConstraint extends BaseConstraint
         }
     }
 
-    protected function getAdditional($schema)
+    /**
+     * @return object|bool
+     */
+    protected function getAdditional(stdClass $schema)
     {
         $this->getValue($schema, 'additionalProperties', $value, ['object', 'boolean']);
 
         return $value;
     }
 
-    protected function checkProperties($data, $schema, $additional)
+    /**
+    * @param mixed $data
+    * @param object|bool $additional
+    */
+    protected function checkProperties($data, stdClass $schema, $additional): void
     {
         $set = (array) $data;
 
         $this->parseProperties($schema, $set);
         $this->parsePatternProperties($schema, $set);
 
-        if (false === $additional && !empty($set)) {
+        if (false === $additional && Utils::arrayNotEmpty($set)) {
             $this->addError('contains unspecified additional properties');
         }
 
         $this->mergeAdditional($set, $additional);
     }
 
-    protected function parseProperties($schema, array &$set)
+    /**
+    * @param array<string, mixed> $set
+    */
+    protected function parseProperties(stdClass $schema, array &$set): void
     {
-        if (!$this->getSchemaProperties($schema, 'properties', $p)) {
+        if (!$this->getSchemaProperties($schema, 'properties', $props)) {
             return;
         }
 
-        foreach ($p as $key => $schema) {
-
+        foreach ($props as $key => $subSchema) {
             if (array_key_exists($key, $set)) {
-                $this->addChild($set[$key], $schema, $key);
+                $this->addChild($set[$key], $subSchema, $key);
                 unset($set[$key]);
             }
         }
     }
 
-    protected function parsePatternProperties($schema, array &$set)
+    /**
+    * @param array<string, mixed> $set
+    */
+    protected function parsePatternProperties(stdClass $schema, array &$set): void
     {
-        if (!$this->getSchemaProperties($schema, 'patternProperties', $pp)) {
+        if (!$this->getSchemaProperties($schema, 'patternProperties', $props)) {
             return;
         }
 
-        foreach ($pp as $regex => $schema) {
-            $this->checkPattern($regex, $schema, $set);
+        foreach ($props as $regex => $subSchema) {
+            $this->checkPattern($regex, $subSchema, $set);
         }
     }
 
-    protected function getSchemaProperties($schema, $key, &$value)
+    /**
+    * @param mixed $value Set by method
+    */
+    protected function getSchemaProperties(stdClass $schema, string $key, &$value): bool
     {
         if ($result = $this->getValue($schema, $key, $value, 'object')) {
             $this->manager->dataChecker->checkContainerTypes($value, 'object');
@@ -91,7 +106,11 @@ class PropertiesConstraint extends BaseConstraint
         return $result;
     }
 
-    protected function mergeAdditional(array $set, $additional)
+    /**
+    * @param array<string, mixed> $set
+    * @param object|bool $additional
+    */
+    protected function mergeAdditional(array $set, $additional): void
     {
         if (is_object($additional)) {
 
@@ -101,7 +120,10 @@ class PropertiesConstraint extends BaseConstraint
         }
     }
 
-    protected function checkPattern($regex, $schema, array &$set)
+    /**
+    * @param array<string, mixed> $set
+    */
+    protected function checkPattern(string $regex, stdClass $schema, array &$set): void
     {
         $copy = $set;
 
@@ -116,7 +138,10 @@ class PropertiesConstraint extends BaseConstraint
         }
     }
 
-    protected function addChild($data, $schema, $key)
+    /**
+    * @param mixed $data
+    */
+    protected function addChild($data, stdClass $schema, string $key): void
     {
         $this->children[] = [
             'data' => $data,

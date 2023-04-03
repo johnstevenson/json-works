@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Common;
 
 class AnyOfTest extends \JsonWorks\Tests\Base
 {
-    public function testDataValid()
+    public function testDataValid(): void
     {
         $schema = '{
             "anyOf": [
@@ -15,10 +15,10 @@ class AnyOfTest extends \JsonWorks\Tests\Base
 
         $data = 'value';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataInvalid()
+    public function testDataInvalid(): void
     {
         $schema = '{
             "anyOf": [
@@ -29,6 +29,6 @@ class AnyOfTest extends \JsonWorks\Tests\Base
 
         $data = 'value';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers;
 
@@ -6,23 +6,23 @@ use JohnStevenson\JsonWorks\Helpers\Formatter;
 
 class FormatPruneTest extends \JsonWorks\Tests\Base
 {
-    protected $formatter;
+    protected Formatter $formatter;
 
     protected function setUp(): void
     {
         $this->formatter = new Formatter();
     }
 
-    public function testNoData()
+    public function testNoData(): void
     {
         $data = '';
         $expected = '';
 
         $result = $this->formatter->prune(json_decode($data));
-        $this->assertEquals(json_decode($expected), $result);
+        self::assertEquals(json_decode($expected), $result);
     }
 
-    public function testSimple()
+    public function testSimple(): void
     {
         $data = '{
             "prop1": "",
@@ -36,14 +36,14 @@ class FormatPruneTest extends \JsonWorks\Tests\Base
             "prop4": null
         }';
 
-        $data = $this->fromJson($data);
-        $expected = $this->fromJson($expected);
+        $data = $this->objectFromJson($data);
+        $expected = $this->objectFromJson($expected);
 
         $result = $this->formatter->prune($data);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testNested()
+    public function testNested(): void
     {
         $data = '{
             "prop1": {
@@ -72,10 +72,10 @@ class FormatPruneTest extends \JsonWorks\Tests\Base
             "prop4": null
         }';
 
-        $data = $this->fromJson($data);
-        $expected = $this->fromJson($expected);
+        $data = $this->objectFromJson($data);
+        $expected = $this->objectFromJson($expected);
 
         $result = $this->formatter->prune($data);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 }

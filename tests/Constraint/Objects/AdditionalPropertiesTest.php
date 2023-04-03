@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Objects;
 
 class AdditionalPropertiesTest extends \JsonWorks\Tests\Base
 {
-    public function testSimpleNoneValid()
+    public function testSimpleNoneValid(): void
     {
         $schema = '{}';
 
@@ -13,10 +13,10 @@ class AdditionalPropertiesTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testSimpleTrueValid()
+    public function testSimpleTrueValid(): void
     {
         $schema = '{
             "additionalProperties": true
@@ -27,10 +27,10 @@ class AdditionalPropertiesTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testSimpleObjectValid()
+    public function testSimpleObjectValid(): void
     {
         $schema = '{
             "additionalProperties": {}
@@ -41,10 +41,10 @@ class AdditionalPropertiesTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testSimpleInvalid()
+    public function testSimpleInvalid(): void
     {
         $schema = '{
             "additionalProperties": false
@@ -54,6 +54,6 @@ class AdditionalPropertiesTest extends \JsonWorks\Tests\Base
             "prop1": 1
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\BaseDocument;
 
 class ValidateTest extends \JsonWorks\Tests\Base
 {
-    public function testRainbowIssue()
+    public function testRainbowIssue(): void
     {
         $schema = '{
            "type": "object",
@@ -47,6 +47,6 @@ class ValidateTest extends \JsonWorks\Tests\Base
             ]
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 }

@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,19 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
+
+use \stdClass;
 
 class ItemsConstraint extends BaseConstraint
 {
     /**
-    * The main method
-    *
-    * @param mixed $data
-    * @param mixed $schema
-    */
-    public function validate($data, $schema)
+     * @param mixed $data
+     */
+    public function validate($data, stdClass $schema): void
     {
-        $this->getItemValues($schema, $items, $additional);
+        list($items, $additional) = $this->getItemValues($schema);
 
         if (is_object($items)) {
             $this->validateObjectItems($data, $items);
@@ -30,7 +30,12 @@ class ItemsConstraint extends BaseConstraint
         }
     }
 
-    protected function getItemValues($schema, &$items, &$additional)
+    /**
+     * Returns items and additionalItems values
+     *
+     * @return array{0: array<mixed>|object, 1: object|boolean|null}
+     */
+    protected function getItemValues(stdClass $schema): array
     {
         $items = null;
         $this->getValue($schema, 'items', $items, ['array', 'object']);
@@ -41,9 +46,14 @@ class ItemsConstraint extends BaseConstraint
 
         $additional = null;
         $this->getValue($schema, 'additionalItems', $additional, ['boolean', 'object']);
+
+        return [$items, $additional];
     }
 
-    protected function validateObjectItems($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    protected function validateObjectItems($data, stdClass $schema): void
     {
         $key = 0;
 
@@ -53,7 +63,12 @@ class ItemsConstraint extends BaseConstraint
         }
     }
 
-    protected function checkArrayItems($data, $items, $additional)
+    /**
+     * @param mixed $data
+     * @param array<mixed> $items
+     * @param object|boolean|null $additional
+     */
+    protected function checkArrayItems($data, array $items, $additional): void
     {
         if (false === $additional) {
             if (count($data) > count($items)) {
@@ -62,7 +77,12 @@ class ItemsConstraint extends BaseConstraint
         }
     }
 
-    protected function validateArrayItems($data, $items, $additional)
+    /**
+     * @param mixed $data
+     * @param array<mixed> $items
+     * @param object|boolean|null $additional
+     */
+    protected function validateArrayItems($data, array $items, $additional): void
     {
         $key = 0;
         $itemsCount = count($items);

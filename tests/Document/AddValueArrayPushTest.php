@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Document;
 
 class AddValueArrayPushTest extends \JsonWorks\Tests\Base
 {
-    public function testRootSingleDash()
+    public function testRootSingleDash(): void
     {
         $schema = null;
         $data = null;
@@ -13,11 +13,11 @@ class AddValueArrayPushTest extends \JsonWorks\Tests\Base
         $path = '/-';
         $value = 1;
         $expected = [$value];
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($expected, $document->data);
     }
 
-    public function testRootSingleZero()
+    public function testRootSingleZero(): void
     {
         $schema = null;
         $data = null;
@@ -26,37 +26,37 @@ class AddValueArrayPushTest extends \JsonWorks\Tests\Base
         $path = '/0';
         $value = 1;
         $expected = [$value];
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($expected, $document->data);
     }
 
-    public function testRootMultiDash()
+    public function testRootMultiDash(): void
     {
         $document = $this->getDocument(null, null);
         $path = '/-/-/-';
         $value = 1;
         $expected = [[[$value]]];
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($expected, $document->data);
     }
 
-    public function testRootMultiZero()
+    public function testRootMultiZero(): void
     {
         $document = $this->getDocument(null, null);
         $path = '/0/0/0';
         $value = 1;
         $expected = [[[$value]]];
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($expected, $document->data);
     }
 
-    public function testRootMultiMixed()
+    public function testRootMultiMixed(): void
     {
         $document = $this->getDocument(null, null);
         $path = '/-/0/-';
         $value = 1;
         $expected = [[[$value]]];
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($expected, $document->data);
     }
 }

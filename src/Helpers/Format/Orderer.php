@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -10,6 +10,8 @@
 
 namespace JohnStevenson\JsonWorks\Helpers\Format;
 
+use \stdClass;
+
 /**
 * A class to order elements based on their order in a schema
 */
@@ -20,16 +22,19 @@ class Orderer
     *
     * @internal
     * @param mixed $data
-    * @param mixed $schema
     * @return mixed
     */
-    public function run($data, $schema)
+    public function run($data, ?stdClass $schema)
     {
-        if ($properties = $this->objectWithSchema($data, $schema)) {
+        $properties = $this->objectWithSchema($data, $schema);
+
+        if ($properties !== null) {
             return $this->orderObject($data, $properties);
         }
 
-        if ($items = $this->arrayWithSchema($data, $schema)) {
+        $items = $this->arrayWithSchema($data, $schema);
+
+        if ($items !== null) {
             return $this->orderArray($data, $items);
         }
 
@@ -40,33 +45,31 @@ class Orderer
     * Returns schema items if they are relevant and exist
     *
     * @param mixed $data
-    * @param mixed $schema
-    * @return object|null
     */
-    protected function arrayWithSchema($data, $schema)
+    protected function arrayWithSchema($data, ?stdClass $schema): ?stdClass
     {
         if (!is_array($data)) {
-            return;
+            return null;
         }
 
         $items = $this->getProperties($schema, 'items');
-        return $items ?: new \stdClass();
+        return $items ?? new stdClass();
     }
 
     /**
     * Returns schema properties if they are relevant and exist
     *
     * @param mixed $data
-    * @param mixed $schema
-    * @return object|null
     */
-    protected function objectWithSchema($data, $schema)
+    protected function objectWithSchema($data, ?stdClass $schema): ?stdClass
     {
         if (!is_object($data)) {
-            return;
+            return null;
         }
 
-        if (!$properties = $this->getProperties($schema, 'properties')) {
+        $properties = $this->getProperties($schema, 'properties');
+
+        if ($properties === null) {
             $properties = $this->getPropertiesFromData($data);
         }
 
@@ -74,17 +77,16 @@ class Orderer
     }
 
     /**
-    * Returns schema properties if valid
+    * Returns schema properties if valid, otherwise null
     *
-    * @param mixed $schema
-    * @param string $key
-    * @return object|null
     */
-    protected function getProperties($schema, $key)
+    protected function getProperties(?stdClass $schema, string $key): ?stdClass
     {
-        if (isset($schema->$key)) {
-            return is_object($schema->$key) ? $schema->$key : null;
+        if (!isset($schema->$key)) {
+            return null;
         }
+
+        return is_object($schema->$key) ? $schema->$key : null;
     }
 
     /**
@@ -138,7 +140,9 @@ class Orderer
 
         foreach ($properties as $key => $schema) {
             if (property_exists($data, $key)) {
+                // @phpstan-ignore-next-line
                 $result[$key] = $this->run($data->$key, $schema);
+                // @phpstan-ignore-next-line
                 unset($data->$key);
             }
         }

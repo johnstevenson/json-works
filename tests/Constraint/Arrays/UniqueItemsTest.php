@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Arrays;
 
 class UniqueItemsTest extends \JsonWorks\Tests\Base
 {
-    public function testDataTrueValid()
+    public function testDataTrueValid(): void
     {
         $schema = '{
             "uniqueItems": true
@@ -12,10 +12,10 @@ class UniqueItemsTest extends \JsonWorks\Tests\Base
 
         $data = array(1, null, 2, false, 3);
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataTrueInvalid()
+    public function testDataTrueInvalid(): void
     {
          $schema = '{
             "uniqueItems": true
@@ -23,10 +23,10 @@ class UniqueItemsTest extends \JsonWorks\Tests\Base
 
         $data = array(1, null, 2, false, 3, 1);
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testDataFalseValid()
+    public function testDataFalseValid(): void
     {
          $schema = '{
             "uniqueItems": false
@@ -34,10 +34,10 @@ class UniqueItemsTest extends \JsonWorks\Tests\Base
 
         $data = array(1, null, 2, false, 3, 1);
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testTrueValid()
+    public function testTrueValid(): void
     {
         $schema = '{
             "properties": {
@@ -54,10 +54,10 @@ class UniqueItemsTest extends \JsonWorks\Tests\Base
             "items": ["item1", "item2"]
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testTrueInvalid()
+    public function testTrueInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -74,10 +74,10 @@ class UniqueItemsTest extends \JsonWorks\Tests\Base
             "items": ["item1", "item2", "item1"]
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testFalseValid()
+    public function testFalseValid(): void
     {
         $schema = '{
             "properties": {
@@ -94,6 +94,6 @@ class UniqueItemsTest extends \JsonWorks\Tests\Base
             "items": ["item1", "item2", "item1"]
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 }

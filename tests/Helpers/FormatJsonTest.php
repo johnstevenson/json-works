@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers;
 
@@ -6,19 +6,19 @@ use JohnStevenson\JsonWorks\Helpers\Formatter;
 
 class FormatJsonTest extends \JsonWorks\Tests\Base
 {
-    protected $formatter;
+    protected Formatter $formatter;
 
     protected function setUp(): void
     {
         $this->formatter = new Formatter();
     }
 
-    public function testReplacesEmptyKeys()
+    public function testReplacesEmptyKeys(): void
     {
         $expected = $this->getFixtureFile('nullkeys.json');
-        $data = $this->fromJson($expected);
+        $data = $this->decodeJson($expected);
 
         $result = $this->formatter->toJson($data, JSON_PRETTY_PRINT);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 }

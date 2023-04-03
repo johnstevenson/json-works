@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Numbers;
 
 class MultipleOfTest extends \JsonWorks\Tests\Base
 {
-    public function testIntegerValid()
+    public function testIntegerValid(): void
     {
         $schema = '{
             "properties": {
@@ -16,10 +16,10 @@ class MultipleOfTest extends \JsonWorks\Tests\Base
             "test": 25
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testIntegerInvalid()
+    public function testIntegerInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -31,10 +31,10 @@ class MultipleOfTest extends \JsonWorks\Tests\Base
             "test": 26
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testFloatValid()
+    public function testFloatValid(): void
     {
         $schema = '{
             "properties": {
@@ -46,10 +46,10 @@ class MultipleOfTest extends \JsonWorks\Tests\Base
             "test": 54
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testFloatInvalid()
+    public function testFloatInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -61,6 +61,6 @@ class MultipleOfTest extends \JsonWorks\Tests\Base
             "test": 53.999
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

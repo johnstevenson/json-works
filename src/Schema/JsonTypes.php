@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -18,9 +18,8 @@ class JsonTypes
     * Numeric variables are reported as numbers
     *
     * @param mixed $value
-    * @return string
     */
-    public function getGeneric($value)
+    public function getGeneric($value): string
     {
         $result = $this->getSpecific($value);
 
@@ -33,9 +32,8 @@ class JsonTypes
     * Numeric variables are reported as either numbers or integers
     *
     * @param mixed $value
-    * @return string
     */
-    public function getSpecific($value)
+    public function getSpecific($value): string
     {
         $result = strtolower(gettype($value));
 
@@ -50,14 +48,15 @@ class JsonTypes
     * Returns true if a value is the generic type
     *
     * @param mixed $value
-    * @param string $type
-    * @return bool
     */
-    public function checkType($value, $type)
+    public function checkType($value, string $type): bool
     {
-        if (in_array($type, ['integer', 'number'])) {
-            $method = 'is' . ucfirst($type);
-            return $this->$method($value);
+        if ($type === 'integer') {
+            return $this->isInteger($value);
+        }
+
+        if ($type === 'number') {
+            return $this->isNumber($value);
         }
 
         return $type === $this->getGeneric($value);
@@ -66,11 +65,9 @@ class JsonTypes
     /**
     * Returns true if array values are the same type
     *
-    * @param array $data
-    * @param string $type
-    * @return bool
+    * @param array<mixed> $data
     */
-    public function arrayOfType(array $data, $type)
+    public function arrayOfType(array $data, string $type): bool
     {
         foreach ($data as $value) {
 
@@ -89,9 +86,8 @@ class JsonTypes
     * may have been truncated to fit a 64-bit PHP_MAX_INT
     *
     * @param mixed $value
-    * @return bool
     */
-    protected function isInteger($value)
+    protected function isInteger($value): bool
     {
         return is_integer($value) || (is_float($value) && abs($value) >= PHP_INT_MAX);
     }
@@ -100,9 +96,8 @@ class JsonTypes
     * Returns true if a value is a json number
     *
     * @param mixed $value
-    * @return bool
     */
-    protected function isNumber($value)
+    protected function isNumber($value): bool
     {
         return is_float($value) || is_integer($value);
     }

@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Strings;
 
 class InvalidSchemaTest extends \JsonWorks\Tests\Base
 {
-    public function testMinLengthNotInteger1()
+    public function testMinLengthNotInteger1(): void
     {
         $schema = '{
             "minLength": "1"
@@ -16,7 +16,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMinLengthNotInteger2()
+    public function testMinLengthNotInteger2(): void
     {
         $schema = '{
             "minLength": 1.0
@@ -28,7 +28,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMinLengthNegative()
+    public function testMinLengthNegative(): void
     {
         $schema = '{
             "minLength": -7
@@ -40,7 +40,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxLengthNotInteger1()
+    public function testMaxLengthNotInteger1(): void
     {
         $schema = '{
             "maxLength": "2"
@@ -52,7 +52,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxLengthNotInteger2()
+    public function testMaxLengthNotInteger2(): void
     {
         $schema = '{
             "maxLength": 2.0
@@ -64,7 +64,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxLengthNegative()
+    public function testMaxLengthNegative(): void
     {
         $schema = '{
             "maxLength": -7
@@ -76,7 +76,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testPatternNotString()
+    public function testPatternNotString(): void
     {
         $schema = '{
             "pattern": true
@@ -88,7 +88,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testPatternInvalidRegex()
+    public function testPatternInvalidRegex(): void
     {
         $schema = '{
             "pattern": "(*)"
@@ -100,7 +100,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testFormatNotString()
+    public function testFormatNotString(): void
     {
         $schema = '{
             "format": {}

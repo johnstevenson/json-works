@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\BaseDocument;
 
@@ -6,7 +6,7 @@ use JohnStevenson\JsonWorks\BaseDocument;
 
 class LoadingTest extends \JsonWorks\Tests\Base
 {
-    public function testLoadData()
+    public function testLoadData(): void
     {
         $document = new BaseDocument();
         $filename = $this->getFixturePath('pretty.json');
@@ -18,21 +18,21 @@ class LoadingTest extends \JsonWorks\Tests\Base
             $result = false;
         }
 
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 
-    public function testLoadScema()
+    public function testLoadScema(): void
     {
         $document = new BaseDocument();
         $filename = $this->getFixturePath('schema.json');
 
         try {
-            $document->loadSchema($filename, $filename);
+            $document->loadSchema($filename);
             $result = true;
         } catch (\RuntimeException $e) {
             $result = false;
         }
 
-        $this->assertTrue($result);
+        self::assertTrue($result);
     }
 }

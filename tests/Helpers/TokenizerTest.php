@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers;
 
@@ -6,121 +6,121 @@ use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 
 class TokenizerTest extends \PHPUnit\Framework\TestCase
 {
-    protected $tokenizer;
+    protected Tokenizer $tokenizer;
 
     protected function setUp(): void
     {
         $this->tokenizer = new Tokenizer();
     }
 
-    public function testAddPlain()
+    public function testAddPlain(): void
     {
         $path = '/prop1';
         $value = 'prop2';
         $expected = '/prop1/prop2';
-        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testAddWithSlash()
+    public function testAddWithSlash(): void
     {
         $path = '/prop1';
         $value = 'name/with/slash';
         $expected = '/prop1/name~1with~1slash';
-        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testAddWithTilde()
+    public function testAddWithTilde(): void
     {
         $path = '/prop1';
         $value = 'name~with~tilde';
         $expected = '/prop1/name~0with~0tilde';
-        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testAddWithSlashAndTilde()
+    public function testAddWithSlashAndTilde(): void
     {
         $path = '/prop1';
         $value = 'name/with/slash~and~tilde';
         $expected = '/prop1/name~1with~1slash~0and~0tilde';
-        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testAddPathEmpty()
+    public function testAddPathEmpty(): void
     {
         $path = '';
         $value = 'prop1';
         $expected = '/prop1';
-        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testAddPathEmptyWithEmpty()
+    public function testAddPathEmptyWithEmpty(): void
     {
         $path = '';
         $value = '';
         $expected = '';
-        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testAddPathEmptyWithZero()
+    public function testAddPathEmptyWithZero(): void
     {
         $path = '';
         $value = '0';
         $expected = '/0';
-        $this->assertEquals($expected, $this->tokenizer->add($path, $value));
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
-    public function testDecodePathPlain()
+    public function testDecodePathPlain(): void
     {
         $value = '/prop1/prop2/prop3';
         $expected = array('prop1', 'prop2', 'prop3');
-        $this->assertTrue($this->tokenizer->decode($value, $tokens));
-        $this->assertEquals($expected, $tokens);
+        self::assertTrue($this->tokenizer->decode($value, $tokens));
+        self::assertEquals($expected, $tokens);
     }
 
-    public function testDecodePathEncoded()
+    public function testDecodePathEncoded(): void
     {
         $value = '/key~01/key~02~1sub';
         $expected = array('key~1', 'key~2/sub');
-        $this->assertTrue($this->tokenizer->decode($value, $tokens));
-        $this->assertEquals($expected, $tokens);
+        self::assertTrue($this->tokenizer->decode($value, $tokens));
+        self::assertEquals($expected, $tokens);
     }
 
-    public function testDecodeFailsWithInvalidPath()
+    public function testDecodeFailsWithInvalidPath(): void
     {
         $msg = 'Testing failure with missing root slash';
         $value = 'prop1/prop2/prop3';
-        $this->assertFalse($this->tokenizer->decode($value, $tokens), $msg);
+        self::assertFalse($this->tokenizer->decode($value, $tokens), $msg);
 
         $msg = 'Testing failure with # ref at root';
         $value = '#prop1/prop2/prop3';
-        $this->assertFalse($this->tokenizer->decode($value, $tokens), $msg);
+        self::assertFalse($this->tokenizer->decode($value, $tokens), $msg);
     }
 
-    public function testEncodePathPlain()
+    public function testEncodePathPlain(): void
     {
         $value = 'key1';
         $expected = '/key1';
-        $this->assertEquals($expected, $this->tokenizer->encode($value));
+        self::assertEquals($expected, $this->tokenizer->encode($value));
     }
 
-    public function testEncodePathWithEncodeChars()
+    public function testEncodePathWithEncodeChars(): void
     {
         $value = array('key~1', 'key~2//sub', 'key3');
         $expected = '/key~01/key~02~1~1sub/key3';
-        $this->assertEquals($expected, $this->tokenizer->encode($value));
+        self::assertEquals($expected, $this->tokenizer->encode($value));
     }
 
-    public function testEncodePathEmpty()
+    public function testEncodePathEmpty(): void
     {
         $value = '';
         $expected = '';
-        $this->assertEquals($expected, $this->tokenizer->encode($value));
+        self::assertEquals($expected, $this->tokenizer->encode($value));
     }
 
-    public function testEncodePathWithZero()
+    public function testEncodePathWithZero(): void
     {
         $value = '0';
         $expected = '/0';
-        $this->assertEquals($expected, $this->tokenizer->encode($value));
+        self::assertEquals($expected, $this->tokenizer->encode($value));
     }
 }

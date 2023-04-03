@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JohnStevenson\JsonWorks;
 
@@ -7,10 +7,7 @@ use JohnStevenson\JsonWorks\Helpers\Finder;
 
 class Document extends BaseDocument
 {
-    /**
-    * @var Helpers\Finder
-    */
-    protected $finder;
+    protected Finder $finder;
 
     public function __construct()
     {
@@ -18,9 +15,16 @@ class Document extends BaseDocument
         $this->finder = new Finder();
     }
 
-    public function addValue($path, $value)
+    /**
+    * Adds an element to the data
+    *
+    * @param string $path
+    * @param mixed $value
+    * @return bool If the value was added
+    */
+    public function addValue(string $path, $value): bool
     {
-        $this->lastError = null;
+        $this->lastError = '';
         $value = $this->formatter->copy($value);
         $patcher = new Patcher();
 
@@ -31,19 +35,23 @@ class Document extends BaseDocument
         return $result;
     }
 
-    public function copyValue($fromPath, $toPath)
+    public function copyValue(string $fromPath, string $toPath): bool
     {
         return $this->workMove($fromPath, $toPath, false);
     }
 
-    public function deleteValue($path)
+    public function deleteValue(string $path): bool
     {
         $patcher = new Patcher();
 
         return $patcher->remove($this->data, $path);
     }
 
-    public function getValue($path, $default = null)
+    /**
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getValue(string $path, $default = null)
     {
         if (!$this->hasValue($path, $value)) {
             $value = $default;
@@ -52,7 +60,10 @@ class Document extends BaseDocument
         return $value;
     }
 
-    public function hasValue($path, &$value)
+    /**
+     * @param mixed $value
+     */
+    public function hasValue(string $path, &$value): bool
     {
         $value = null;
 
@@ -63,12 +74,12 @@ class Document extends BaseDocument
         return $result;
     }
 
-    public function moveValue($fromPath, $toPath)
+    public function moveValue(string $fromPath, string $toPath): bool
     {
         return $this->workMove($fromPath, $toPath, true);
     }
 
-    protected function workMove($fromPath, $toPath, $delete)
+    protected function workMove(string $fromPath, string $toPath, bool $delete): bool
     {
         $result = false;
 

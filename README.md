@@ -1,17 +1,14 @@
 Json-Works
 ==========
 
-[![Build Status](https://travis-ci.org/johnstevenson/json-works.png?branch=master)](https://travis-ci.org/johnstevenson/json-works)
-
-A PHP library to create, edit, query and validate [JSON](http://www.json.org/).
+A PHP library to create, edit, query and validate [JSON](https://www.json.org/).
 
 ## Contents
-* [About](#About)
-* [Installation](#Installation)
-* [Usage](#Usage)
-* [License](#License)
+* [About](#about)
+* [Installation](#installation)
+* [Usage](#usage)
+* [License](#license)
 
-<a name="About"></a>
 ## About
 
 The library is intended to be used with nested json structures, or with json data that needs validation. Or in any situation where you would find it is easier to do something like this:
@@ -20,46 +17,44 @@ The library is intended to be used with nested json structures, or with json dat
 <?php
 $document = new JohnStevenson\JsonWorks\Document();
 
-$document->addValue('/path/to/nested/array/-', array('firstName'=> 'Fred', 'lastName' => 'Blogg'));
+$document->addValue('/path/to/array/-', ['firstName'=> 'Fred', 'lastName' => 'Blogg']);
 
-# prettyPrint
+// prettyPrint
 $json = $document->toJson(true);
 ```
 
 which will give you the following json:
 
-```
+```json
 {
-  "path": {
-    "to": {
-      "nested": {
-        "array": [
-            {
-              "firstName": "Fred",
-              "lastName": "Blogg"
-            }
-        ]
-      }
+    "path": {
+        "to": {
+            "array": [
+                {
+                  "firstName": "Fred",
+                  "lastName": "Blogg"
+                }
+            ]
+        }
     }
-  }
 }
 ```
 
 You can query this value by calling:
 
 ```php
-$person = $document->getValue('/path/to/nested/array/0');
+$person = $document->getValue('/path/to/array/0');
 ```
 
 and update it with:
 
 ```php
-$document->addValue('/path/to/nested/array/0/lastName', 'Bloggs');
+$document->addValue('/path/to/array/0/lastName', 'Bloggs');
 ```
 and move it with:
 
 ```php
-$document->moveValue('/path/to/nested/array/0', '/users/-');
+$document->moveValue('/path/to/array/0', '/users/-');
 
 $document->tidy();
 $json = $document->toJson(true);
@@ -67,14 +62,14 @@ $json = $document->toJson(true);
 
 to end up with:
 
-```
+```json
 {
-  "users": [
-    {
-      "firstName": "Fred",
-      "lastName": "Bloggs"
-    }
-  ]
+    "users": [
+        {
+            "firstName": "Fred",
+            "lastName": "Bloggs"
+        }
+    ]
 }
 ```
 
@@ -88,14 +83,15 @@ $document->deleteValue('/users/0');
 
 Json-Works includes an implementation of [JSON Schema][schema], version 4. This allows you to validate your data. The following example schema describes an array containing objects whose properties are all required and whose types are defined.
 
-```
+```json
+// schemas can be very simple
 {
-  "items": {
-    "properties": {
-      "firstName": {"type": "string"},
-      "lastName": {"type": "string"}
-    },
-      "required": ["firstName", "lastName"]
+    "items": {
+        "properties": {
+            "firstName": { "type": "string" },
+            "lastName": { "type": "string" }
+        },
+        "required": [ "firstName", "lastName" ]
     }
 }
 ```
@@ -132,7 +128,7 @@ composer require "johnstevenson/json-works=1.1.*"
 
 or add the requirement to your `composer.json` file:
 
-```
+```json
 {
     "require": {
         "johnstevenson/json-works": "1.1.*"
@@ -140,19 +136,16 @@ or add the requirement to your `composer.json` file:
 }
 ```
 
-<a name="Usage"></a>
 ## Usage
 
 Full usage [documentation][wiki] is available in the Wiki.
 
-<a name="License"></a>
 ## License
 
 Json-Works is licensed under the MIT License - see the `LICENSE` file for details.
 
-[pointer]: http://tools.ietf.org/html/rfc6901/
-[schema]: http://json-schema.org/
-[composer]: http://getcomposer.org
-[download]: https://github.com/johnstevenson/json-works/archive/master.zip
+[pointer]: https://www.rfc-editor.org/rfc/rfc6901
+[schema]: https://json-schema.org/
+[composer]: https://getcomposer.org
 [wiki]:https://github.com/johnstevenson/json-works/wiki/Home
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers;
 
@@ -6,99 +6,99 @@ use JohnStevenson\JsonWorks\Helpers\Formatter;
 
 class FormatCopyTest extends \JsonWorks\Tests\Base
 {
-    protected $formatter;
+    protected Formatter $formatter;
 
     protected function setUp(): void
     {
         $this->formatter = new Formatter();
     }
 
-    public function testFromObject()
+    public function testFromObject(): void
     {
-        $obj1 = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
+        $obj1 = (object) ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
         $obj2 = $this->formatter->copy($obj1);
 
         $obj1->lastName = 'Smith';
         $expected = 'Bloggs';
-        $this->assertEquals($expected, $obj2->lastName);
+        self::assertEquals($expected, $obj2->lastName);
     }
 
-    public function testFromAssoc()
+    public function testFromAssoc(): void
     {
-        $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
+        $arr = ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
         $obj = $this->formatter->copy($arr);
 
         $expected = (object) $arr;
-        $this->assertEquals($expected, $obj);
+        self::assertEquals($expected, $obj);
     }
 
-    public function testDeepFromObject()
+    public function testDeepFromObject(): void
     {
-        $obj = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj1 = (object) array('users' => array($obj));
+        $obj = (object) ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
+        $obj1 = (object) ['users' => array($obj)];
         $obj2 = $this->formatter->copy($obj1);
 
         $obj1->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
-        $this->assertEquals($expected, $obj2->users[0]->lastName);
+        self::assertEquals($expected, $obj2->users[0]->lastName);
     }
 
-    public function testDeepFromAssoc()
+    public function testDeepFromAssoc(): void
     {
-        $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj1 = (object) array('users' => array($arr));
+        $arr = ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
+        $obj1 = (object) ['users' => array($arr)];
 
         $obj2 = $this->formatter->copy($obj1);
 
         $expected = (object) $arr;
-        $this->assertEquals($expected, $obj2->users[0]);
+        self::assertEquals($expected, $obj2->users[0]);
     }
 
-    public function testArrayDeepFromObject()
+    public function testArrayDeepFromObject(): void
     {
-        $obj = (object) array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj1 = (object) array('users' => array($obj));
-        $arr1 = array(9, $obj1);
+        $obj = (object) ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
+        $obj1 = (object) ['users' => array($obj)];
+        $arr1 = [9, $obj1];
 
         $arr2 = $this->formatter->copy($arr1);
 
         $arr1[1]->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
-        $this->assertEquals($expected, $arr2[1]->users[0]->lastName);
+        self::assertEquals($expected, $arr2[1]->users[0]->lastName);
     }
 
-    public function testArrayDeepFromAssoc()
+    public function testArrayDeepFromAssoc(): void
     {
-        $arr = array('firstname' => 'Fred', 'lastName' => 'Bloggs');
-        $obj = (object) array('users' => array($arr));
-        $arr1 = array(9, $obj);
+        $arr = ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
+        $obj = (object) ['users' => array($arr)];
+        $arr1 = [9, $obj];
 
         $arr2 = $this->formatter->copy($arr1);
 
         $expected = (object) $arr;
-        $this->assertEquals($expected, $arr2[1]->users[0]);
+        self::assertEquals($expected, $arr2[1]->users[0]);
     }
 
-    public function testObjectFromEmptyObject()
+    public function testObjectFromEmptyObject(): void
     {
         $obj = new \stdClass();
         $result = $this->formatter->copy($obj);
 
         $expected = new \stdClass();
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testArrayFromEmptyArray()
+    public function testArrayFromEmptyArray(): void
     {
         $arr = [];
         $result = $this->formatter->copy($arr);
         $expected = [];
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testArrayMixedToObject()
+    public function testArrayMixedToObject(): void
     {
-        $arr = array('Bloggs', 'firstName' => 'Fred', 9);
+        $arr = ['Bloggs', 'firstName' => 'Fred', 9];
         $result = $this->formatter->copy($arr);
 
         $expected = '{
@@ -107,19 +107,19 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
             "1": 9
         }';
 
-        $expected = $this->fromJson($expected);
-        $this->assertEquals($expected, $result);
+        $expected = $this->objectFromJson($expected);
+        self::assertEquals($expected, $result);
     }
 
-    public function testObjectWithEmptyElements()
+    public function testObjectWithEmptyElements(): void
     {
         $data = new \stdClass();
         $data->prop1 = new \stdClass();
         $data->prop2 = 'none';
         $data->prop3 = null;
         $data->prop4 = [];
-        $data->prop5 = array(7);
-        $data->prop6 = array('Bloggs', 'firstName' => 'Fred', 9);
+        $data->prop5 = [7];
+        $data->prop6 = ['Bloggs', 'firstName' => 'Fred', 9];
         $result = $this->formatter->copy($data);
 
         $expected = '{
@@ -135,7 +135,7 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $expected = $this->fromJson($expected);
-        $this->assertEquals($expected, $result);
+        $expected = $this->objectFromJson($expected);
+        self::assertEquals($expected, $result);
     }
 }

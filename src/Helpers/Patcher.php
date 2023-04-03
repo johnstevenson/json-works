@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -14,31 +14,17 @@ use InvalidArgumentException;
 use JohnStevenson\JsonWorks\Helpers\Finder;
 use JohnStevenson\JsonWorks\Helpers\Patch\Builder;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
 /**
 * A class for building json
 */
 class Patcher
 {
-    /**
-    * @var Patch\Builder
-    */
-    protected $builder;
-
-    /**
-    * @var Finder
-    */
-    protected $finder;
-
-    /**
-    * @var string
-    */
-    protected $error;
-
-    /**
-    * @var bool
-    */
-    protected $jsonPatch;
+    protected string $error = '';
+    protected bool $jsonPatch;
+    protected Builder $builder;
+    protected Finder $finder;
 
     /**
     * Constructor
@@ -59,11 +45,9 @@ class Patcher
     * Adds an element to the data
     *
     * @param mixed $data
-    * @param string $path
     * @param mixed $value
-    * @return bool If the value was added
     */
-    public function add(&$data, $path, $value)
+    public function add(&$data, string $path, $value): bool
     {
         if ($result = $this->getElement($data, $path, $value, $target)) {
             $this->addData($target, $value);
@@ -76,10 +60,8 @@ class Patcher
     * Removes an element if found
     *
     * @param mixed $data
-    * @param string $path
-    * @return bool If the data was removed
     */
-    public function remove(&$data, $path)
+    public function remove(&$data, string $path): bool
     {
         if ($result = $this->find($data, $path, $target)) {
 
@@ -88,6 +70,7 @@ class Patcher
             } elseif (is_array($target->parent)) {
                 array_splice($target->parent, (int) $target->childKey, 1);
             } else {
+                // @phpstan-ignore-next-line
                 unset($target->parent->{$target->childKey});
             }
         }
@@ -99,11 +82,9 @@ class Patcher
     * Replaces an element if found
     *
     * @param mixed $data
-    * @param string $path
     * @param mixed $value
-    * @return bool If the element was replaced
     */
-    public function replace(&$data, $path, $value)
+    public function replace(&$data, string $path, $value): bool
     {
         if ($result = $this->find($data, $path, $target)) {
             $this->addData($target, $value);
@@ -112,7 +93,7 @@ class Patcher
         return $result;
     }
 
-    public function getError()
+    public function getError(): string
     {
         return $this->error;
     }
@@ -120,16 +101,16 @@ class Patcher
     /**
     * Adds or modifies the data
     *
-    * @param Target $target
     * @param mixed $value
     */
-    protected function addData(Target $target, $value)
+    protected function addData(Target $target, $value): void
     {
         switch ($target->type) {
             case Target::TYPE_VALUE:
                 $target->element = $value;
                 break;
             case Target::TYPE_OBJECT:
+                // @phpstan-ignore-next-line
                 $target->element->{$target->key} = $value;
                 break;
             case Target::TYPE_ARRAY:
@@ -140,23 +121,18 @@ class Patcher
 
     /**
     * Returns true if we can create a new element
-    *
-    * @param Target $target
-    * @return bool
     */
-    protected function canBuild(Target $target)
+    protected function canBuild(Target $target): bool
     {
-        return !$target->invalid && !($this->jsonPatch && count($target->tokens) > 1);
+        return !$target->invalid && !($this->jsonPatch && Utils::arrayNotEmpty($target->tokens));
     }
 
     /**
     * Returns true if an element is found
     *
     * @param mixed $data
-    * @param string $path
-    * @param Target $target
     */
-    protected function find(&$data, $path, &$target)
+    protected function find(&$data, string $path, ?Target &$target): bool
     {
         $target = new Target($path, $this->error);
 
@@ -167,12 +143,11 @@ class Patcher
     * Returns true if an element is found or built
     *
     * @param mixed $data
-    * @param string $path
     * @param mixed $value
     * @param Target $target Set by method
     * @return bool
     */
-    protected function getElement(&$data, $path, &$value, &$target)
+    protected function getElement(&$data, string $path, &$value, &$target): bool
     {
         if ($this->find($data, $path, $target)) {
 
@@ -190,11 +165,10 @@ class Patcher
     /**
     * Return true if a new value has been built
     *
-    * @param Target $target
     * @param mixed $value
     * @return bool
     */
-    protected function buildElement(Target $target, &$value)
+    protected function buildElement(Target $target, &$value): bool
     {
         if ($result = $this->canBuild($target)) {
 

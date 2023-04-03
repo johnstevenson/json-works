@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -19,13 +19,15 @@ class Copier extends BaseFormat
     * Returns an unreferenced copy of the data
     *
     * @internal
-    * @param mixed $data
-    * @return mixed
+    * @param object|array<mixed>|mixed $data
+    * @return object|array<mixed>|mixed
     */
     public function run($data)
     {
-        if ($this->isContainer($data, $object)) {
-            return $this->copyContainer($data, $object);
+        $isObject = null;
+
+        if ($this->isContainer($data, $isObject)) {
+            return $this->copyContainer($data, $isObject);
         }
 
         return $data;
@@ -34,11 +36,10 @@ class Copier extends BaseFormat
     /**
     * Recursively copies an object or array
     *
-    * @param object|array $data The data to copy
-    * @param bool $object Whether the result should be an object
-    * @return object|array An unreferenced copy
+    * @param object|array<mixed> $data The data to copy
+    * @return object|array<mixed> An unreferenced copy
     */
-    protected function copyContainer($data, $object)
+    protected function copyContainer($data, bool $isObject)
     {
         $result = [];
 
@@ -46,6 +47,6 @@ class Copier extends BaseFormat
             $result[$key] = $this->run($value);
         }
 
-        return $this->formatContainer($result, $object);
+        return $this->formatContainer($result, $isObject);
     }
 }

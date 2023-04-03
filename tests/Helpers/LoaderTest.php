@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers;
 
@@ -6,7 +6,8 @@ use JohnStevenson\JsonWorks\Helpers\Loader;
 
 class LoaderTest extends \JsonWorks\Tests\Base
 {
-    protected $loader;
+    protected Loader $loader;
+    /** @var resource|null */
     protected $resource;
 
     protected function setUp(): void
@@ -16,18 +17,22 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
     protected function tearDown(): void
     {
-        if ($this->resource) {
+        if ($this->resource !== null) {
             fclose($this->resource);
         }
     }
 
-    protected function callLoader($loadType, $data)
+    /**
+     * @param mixed $data
+     * @return mixed
+     */
+    protected function callLoader(string $loadType, $data)
     {
         switch ($loadType) {
             case Loader::TYPE_DOCUMENT:
                 return $this->loader->loadData($data);
             case Loader::TYPE_SCHEMA:
-                return $this->loader->loadSchema($data, $file);
+                return $this->loader->loadSchema($data);
             case Loader::TYPE_PATCH:
                 return $this->loader->loadPatch($data);
             default:
@@ -36,16 +41,22 @@ class LoaderTest extends \JsonWorks\Tests\Base
         }
     }
 
+    /**
+     * @return resource
+     */
     protected function getResource()
     {
-        if (!$this->resource) {
+        if ($this->resource === null) {
             $this->resource = fopen(__FILE__, 'r');
         }
 
         return $this->resource;
     }
 
-    protected function getAllData($keysOnly = false)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getAllData(bool $keysOnly = false): array
     {
         $data = [
             'object'    => new \stdClass(),
@@ -61,7 +72,10 @@ class LoaderTest extends \JsonWorks\Tests\Base
         return $keysOnly ? array_keys($data) : $data;
     }
 
-    protected function runInvalidTypesTest($loadType, $valid)
+    /**
+     * @param array<mixed> $valid
+     */
+    protected function runInvalidTypesTest(string $loadType, array $valid): void
     {
         $tests = $this->getAllData();
 
@@ -76,14 +90,17 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
             try {
                 $this->callLoader($loadType, $data);
-                $this->fail('Exception not raised for '.$msg);
+                self::fail('Exception not raised for '.$msg);
             } catch (\RuntimeException $e) {
-                $this->assertStringContainsString('ERR_BAD_INPUT', $e->getMessage(), $msg);
+                self::assertStringContainsString('ERR_BAD_INPUT', $e->getMessage(), $msg);
             }
         }
     }
 
-    protected function runValidTypesTest($loadType, array $valid)
+    /**
+     * @param array<mixed> $valid
+     */
+    protected function runValidTypesTest(string $loadType, array $valid): void
     {
         $allData = $this->getAllData();
         $tests = [];
@@ -102,11 +119,11 @@ class LoaderTest extends \JsonWorks\Tests\Base
             }
 
             $msg = sprintf("%s test valid '%s'", $loadType, $type);
-            $this->assertTrue($result, $msg);
+            self::assertTrue($result, $msg);
         }
     }
 
-    protected function runInvalidFilesTest($loadType)
+    protected function runInvalidFilesTest(string $loadType): void
     {
         $tests = [
             'invalid.json'  => 'ERR_BAD_INPUT',
@@ -120,14 +137,14 @@ class LoaderTest extends \JsonWorks\Tests\Base
             try {
                 $filename = $this->getFixturePath($file);
                 $this->callLoader($loadType, $filename);
-                $this->fail('Exception not raised for '.$msg);
+                self::fail('Exception not raised for '.$msg);
             } catch (\RuntimeException $e) {
-                $this->assertStringContainsString($errMsg, $e->getMessage(), $msg);
+                self::assertStringContainsString($errMsg, $e->getMessage(), $msg);
             }
         }
     }
 
-    protected function runValidFileTest($loadType, $file)
+    protected function runValidFileTest(string $loadType, string $file): void
     {
         try {
             $filename = $this->getFixturePath($file);
@@ -138,10 +155,10 @@ class LoaderTest extends \JsonWorks\Tests\Base
         }
 
         $msg = sprintf("%s test valid file '%s'", $loadType, $file);
-        $this->assertTrue($result, $msg);
+        self::assertTrue($result, $msg);
     }
 
-    public function testLoadDataTypes()
+    public function testLoadDataTypes(): void
     {
         $loadType = Loader::TYPE_DOCUMENT;
 
@@ -152,7 +169,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
         $this->runInvalidTypesTest($loadType, $valid);
     }
 
-    public function testLoadDataFiles()
+    public function testLoadDataFiles(): void
     {
         $loadType = Loader::TYPE_DOCUMENT;
 
@@ -160,7 +177,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
         $this->runInvalidFilesTest($loadType);
     }
 
-    public function testLoadSchemaTypes()
+    public function testLoadSchemaTypes(): void
     {
         $loadType = Loader::TYPE_SCHEMA;
         $valid = ['object'];
@@ -169,7 +186,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
         $this->runInvalidTypesTest($loadType, $valid);
     }
 
-    public function testLoadSchemaFiles()
+    public function testLoadSchemaFiles(): void
     {
         $loadType = Loader::TYPE_SCHEMA;
 
@@ -177,7 +194,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
         $this->runInvalidFilesTest($loadType);
     }
 
-    public function testLoadPatchTypes()
+    public function testLoadPatchTypes(): void
     {
         $loadType = Loader::TYPE_PATCH;
         $valid = ['array'];
@@ -186,7 +203,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
         $this->runInvalidTypesTest($loadType, $valid);
     }
 
-    public function testLoadPatchFiles()
+    public function testLoadPatchFiles(): void
     {
         $loadType = Loader::TYPE_PATCH;
 

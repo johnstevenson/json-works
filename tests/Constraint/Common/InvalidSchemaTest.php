@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Common;
 
 class InvalidSchemaTest extends \JsonWorks\Tests\Base
 {
-    public function testAllOfNotArray()
+    public function testAllOfNotArray(): void
     {
         $schema = '{
             "allOf": {
@@ -18,7 +18,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testAllOfEmptyArray()
+    public function testAllOfEmptyArray(): void
     {
         $schema = '{
             "allOf": []
@@ -30,7 +30,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testAllOfItemNotObject()
+    public function testAllOfItemNotObject(): void
     {
         $schema = '{
             "allOf": [
@@ -44,7 +44,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testAnyOfNotArray()
+    public function testAnyOfNotArray(): void
     {
         $schema = '{
             "anyOf": {
@@ -58,7 +58,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testAnyOfEmptyArray()
+    public function testAnyOfEmptyArray(): void
     {
         $schema = '{
             "anyOf": []
@@ -70,7 +70,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testAnyOfItemNotObject()
+    public function testAnyOfItemNotObject(): void
     {
         $schema = '{
             "anyOf": [
@@ -84,7 +84,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testOneOfNotArray()
+    public function testOneOfNotArray(): void
     {
         $schema = '{
             "oneOf": {
@@ -98,7 +98,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testOneOfEmptyArray()
+    public function testOneOfEmptyArray(): void
     {
         $schema = '{
             "oneOf": []
@@ -110,7 +110,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testOneOfItemNotObject()
+    public function testOneOfItemNotObject(): void
     {
         $schema = '{
             "oneOf": [
@@ -124,7 +124,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testNotNotObject()
+    public function testNotNotObject(): void
     {
         $schema = '{
             "not": true
@@ -136,7 +136,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testEnumNotArray()
+    public function testEnumNotArray(): void
     {
         $schema = '{
             "enum": {}
@@ -148,7 +148,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testEnumEmptyArray()
+    public function testEnumEmptyArray(): void
     {
         $schema = '{
             "enum": []
@@ -160,7 +160,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testEnumNotUnique()
+    public function testEnumNotUnique(): void
     {
         $schema = '{
             "enum": ["one", "one", "three"]
@@ -172,7 +172,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testTypeNotStringOrArray()
+    public function testTypeNotStringOrArray(): void
     {
         $schema = '{
             "type": {}
@@ -184,7 +184,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testTypeArrayNotStrings()
+    public function testTypeArrayNotStrings(): void
     {
         $schema = '{
             "type": ["string", [], "number"]
@@ -196,7 +196,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testTypeArrayNotUnique()
+    public function testTypeArrayNotUnique(): void
     {
         $schema = '{
             "type": ["string", "string", "number"]
@@ -208,7 +208,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testTypeArrayUnknownType()
+    public function testTypeArrayUnknownType(): void
     {
         $schema = '{
             "type": ["string", "array", "something", "number"]
@@ -221,7 +221,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
     }
 
 
-    public function testTypeArrayEmptyType()
+    public function testTypeArrayEmptyType(): void
     {
         $schema = '{
             "type": ""

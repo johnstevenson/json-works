@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Arrays;
 
 class MinItemsTest extends \JsonWorks\Tests\Base
 {
-    public function testDataValid()
+    public function testDataValid(): void
     {
         $schema = '{
             "minItems": 1
@@ -12,10 +12,10 @@ class MinItemsTest extends \JsonWorks\Tests\Base
 
         $data = array(1, 2);
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataInvalid()
+    public function testDataInvalid(): void
     {
         $schema = '{
             "minItems": 3
@@ -23,10 +23,10 @@ class MinItemsTest extends \JsonWorks\Tests\Base
 
         $data = array(1, 2);
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testValid()
+    public function testValid(): void
     {
         $schema = '{
             "properties": {
@@ -43,10 +43,10 @@ class MinItemsTest extends \JsonWorks\Tests\Base
             "items": ["item1", "item2"]
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testInvalid()
+    public function testInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -63,6 +63,6 @@ class MinItemsTest extends \JsonWorks\Tests\Base
             "items": ["item1", "item2"]
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

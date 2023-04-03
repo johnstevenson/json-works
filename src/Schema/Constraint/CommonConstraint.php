@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
-use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
+use \stdClass;
+
+use JohnStevenson\JsonWorks\Schema\DataChecker;
 
 class CommonConstraint extends BaseConstraint
 {
-    protected $dataChecker;
+    protected DataChecker $dataChecker;
 
     public function __construct(Manager $manager)
     {
@@ -22,7 +25,10 @@ class CommonConstraint extends BaseConstraint
         $this->dataChecker = $this->manager->dataChecker;
     }
 
-    public function validate($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    public function validate($data, stdClass $schema): bool
     {
         $errors = count($this->manager->errors);
         $this->run($data, $schema);
@@ -30,7 +36,10 @@ class CommonConstraint extends BaseConstraint
         return count($this->manager->errors) === $errors;
     }
 
-    protected function run($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    protected function run($data, stdClass $schema): void
     {
         $common = [
             'enum' => 'array',
@@ -41,18 +50,19 @@ class CommonConstraint extends BaseConstraint
             'not' => 'object'
         ];
 
-        foreach ($schema as $key => $subSchema) {
-
+        foreach (get_object_vars($schema) as $key => $subSchema) {
             if (isset($common[$key])) {
                 $this->getValue($schema, $key, $subSchema, $common[$key]);
                 $this->checkSchema($subSchema, $key);
-
                 $this->check($data, $subSchema, $key);
             }
         }
     }
 
-    protected function checkSchema(&$schema, $key)
+    /**
+     * @param mixed $schema
+     */
+    protected function checkSchema(&$schema, string $key): void
     {
         if ($key === 'type') {
             $schema = (array) $schema;
@@ -63,9 +73,13 @@ class CommonConstraint extends BaseConstraint
         }
     }
 
-    protected function check($data, $subSchema, $key)
+    /**
+     * @param mixed $data
+     * @param mixed $subSchema
+     */
+    protected function check($data, $subSchema, string $key): void
     {
-        $name = in_array($key, ['enum', 'type']) ? $key : 'of';
+        $name = in_array($key, ['enum', 'type'], true) ? $key : 'of';
         $validator = $this->manager->factory($name);
 
         if ($name === 'of') {

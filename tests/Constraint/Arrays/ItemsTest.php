@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Arrays;
 
 class ItemsTest extends \JsonWorks\Tests\Base
 {
-    public function testObjectValid()
+    public function testObjectValid(): void
     {
         $schema = '{
             "items": {
@@ -15,10 +15,10 @@ class ItemsTest extends \JsonWorks\Tests\Base
 
         $data = '[1, 2, 5, 6]';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testObjectInvalid()
+    public function testObjectInvalid(): void
     {
         $schema = '{
             "items": {
@@ -29,10 +29,10 @@ class ItemsTest extends \JsonWorks\Tests\Base
 
         $data = '[1, {}, 5, {}]';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testArrayValid()
+    public function testArrayValid(): void
     {
         $schema = '{
             "items": [
@@ -51,10 +51,10 @@ class ItemsTest extends \JsonWorks\Tests\Base
 
         $data = '[ 1, "two", {"name": "value"} ]';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testArrayInvalid()
+    public function testArrayInvalid(): void
     {
         $schema = '{
             "items": [
@@ -73,10 +73,10 @@ class ItemsTest extends \JsonWorks\Tests\Base
 
         $data = '[ 1, "two", "three" ]';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testAdditionalValid()
+    public function testAdditionalValid(): void
     {
         $schema = '{
             "items": [
@@ -97,10 +97,10 @@ class ItemsTest extends \JsonWorks\Tests\Base
 
         $data = '[ 1, "two", {"name": "value"}, 24.3, 6, 9 ]';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testAdditionalInvalid()
+    public function testAdditionalInvalid(): void
     {
         $schema = '{
             "items": [
@@ -121,6 +121,6 @@ class ItemsTest extends \JsonWorks\Tests\Base
 
         $data = '[ 1, "two", {"name": "value"}, null ]';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Arrays;
 
 class AdditionalItemsTest extends \JsonWorks\Tests\Base
 {
-    public function testDataNoneValid()
+    public function testDataNoneValid(): void
     {
         $schema = '{}';
 
         $data = [1, 2];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataTrueValid()
+    public function testDataTrueValid(): void
     {
         $schema = '{
             "additionalItems": true
@@ -21,10 +21,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [1, 2];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataFalseValid()
+    public function testDataFalseValid(): void
     {
         $schema = '{
             "items": {
@@ -35,10 +35,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [1, 2];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataObjectValid()
+    public function testDataObjectValid(): void
     {
         $schema = '{
             "additionalItems": {}
@@ -46,10 +46,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [1, 2];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testDataInvalid()
+    public function testDataInvalid(): void
     {
         $schema = '{
             "items": [],
@@ -58,10 +58,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [1, 2];
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testExample1Valid()
+    public function testExample1Valid(): void
     {
         $schema = '{
             "items": [ {}, {}, {} ],
@@ -70,10 +70,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testExample2Valid()
+    public function testExample2Valid(): void
     {
         $schema = '{
             "items": [ {}, {}, {} ],
@@ -82,10 +82,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [ [ 1, 2, 3, 4 ], [ 5, 6, 7, 8 ] ];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testExample3Valid()
+    public function testExample3Valid(): void
     {
         $schema = '{
             "items": [ {}, {}, {} ],
@@ -94,10 +94,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [1, 2, 3];
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testExample1Invalid()
+    public function testExample1Invalid(): void
     {
         $schema = '{
             "items": [ {}, {}, {} ],
@@ -106,10 +106,10 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = [1, 2, 3, 4];
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testExample2Invalid()
+    public function testExample2Invalid(): void
     {
         $schema = '{
             "items": [ {}, {}, {} ],
@@ -118,6 +118,6 @@ class AdditionalItemsTest extends \JsonWorks\Tests\Base
 
         $data = '[ null, { "a": "b" }, true, 31.000002020013 ]';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

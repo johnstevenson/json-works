@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,11 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
+
+use \stdClass;
 
 class NumberConstraint extends BaseConstraint
 {
-    public function validate($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    public function validate($data, stdClass $schema): void
     {
         // maximum
         $this->checkMaxMin($data, $schema, 'maximum', true);
@@ -24,7 +30,10 @@ class NumberConstraint extends BaseConstraint
         $this->checkMultipleOf($data, $schema);
     }
 
-    protected function checkMaxMin($data, $schema, $key, $max)
+    /**
+     * @param mixed $data
+     */
+    protected function checkMaxMin($data, stdClass $schema, string $key, bool $max): void
     {
         $exclusiveKey = sprintf('exclusive%s', ucfirst($key));
         $exclusive = $this->getExclusive($schema, $exclusiveKey);
@@ -38,7 +47,10 @@ class NumberConstraint extends BaseConstraint
         }
     }
 
-    protected function checkMultipleOf($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    protected function checkMultipleOf($data, stdClass $schema): void
     {
         if (!$this->getNumber($schema, 'multipleOf', true, $multipleOf)) {
             return;
@@ -53,12 +65,15 @@ class NumberConstraint extends BaseConstraint
         }
     }
 
-    protected function getExclusive($schema, $key)
+    protected function getExclusive(stdClass $schema, string $key): bool
     {
         return $this->getValue($schema, $key, $value, 'boolean');
     }
 
-    protected function getNumber($schema, $key, $positiveNonZero, &$value)
+    /**
+     * @param mixed $value Set by method
+     */
+    protected function getNumber(stdClass $schema, string $key, bool $positiveNonZero, &$value): bool
     {
         if (!$this->getValue($schema, $key, $value, ['number', 'integer'])) {
             return false;
@@ -68,11 +83,15 @@ class NumberConstraint extends BaseConstraint
             return true;
         }
 
-        $error = $this->formatError('> 0', $value);
+        $error = $this->formatError('> 0', (string) $value);
         throw new \RuntimeException($error);
     }
 
-    protected function compare($data, $value, $exclusive, $max)
+    /**
+     * @param mixed $data
+     * @param mixed $value
+     */
+    protected function compare($data, $value, bool $exclusive, bool $max): void
     {
         if ($this->precisionCompare($data, $value, $exclusive, $max)) {
             return;
@@ -86,7 +105,11 @@ class NumberConstraint extends BaseConstraint
         $this->addError($error);
     }
 
-    protected function precisionCompare($data, $value, $exclusive, $max)
+    /**
+     * @param mixed $data
+     * @param mixed $value
+     */
+    protected function precisionCompare($data, $value, bool $exclusive, bool $max): bool
     {
         $comp = bccomp(strval($data), strval($value), 16);
 

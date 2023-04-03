@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers\Patch;
 
@@ -7,13 +7,17 @@ use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
 class TargetTest extends \JsonWorks\Tests\Base
 {
-    protected function getMsg($key, $value)
+    /**
+     * @param string|int $value
+     */
+    protected function getMsg(string $key, $value): string
     {
         return sprintf('Testing "%s" is "%s"', $key, $value);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
+        $error = '';
         $target = new Target('', $error);
 
         $tests = [
@@ -26,103 +30,113 @@ class TargetTest extends \JsonWorks\Tests\Base
 
         foreach ($tests as $key => $value) {
             $msg = $this->getMsg($key, $value);
-            $this->assertEquals($target->$key, $value, $msg);
+            // @phpstan-ignore-next-line
+            self::assertEquals($target->$key, $value, $msg);
         }
 
         $msg = 'Test error is a reference';
         $error = 'my error';
-        $this->assertEquals($error, $target->error, $msg);
+        self::assertEquals($error, $target->error, $msg);
     }
 
-    public function testConstructorNoPath()
+    public function testConstructorNoPath(): void
     {
+        $error = '';
         $target = new Target('', $error);
 
-        $this->assertEmpty($target->tokens);
+        self::assertEmpty($target->tokens);
     }
 
-    public function testConstructorValidPath()
+    public function testConstructorValidPath(): void
     {
+        $error = '';
         $target = new Target('/prop1/prop2', $error);
 
-        $this->assertCount(2, $target->tokens);
+        self::assertCount(2, $target->tokens);
     }
 
-    public function testConstructorInvalidPath()
+    public function testConstructorInvalidPath(): void
     {
+        $error = '';
         $target = new Target('invalid/key', $error);
 
-        $this->assertTrue($target->invalid);
-        $this->assertStringContainsString('ERR_PATH_KEY', $target->error);
+        self::assertTrue($target->invalid);
+        self::assertStringContainsString('ERR_PATH_KEY', $target->error);
     }
 
-    public function testSetArray()
+    public function testSetArray(): void
     {
+        $error = '';
         $target = new Target('/prop1/prop2', $error);
 
         $value = '3';
         $target->setArray($value);
 
         $msg = $this->getMsg('type', Target::TYPE_ARRAY);
-        $this->assertEquals($target->type, Target::TYPE_ARRAY, $msg);
+        self::assertEquals($target->type, Target::TYPE_ARRAY, $msg);
 
         $msg = sprintf('Testing key is integer "%s"', $value);
-        $this->assertEquals((int) $value, $target->key, $msg);
+        self::assertEquals((int) $value, $target->key, $msg);
     }
 
-    public function testSetObject()
+    public function testSetObject(): void
     {
+        $error = '';
         $target = new Target('/prop1/prop2', $error);
 
         $value = 'prop1';
         $target->setObject($value);
 
         $msg = $this->getMsg('type', Target::TYPE_OBJECT);
-        $this->assertEquals($target->type, Target::TYPE_OBJECT, $msg);
+        self::assertEquals($target->type, Target::TYPE_OBJECT, $msg);
 
         $msg = $this->getMsg('key', $value);
-        $this->assertEquals($value, $target->key, $msg);
+        self::assertEquals($value, $target->key, $msg);
     }
 
-    public function testSetError()
+    public function testSetError(): void
     {
+        $error = '';
         $target = new Target('/prop1/prop2', $error);
 
         $value = Error::ERR_PATH_KEY;
         $target->setError($value);
 
         $msg = 'Testing error is not empty';
-        $this->assertNotEmpty($target->error, $msg);
+        self::assertNotEmpty($target->error, $msg);
 
         // check null clears error
         $target->setError(null);
 
         $msg = 'Testing error is empty';
-        $this->assertEmpty($target->error, $msg);
+        self::assertEmpty($target->error, $msg);
     }
 
-    public function testSetResult()
+    public function testSetResult(): void
     {
+        $error = '';
         $target = new Target('/prop1/prop2', $error);
 
         $element = [];
 
         $target->setResult(true, $element);
 
-        $this->assertTrue($this->sameRef($element, $target->element));
+        self::assertTrue($this->sameRef($element, $target->element));
     }
 
-    public function testSetResultFalseSetsError()
+    public function testSetResultFalseSetsError(): void
     {
+        $error = '';
         $target = new Target('/prop1/prop2', $error);
 
         $target->setResult(false, $element);
 
-        $this->assertStringContainsString('ERR_NOT_FOUND', $target->error);
+        self::assertStringContainsString('ERR_NOT_FOUND', $target->error);
     }
 
-    public function testSetResultFalsePreservesExistingError()
+    public function testSetResultFalsePreservesExistingError(): void
     {
+        $error = '';
         $target = new Target('/prop1/prop2', $error);
 
         // set an error
@@ -132,6 +146,6 @@ class TargetTest extends \JsonWorks\Tests\Base
         // set result
         $target->setResult(false, $element);
 
-        $this->assertStringContainsString('ERR_PATH_KEY', $target->error);
+        self::assertStringContainsString('ERR_PATH_KEY', $target->error);
     }
 }

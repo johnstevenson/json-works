@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Common;
 
 class NotTest extends \JsonWorks\Tests\Base
 {
-    public function testData()
+    public function testData(): void
     {
         $schema = '{
             "not": {"type": "boolean"}
         }';
 
         $data = 'value';
-        $this->assertTrue($this->validate($schema, $data), 'Valid');
+        self::assertTrue($this->validate($schema, $data), 'Valid');
 
         $data = true;
-        $this->assertFalse($this->validate($schema, $data), 'Invalid');
+        self::assertFalse($this->validate($schema, $data), 'Invalid');
     }
 }

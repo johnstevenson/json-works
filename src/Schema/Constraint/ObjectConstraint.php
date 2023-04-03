@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,16 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
-use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
-use JohnStevenson\JsonWorks\Schema\Constraints\MaxMinConstraint;
-use JohnStevenson\JsonWorks\Schema\Constraints\PropertiesConstraint;
+use \stdClass;
+
+use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
+use JohnStevenson\JsonWorks\Schema\Constraint\MaxMinConstraint;
+use JohnStevenson\JsonWorks\Schema\Constraint\PropertiesConstraint;
 
 class ObjectConstraint extends BaseConstraint
 {
-    protected $maxMin;
-    protected $properties;
+    protected MaxMinConstraint $maxMin;
+    protected PropertiesConstraint $properties;
 
     public function __construct(Manager $manager)
     {
@@ -26,7 +29,10 @@ class ObjectConstraint extends BaseConstraint
         $this->properties = new PropertiesConstraint($manager);
     }
 
-    public function validate($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    public function validate($data, stdClass $schema): void
     {
         // max and min
         $this->checkMaxMin($data, $schema);
@@ -37,7 +43,10 @@ class ObjectConstraint extends BaseConstraint
         $this->properties->validate($data, $schema);
     }
 
-    protected function checkMaxMin($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    protected function checkMaxMin($data, stdClass $schema): void
     {
         // maxProperties
         $this->maxMin->validate($data, $schema, 'maxProperties');
@@ -46,7 +55,10 @@ class ObjectConstraint extends BaseConstraint
         $this->maxMin->validate($data, $schema, 'minProperties');
     }
 
-    protected function checkRequired($data, $schema)
+    /**
+     * @param mixed $data
+     */
+    protected function checkRequired($data, stdClass $schema): void
     {
         if (!$this->getValue($schema, 'required', $value, 'array')) {
             return;

@@ -1,33 +1,33 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Document;
 
 class AddValueRootTest extends \JsonWorks\Tests\Base
 {
-    public function testObject()
+    public function testObject(): void
     {
         $document = $this->getDocument(null, null);
         $path = '';
         $value = (object) ['prop1' => 1, 'prop2' => 'value'];
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($value, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($value, $document->data);
     }
 
-    public function testArray()
+    public function testArray(): void
     {
         $document = $this->getDocument(null, null);
         $path = '';
         $value = [1, 'value'];
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($value, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($value, $document->data);
     }
 
-    public function testScalar()
+    public function testScalar(): void
     {
         $document = $this->getDocument(null, null);
         $path = '';
         $value = 'value';
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals($value, $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals($value, $document->data);
     }
 }

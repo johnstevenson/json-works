@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -12,7 +12,11 @@ namespace JohnStevenson\JsonWorks\Schema;
 
 class Comparer extends JsonTypes
 {
-    public function equals($value1, $value2)
+    /**
+     * @param mixed $value1
+     * @param mixed $value2
+     */
+    public function equals($value1, $value2): bool
     {
         $type = $this->getGeneric($value1);
 
@@ -20,15 +24,25 @@ class Comparer extends JsonTypes
             return false;
         }
 
-        if (in_array($type, ['array', 'number', 'object'])) {
-            $method = 'equals' . ucfirst($type);
-            return $this->$method($value1, $value2);
+        if ($type === 'array') {
+            return $this->equalsArray($value1, $value2);
+        }
+
+        if ($type === 'number') {
+            return $this->equalsNumber($value1, $value2);
+        }
+
+        if ($type === 'object') {
+            return $this->equalsObject($value1, $value2);
         }
 
         return $value1 === $value2;
     }
 
-    public function uniqueArray(array $data)
+    /**
+     * @param array<mixed> $data
+     */
+    public function uniqueArray(array $data): bool
     {
         $count = count($data);
 
@@ -44,7 +58,11 @@ class Comparer extends JsonTypes
         return true;
     }
 
-    protected function equalsArray($arr1, $arr2)
+    /**
+     * @param array<mixed> $arr1
+     * @param array<mixed> $arr2
+     */
+    protected function equalsArray(array $arr1, array $arr2): bool
     {
         $count = count($arr1);
 
@@ -61,12 +79,20 @@ class Comparer extends JsonTypes
         return true;
     }
 
-    protected function equalsNumber($value1, $value2)
+    /**
+     * @param int|double|string $value1
+     * @param int|double|string $value2
+     */
+    protected function equalsNumber($value1, $value2): bool
     {
         return 0 === bccomp(strval($value1), strval($value2), 16);
     }
 
-    protected function equalsObject($obj1, $obj2)
+   /**
+     * @param object $obj1
+     * @param object $obj2
+     */
+    protected function equalsObject($obj1, $obj2): bool
     {
         // get_object_vars fails on objects with digit keys
         if (count((array) $obj1) !== count((array) $obj2)) {
@@ -82,12 +108,17 @@ class Comparer extends JsonTypes
         return true;
     }
 
-    protected function hasEqualProperty($object, $key, $value)
+   /**
+     * @param object $object
+     * @param mixed $value
+     */
+    protected function hasEqualProperty($object, string $key, $value): bool
     {
         if (!property_exists($object, $key)) {
             return false;
         }
 
+        // @phpstan-ignore-next-line
         return $this->equals($value, $object->$key);
     }
 }

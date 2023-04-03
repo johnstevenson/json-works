@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Document;
 
 class CopyValueTest extends \JsonWorks\Tests\Base
 {
-    public function testSuccess()
+    public function testSuccess(): void
     {
         $schema = null;
         $data = '{
@@ -35,11 +35,11 @@ class CopyValueTest extends \JsonWorks\Tests\Base
         $fromPath = '/prop1/collection/1';
         $toPath = '/prop2/collection/-';
 
-        $this->assertTrue($document->copyValue($fromPath, $toPath));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->copyValue($fromPath, $toPath));
+        self::assertEquals($expected, $document->data);
     }
 
-    public function testFail()
+    public function testFail(): void
     {
         $schema = null;
         $data = '{
@@ -55,6 +55,6 @@ class CopyValueTest extends \JsonWorks\Tests\Base
 
         $fromPath = '/prop1/collection/2';
         $toPath = '/prop2/collection/-';
-        $this->assertFalse($document->copyValue($fromPath, $toPath));
+        self::assertFalse($document->copyValue($fromPath, $toPath));
     }
 }

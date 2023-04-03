@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,21 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\JsonTypes;
 
 class TypeConstraint extends BaseConstraint
 {
-    /**
-    * @var \JohnStevenson\JsonWorks\Schema\JsonTypes
-    */
-    protected $jsonTypes;
+    protected jsonTypes $jsonTypes;
 
-    /**
-    * @var array
-    */
-    protected $types;
+    /** @var array<string> */
+    protected array $types;
 
     public function __construct(Manager $manager)
     {
@@ -40,9 +37,13 @@ class TypeConstraint extends BaseConstraint
         ];
     }
 
-    public function validate($data, array $schema)
+    /**
+    * @param mixed $data
+    * @param array<mixed> $schema
+    */
+    public function validate($data, array $schema): void
     {
-        if (empty($schema)) {
+        if (Utils::arrayIsEmpty($schema)) {
             return;
         }
 
@@ -58,9 +59,14 @@ class TypeConstraint extends BaseConstraint
         $this->addError($error);
     }
 
-    protected function checkSchema(array $schema)
+    /**
+    * @param array<mixed> $schema
+    */
+    protected function checkSchema(array $schema): void
     {
-        if ($unknown = array_diff($schema, $this->types)) {
+        $unknown = array_diff($schema, $this->types);
+
+        if (Utils::arrayNotEmpty($unknown)) {
             $error = $this->formatError(implode('|', $this->types), implode('', $unknown));
             throw new \RuntimeException($error);
         }

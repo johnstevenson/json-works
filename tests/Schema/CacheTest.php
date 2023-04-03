@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Schema;
 
@@ -6,17 +6,17 @@ use JohnStevenson\JsonWorks\Schema\Cache;
 
 class CacheTest extends \JsonWorks\Tests\Base
 {
-    protected function resolve($ref, $schema)
+    /**
+     * @return mixed
+     */
+    protected function resolve(string $ref, object $schema)
     {
-        if (!is_object($schema)) {
-            throw new \InvalidArgumentException('Test not run, schema is not an object');
-        }
         $cache = new Cache($schema);
 
-        return $cache->resolveRef($ref, $schema);
+        return $cache->resolveRef($ref);
     }
 
-    public function testRoot()
+    public function testRoot(): void
     {
         $schema = '{
             "properties": {
@@ -25,27 +25,28 @@ class CacheTest extends \JsonWorks\Tests\Base
             "additionalProperties": false
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
         $expected = $schema;
 
         $ref = '#';
         $result = $this->resolve($ref, $schema);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testRootCircular()
+    public function testRootCircular(): void
     {
         $schema = '{ "$ref": "#" }';
 
-        $schema = $this->fromJson($schema);
-        $this->expectException('RuntimeException', 'Circular reference');
+        $schema = $this->objectFromJson($schema);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Circular reference');
 
         $ref = '#';
         $this->resolve($ref, $schema);
     }
 
-    public function testSimple()
+    public function testSimple(): void
     {
         $schema = '{
             "type": "object",
@@ -59,16 +60,16 @@ class CacheTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
         $expected = $schema->definitions->alphanum;
 
         $ref = '#/definitions/alphanum';
         $result = $this->resolve($ref, $schema);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testSingleEncoded()
+    public function testSingleEncoded(): void
     {
         $schema = '{
             "type": "object",
@@ -82,16 +83,17 @@ class CacheTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
+        // @phpstan-ignore-next-line
         $expected = $schema->definitions->{'alpha/num'};
 
         $ref = '#/definitions/alpha~1num';
         $result = $this->resolve($ref, $schema);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testNotFound()
+    public function testNotFound(): void
     {
         $schema = '{
             "type": "object",
@@ -100,14 +102,15 @@ class CacheTest extends \JsonWorks\Tests\Base
              }
         }';
 
-        $schema = $this->fromJson($schema);
-        $this->expectException('RuntimeException', 'Unable to find $ref');
+        $schema = $this->objectFromJson($schema);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to find $ref');
 
         $ref = '#/definitions/alphanum';
         $this->resolve($ref, $schema);
     }
 
-    public function testCircular()
+    public function testCircular(): void
     {
         $schema = '{
             "type": "object",
@@ -119,14 +122,15 @@ class CacheTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $schema = $this->fromJson($schema);
-        $this->expectException('RuntimeException', 'Circular reference');
+        $schema = $this->objectFromJson($schema);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Circular reference');
 
         $ref = '#/definitions/alphanum';
         $this->resolve($ref, $schema);
     }
 
-    public function testCompound()
+    public function testCompound(): void
     {
         $schema = '{
             "type": "object",
@@ -155,19 +159,19 @@ class CacheTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
         $expected = $schema->definitions->alphanum;
 
         $ref = '#/properties/prop1';
         $result = $this->resolve($ref, $schema);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
 
         $ref = '#/properties/prop2';
         $result = $this->resolve($ref, $schema);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testCompoundCircular()
+    public function testCompoundCircular(): void
     {
         $schema = '{
             "properties": {
@@ -192,14 +196,15 @@ class CacheTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $schema = $this->fromJson($schema);
-        $this->expectException('RuntimeException', 'Circular reference');
+        $schema = $this->objectFromJson($schema);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Circular reference');
 
         $ref = '#/properties/prop1';
         $this->resolve($ref, $schema);
     }
 
-    public function testCompoundSimilarNames()
+    public function testCompoundSimilarNames(): void
     {
         $schema = '{
             "type": "object",
@@ -230,23 +235,23 @@ class CacheTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
         $expected = $schema->definitions->alphanum;
 
         $ref = '#/properties/list1/items/properties/list/items';
         $result = $this->resolve($ref, $schema);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
 
         /*
         This fails on recursions - could be a bug
         $ref = '#/properties/list2/items/properties/list/items';
         $result = $this->resolve($ref, $schema);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
         */
     }
 
-    public function testReffedProperty()
+    public function testReffedProperty(): void
     {
         $schema = '{
             "a": {
@@ -261,7 +266,7 @@ class CacheTest extends \JsonWorks\Tests\Base
             "c": { "$ref": "#/b/a1" }
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
 
         // Tests that #/b/a1 finds the parent #/a, resolves it and adds it
         // to #b, then searches #b for /a1
@@ -270,10 +275,10 @@ class CacheTest extends \JsonWorks\Tests\Base
         $ref = '#/b/a1';
         $result = $this->resolve($ref, $schema);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testReffedItem()
+    public function testReffedItem(): void
     {
         $schema = '{
             "a": [ "number", "boolean" ],
@@ -281,7 +286,7 @@ class CacheTest extends \JsonWorks\Tests\Base
             "c": { "$ref": "#/b/1" }
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
         $expected = $schema->a[1];
 
         // Tests that #/b/1 finds the parent #/a, resolves it and adds it
@@ -289,6 +294,6 @@ class CacheTest extends \JsonWorks\Tests\Base
         $ref = '#/b/1';
 
         $result = $this->resolve($ref, $schema);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 }

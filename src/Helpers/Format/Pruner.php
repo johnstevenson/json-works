@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -10,15 +10,14 @@
 
 namespace JohnStevenson\JsonWorks\Helpers\Format;
 
+use JohnStevenson\JsonWorks\Helpers\Utils;
+
 /**
 * A class to remove empty objects and arrays from data
 */
 class Pruner extends BaseFormat
 {
-    /**
-    * @var bool
-    */
-    protected $keep;
+    protected bool $keep;
 
     /**
     * Removes empty objects and arrays from the data
@@ -43,7 +42,7 @@ class Pruner extends BaseFormat
     *
     * @param mixed $container The data container to prune
     * @param mixed $object Whether the result should be an object
-    * @return object|array An unreferenced copy of the pruned container
+    * @return object|array<mixed> An unreferenced copy of the pruned container
     */
     protected function pruneContainer($container, $object)
     {
@@ -57,7 +56,7 @@ class Pruner extends BaseFormat
             }
         }
 
-        $this->keep = !empty($result);
+        $this->keep = Utils::arrayNotEmpty($result);
 
         return $this->formatContainer($result, $object);
     }

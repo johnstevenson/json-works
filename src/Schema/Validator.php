@@ -1,37 +1,40 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JohnStevenson\JsonWorks\Schema;
 
+use stdClass;
+
 use JohnStevenson\JsonWorks\BaseDocument;
 use JohnStevenson\JsonWorks\Helpers\Loader;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Resolver;
 use JohnStevenson\JsonWorks\Schema\ValidationException;
-use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
+use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 
 class Validator
 {
-    protected $errors = [];
-    protected $schema;
-    protected $stopOnError = false;
+    /** @var array<string> */
+    protected array $errors = [];
+    protected stdClass $schema;
+    protected bool $stopOnError = false;
+
+    protected Loader $loader;
+    protected Resolver $resolver;
 
     /**
-    * @var \JohnStevenson\JsonWorks\Helpers\Loader
-    */
-    protected $loader;
-
-    /**
-    * @var Resolver
-    */
-    protected $resolver;
-
-    public function __construct($schema, $basePath = '')
+     * @param mixed $schema
+     */
+    public function __construct($schema)
     {
         $this->loader = new Loader;
-        $this->loadSchema($schema, $basePath);
-        $this->resolver = new Resolver($this->schema, $basePath);
+        $this->schema = $this->loader->loadSchema($schema);
+        $this->resolver = new Resolver($this->schema);
     }
 
-    public function check($data)
+    /**
+     * @param mixed $data
+     */
+    public function check($data): bool
     {
         $data = $this->getData($data);
         $manager = new Manager($this->resolver, $this->stopOnError);
@@ -45,19 +48,23 @@ class Validator
 
         $this->errors = $manager->errors;
 
-        return empty($this->errors);
+        return Utils::arrayIsEmpty($this->errors);
     }
 
-    public function getErrors($single)
+    public function getErrors(bool $single): string
     {
         return $single ? array_shift($this->errors) : $this->errors;
     }
 
-    public function setStopOnError($value)
+    public function setStopOnError(bool $value): void
     {
         $this->stopOnError = $value;
     }
 
+    /**
+     * @param mixed $data
+     * @return mixed
+     */
     protected function getData($data)
     {
         if ($data instanceof BaseDocument) {
@@ -65,30 +72,5 @@ class Validator
         }
 
         return $this->loader->loadData($data);
-    }
-
-    protected function loadSchema($data, &$basePath)
-    {
-        $this->schema = $this->loader->loadSchema($data, $file);
-
-        if ($file && !$basePath) {
-            $basePath = $this->getRealpath($data, true);
-        } elseif ($basePath) {
-            $basePath = $this->getRealpath($data, false);
-        }
-    }
-
-    protected function getRealpath($path, $dirname)
-    {
-        if (!$realpath = realpath($path)) {
-            return '';
-        }
-
-        if ($dirname) {
-            $realpath = dirname($realpath);
-            $realpath = $realpath !== '.' ? $realpath : '';
-        }
-
-        return str_replace('\\', '/', $realpath) . '/';
     }
 }

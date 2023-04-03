@@ -1,10 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Schema;
 
+use JohnStevenson\JsonWorks\Schema\Resolver;
+
 class ResolverTest extends \JsonWorks\Tests\Base
 {
-    public function testRoot()
+    public function testRoot(): void
     {
         $schema = '{
             "properties": {
@@ -15,13 +17,13 @@ class ResolverTest extends \JsonWorks\Tests\Base
 
         $data = '{"prop1": {"prop1": 7}}';
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+        self::assertTrue($this->validate($schema, $data), 'Testing success');
 
         $data = '{"prop1": {"prop2": 7}}';
-        $this->assertFalse($this->validate($schema, $data), 'Testing failure');
+        self::assertFalse($this->validate($schema, $data), 'Testing failure');
     }
 
-    public function testSingle()
+    public function testSingle(): void
     {
         $schema = '{
             "type": "object",
@@ -41,13 +43,13 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop2": "seven"
         }');
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+        self::assertTrue($this->validate($schema, $data), 'Testing success');
 
         $data->prop1 = true;
-        $this->assertFalse($this->validate($schema, $data), 'Testing failure');
+        self::assertFalse($this->validate($schema, $data), 'Testing failure');
     }
 
-    public function testSingleEncoded()
+    public function testSingleEncoded(): void
     {
         $schema = '{
             "type": "object",
@@ -66,13 +68,13 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }');
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+        self::assertTrue($this->validate($schema, $data), 'Testing success');
 
         $data->prop1 = true;
-        $this->assertFalse($this->validate($schema, $data), 'Testing failure');
+        self::assertFalse($this->validate($schema, $data), 'Testing failure');
     }
 
-    public function testInvalidRefType()
+    public function testInvalidRefType(): void
     {
         $schema = '{
             "type": "object",
@@ -86,11 +88,12 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->expectException('RuntimeException', 'Invalid schema value');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid schema value');
         $this->validate($schema, $data);
     }
 
-    public function testNotFound()
+    public function testNotFound(): void
     {
         $schema = '{
             "type": "object",
@@ -104,11 +107,12 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->expectException('RuntimeException', 'Unable to find $ref');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unable to find $ref');
         $this->validate($schema, $data);
     }
 
-    public function testInArray()
+    public function testInArray(): void
     {
         $schema = '{
             "properties": {
@@ -129,13 +133,13 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 5
         }');
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+        self::assertTrue($this->validate($schema, $data), 'Testing success');
 
         $data->prop1 = 6;
-        $this->assertFalse($this->validate($schema, $data), 'Testing failure');
+        self::assertFalse($this->validate($schema, $data), 'Testing failure');
     }
 
-    public function testCircular()
+    public function testCircular(): void
     {
         $schema = '{
             "type": "object",
@@ -152,11 +156,12 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->expectException('RuntimeException', 'Circular reference');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Circular reference');
         $this->validate($schema, $data);
     }
 
-    public function testCompound()
+    public function testCompound(): void
     {
         $schema = '{
             "type": "object",
@@ -190,13 +195,13 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop2": "seven"
         }');
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+        self::assertTrue($this->validate($schema, $data), 'Testing success');
 
         $data->prop1 = true;
-        $this->assertFalse($this->validate($schema, $data), 'Testing failure');
+        self::assertFalse($this->validate($schema, $data), 'Testing failure');
     }
 
-    public function testCompoundCircular()
+    public function testCompoundCircular(): void
     {
         $schema = '{
             "properties": {
@@ -225,11 +230,12 @@ class ResolverTest extends \JsonWorks\Tests\Base
             "prop1": 7
         }';
 
-        $this->expectException('RuntimeException', 'Circular reference');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Circular reference');
         $this->validate($schema, $data);
     }
 
-    public function testCompoundSimilarNames()
+    public function testCompoundSimilarNames(): void
     {
         $schema = '{
             "type": "object",
@@ -260,20 +266,20 @@ class ResolverTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $data = json_decode('{
+        $data = $this->objectFromJson('{
             "list1": [ { "prop1": "string one", "list": [ "one", 1]} ],
             "list2": [ { "prop1": "string two", "list": [ "two", 2]} ]
         }');
 
         list($result, $error) = $this->validateEx($schema, $data, 'Testing success');
-        $this->assertTrue($result, $error);
+        self::assertTrue($result, $error);
 
         $data->list1[0]->list = ['one', false];
         list($result, $error) = $this->validateEx($schema, $data, 'Testing failure');
-        $this->assertFalse($result, $error);
+        self::assertFalse($result, $error);
     }
 
-    public function testAnotherCompound()
+    public function testAnotherCompound(): void
     {
         $schema = '{
             "properties": {
@@ -313,19 +319,19 @@ class ResolverTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $data = $this->fromJson($data);
+        $data = $this->objectFromJson($data);
 
         foreach ($data as $key => $value) {
             $msg = sprintf('Testing success with data property: %s', $key);
             $prop = (object) [$key => $value];
 
-            $this->assertTrue($this->validate($schema, $prop), $msg);
+            self::assertTrue($this->validate($schema, $prop), $msg);
         }
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+        self::assertTrue($this->validate($schema, $data), 'Testing success');
     }
 
-    public function testAnotherCompound2()
+    public function testAnotherCompound2(): void
     {
         $schema = '{
             "properties": {
@@ -362,19 +368,19 @@ class ResolverTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $data = $this->fromJson($data);
+        $data = $this->objectFromJson($data);
 
         foreach ($data as $key => $value) {
             $msg = sprintf('Testing success with data property: %s', $key);
             $prop = (object) [$key => $value];
 
-            $this->assertTrue($this->validate($schema, $prop), $msg);
+            self::assertTrue($this->validate($schema, $prop), $msg);
         }
 
-        $this->assertTrue($this->validate($schema, $data), 'Testing success');
+        self::assertTrue($this->validate($schema, $data), 'Testing success');
     }
 
-    public function testAnotherCompound3()
+    public function testAnotherCompound3(): void
     {
         $schema = '{
             "properties": {
@@ -397,20 +403,20 @@ class ResolverTest extends \JsonWorks\Tests\Base
             }
         }';
 
-        $schema = $this->fromJson($schema);
+        $schema = $this->objectFromJson($schema);
 
-        $resolver = new \JohnStevenson\JsonWorks\Schema\Resolver($schema, '');
+        $resolver = new Resolver($schema);
 
         $ref = '#/properties/a';
         $expected = $schema->properties->a;
 
         $result = $resolver->getRef($ref);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
 
         $ref = '#/properties/b/properties/milk';
         $expected = $schema->properties->a->properties->milk;
 
         $result = $resolver->getRef($ref);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Schema\Comparer;
 
@@ -6,57 +6,57 @@ use JohnStevenson\JsonWorks\Schema\Comparer;
 
 class UniqueArrayTest extends \PHPUnit\Framework\TestCase
 {
-    protected $comparer;
+    protected Comparer $comparer;
 
     protected function setUp(): void
     {
         $this->comparer = new Comparer();
     }
 
-    public function testCheckWithScalarTrue()
+    public function testCheckWithScalarTrue(): void
     {
         $value = [1, 'str', false];
-        $this->assertTrue($this->comparer->uniqueArray($value));
+        self::assertTrue($this->comparer->uniqueArray($value));
     }
 
-    public function testCheckWithScalarFalse()
+    public function testCheckWithScalarFalse(): void
     {
         $value = [1, 'str', 'str', false];
-        $this->assertFalse($this->comparer->uniqueArray($value));
+        self::assertFalse($this->comparer->uniqueArray($value));
     }
 
-    public function testCheckWithArrayTrue()
+    public function testCheckWithArrayTrue(): void
     {
         $arr1 = ['value'];
         $arr2 = ['value2'];
 
         $value = [1, 'str', $arr1, false, $arr2];
-        $this->assertTrue($this->comparer->uniqueArray($value));
+        self::assertTrue($this->comparer->uniqueArray($value));
     }
 
-    public function testCheckWithArrayFalse()
+    public function testCheckWithArrayFalse(): void
     {
         $arr = ['value'];
 
         $value = [1, 'str', $arr, false, $arr];
-        $this->assertFalse($this->comparer->uniqueArray($value));
+        self::assertFalse($this->comparer->uniqueArray($value));
     }
 
-    public function testCheckWithObjectTrue()
+    public function testCheckWithObjectTrue(): void
     {
         $obj1 = (object) ['name' => 'name', 'other' => 'other'];
         $obj2 = (object) ['other' => 'other', 'name' => 'value'];
 
         $value = [1, 'str', $obj1, false, $obj2];
-        $this->assertTrue($this->comparer->uniqueArray($value));
+        self::assertTrue($this->comparer->uniqueArray($value));
     }
 
-    public function testCheckWithObjectFalse()
+    public function testCheckWithObjectFalse(): void
     {
         $obj1 = (object) ['name' => 'name', 'other' => 'other'];
         $obj2 = (object) ['other' => 'other', 'name' => 'name'];
 
         $value = [1, 'str', $obj1, false, $obj2];
-        $this->assertFalse($this->comparer->uniqueArray($value));
+        self::assertFalse($this->comparer->uniqueArray($value));
     }
 }

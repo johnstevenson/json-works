@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Document;
 
 class AddValueTest extends \JsonWorks\Tests\Base
 {
-    public function testNewArrayValuePush()
+    public function testNewArrayValuePush(): void
     {
         $schema = null;
 
@@ -19,11 +19,11 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/collection/1/-';
         $value = 4;
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testNewArrayValueIndex()
+    public function testNewArrayValueIndex(): void
     {
         $schema = null;
 
@@ -38,11 +38,11 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/collection/1/3';
         $value = 4;
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testNewArrayValueIndexInvalid1()
+    public function testNewArrayValueIndexInvalid1(): void
     {
         $schema = null;
 
@@ -53,10 +53,10 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/collection/prop1/-';
         $value = 4;
-        $this->assertFalse($document->addValue($path, $value));
+        self::assertFalse($document->addValue($path, $value));
     }
 
-    public function testNewArrayValueIndexInvalid2()
+    public function testNewArrayValueIndexInvalid2(): void
     {
         $schema = null;
 
@@ -67,10 +67,10 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/collection/1/4';
         $value = 4;
-        $this->assertFalse($document->addValue($path, $value));
+        self::assertFalse($document->addValue($path, $value));
     }
 
-    public function testReplaceArrayValueInserts()
+    public function testReplaceArrayValueInserts(): void
     {
         $schema = null;
 
@@ -85,11 +85,11 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/collection/2';
         $value = 2;
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testNewValue()
+    public function testNewValue(): void
     {
         $schema = null;
 
@@ -117,11 +117,11 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/prop1/inner1/inner2/prop2';
         $value = false;
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testReplaceObjectValue()
+    public function testReplaceObjectValue(): void
     {
         $schema = null;
 
@@ -150,11 +150,11 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/prop1/inner1/inner2/prop2';
         $value = true;
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testReplaceObjectNullValue()
+    public function testReplaceObjectNullValue(): void
     {
         $schema = null;
 
@@ -183,11 +183,11 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/prop1/inner1/inner2/prop2';
         $value = true;
-        $this->assertTrue($document->addValue($path, $value));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->addValue($path, $value));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testObjectWithNumericKey()
+    public function testObjectWithNumericKey(): void
     {
         $schema = null;
 
@@ -205,18 +205,18 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument(null, null);
 
         $msg = 'Testing that an array is created';
-        $this->assertTrue($document->addValue($path, $value), $msg);
-        $this->assertEquals(json_decode($expectedArray), $document->data, $msg);
+        self::assertTrue($document->addValue($path, $value), $msg);
+        self::assertEquals(json_decode($expectedArray), $document->data, $msg);
 
         $data = '{"prop1": {}}';
         $document = $this->getDocument($schema, $data);
 
         $msg = 'Testing that the value is added to the object';
-        $this->assertTrue($document->addValue($path, $value), $msg);
-        $this->assertEquals(json_decode($expectedObject), $document->data, $msg);
+        self::assertTrue($document->addValue($path, $value), $msg);
+        self::assertEquals(json_decode($expectedObject), $document->data, $msg);
     }
 
-    public function testObjectWithPushKey()
+    public function testObjectWithPushKey(): void
     {
         $schema = null;
 
@@ -234,18 +234,18 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument(null, null);
 
         $msg = 'Testing that an array is created';
-        $this->assertTrue($document->addValue($path, $value), $msg);
-        $this->assertEquals(json_decode($expectedArray), $document->data, $msg);
+        self::assertTrue($document->addValue($path, $value), $msg);
+        self::assertEquals(json_decode($expectedArray), $document->data, $msg);
 
         $data = '{"prop1": {}}';
         $document = $this->getDocument($schema, $data);
 
         $msg = 'Testing that the value is added to the object';
-        $this->assertTrue($document->addValue($path, $value), $msg);
-        $this->assertEquals(json_decode($expectedObject), $document->data, $msg);
+        self::assertTrue($document->addValue($path, $value), $msg);
+        self::assertEquals(json_decode($expectedObject), $document->data, $msg);
     }
 
-    public function testBuildObjectInArray()
+    public function testBuildObjectInArray(): void
     {
         $schema = null;
 
@@ -265,16 +265,16 @@ class AddValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
         $path = '/collection/-';
         $value = ['firstName' => 'John'];
-        $this->assertTrue($document->addValue($path, $value));
+        self::assertTrue($document->addValue($path, $value));
 
         $path = '/collection/1/lastName';
         $value = 'Smith';
-        $this->assertTrue($document->addValue($path, $value));
+        self::assertTrue($document->addValue($path, $value));
 
         $path = '/collection/1/age';
         $value = 24;
-        $this->assertTrue($document->addValue($path, $value));
+        self::assertTrue($document->addValue($path, $value));
 
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertEquals(json_decode($expected), $document->data);
     }
 }

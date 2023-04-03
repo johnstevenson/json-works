@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use JohnStevenson\JsonWorks\Schema\Comparer;
-use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
+use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 
 class EnumConstraint extends BaseConstraint
 {
-    protected $comparer;
+    protected Comparer $comparer;
 
     public function __construct(Manager $manager)
     {
@@ -23,7 +24,11 @@ class EnumConstraint extends BaseConstraint
         $this->comparer = new Comparer();
     }
 
-    public function validate($data, array $schema)
+    /**
+     * @param mixed $data
+     * @param array<mixed> $schema
+     */
+    public function validate($data, array $schema): void
     {
         foreach ($schema as $value) {
             if ($this->comparer->equals($value, $data)) {

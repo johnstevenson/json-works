@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Document;
 
 class DeleteValueTest extends \JsonWorks\Tests\Base
 {
-    public function testFromObject()
+    public function testFromObject(): void
     {
         $schema = null;
         $data = '{
@@ -38,14 +38,14 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $path = '/prop2/collection/3/1/firstName';
-        $this->assertTrue($document->deleteValue($path), 'Testing success: '.$path);
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->deleteValue($path), 'Testing success: '.$path);
+        self::assertEquals(json_decode($expected), $document->data);
 
         $path = '/prop2/collection/0/firstName';
-        $this->assertFalse($document->deleteValue($path), 'Testing fail: '.$path);
+        self::assertFalse($document->deleteValue($path), 'Testing fail: '.$path);
     }
 
-    public function testFromArray()
+    public function testFromArray(): void
     {
         $schema = null;
         $data = '[
@@ -65,14 +65,14 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $path = '/1/1/2';
-        $this->assertTrue($document->deleteValue($path), 'Testing success: '.$path);
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->deleteValue($path), 'Testing success: '.$path);
+        self::assertEquals(json_decode($expected), $document->data);
 
         $path = '/0/3';
-        $this->assertFalse($document->deleteValue($path), 'Testing fail: '.$path);
+        self::assertFalse($document->deleteValue($path), 'Testing fail: '.$path);
     }
 
-    public function testObjectPropertyFromRoot()
+    public function testObjectPropertyFromRoot(): void
     {
         $schema = null;
         $data = '{
@@ -86,11 +86,11 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $path = '/prop1';
-        $this->assertTrue($document->deleteValue($path));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->deleteValue($path));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testArrayItemFromRoot()
+    public function testArrayItemFromRoot(): void
     {
         $schema = null;
         $data = '["item0"]';
@@ -100,11 +100,11 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $path = '/0';
-        $this->assertTrue($document->deleteValue($path));
-        $this->assertEquals(json_decode($expected), $document->data);
+        self::assertTrue($document->deleteValue($path));
+        self::assertEquals(json_decode($expected), $document->data);
     }
 
-    public function testObjectFromRoot()
+    public function testObjectFromRoot(): void
     {
         $schema = null;
         $data = '{
@@ -118,11 +118,11 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $path = '';
-        $this->assertTrue($document->deleteValue($path));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->deleteValue($path));
+        self::assertEquals($expected, $document->data);
     }
 
-    public function testArrayFromRoot()
+    public function testArrayFromRoot(): void
     {
         $schema = null;
         $data = '["item0"]';
@@ -132,7 +132,7 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $path = '';
-        $this->assertTrue($document->deleteValue($path));
-        $this->assertEquals($expected, $document->data);
+        self::assertTrue($document->deleteValue($path));
+        self::assertEquals($expected, $document->data);
     }
 }

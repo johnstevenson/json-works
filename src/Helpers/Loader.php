@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -21,8 +21,6 @@ class Loader
     const TYPE_DOCUMENT = 'LOAD_TYPE_DOCUMENT';
     const TYPE_SCHEMA = 'LOAD_TYPE_SCHEMA';
     const TYPE_PATCH = 'LOAD_TYPE_PATCH';
-
-    protected $file;
 
     /**
     * Processes input to be used as a document
@@ -53,9 +51,9 @@ class Loader
     *
     * @api
     * @param mixed $input
-    * @return array
+    * @return array<mixed>
     */
-    public function loadPatch($input)
+    public function loadPatch($input): array
     {
         return $this->processInput($input, self::TYPE_PATCH);
     }
@@ -72,26 +70,20 @@ class Loader
     *
     * @api
     * @param mixed $input
-    * @param string $file Set by method if a file
     * @return object
     */
-    public function loadSchema($input, &$file)
+    public function loadSchema($input)
     {
-        $this->file = false;
-        $data = $this->processInput($input, self::TYPE_SCHEMA);
-        $file = $this->file;
-
-        return $data;
+        return $this->processInput($input, self::TYPE_SCHEMA);
     }
 
     /**
     * The main input processing method
     *
     * @param mixed $data
-    * @param integer $type
     * @return mixed
     */
-    protected function processInput($data, $type)
+    protected function processInput($data, string $type)
     {
         if (is_string($data)) {
             $data = $this->processStringInput($data);
@@ -108,20 +100,18 @@ class Loader
     /**
     * Processes a file or raw json
     *
-    * @param string $input
     * @return mixed
     */
-    protected function processStringInput($input)
+    protected function processStringInput(string $input)
     {
         if ($this->isFile($input)) {
-            $this->file = true;
             $input = $this->getDataFromFile($input);
         }
 
         return $this->decodeJson($input);
     }
 
-    protected function isFile($input)
+    protected function isFile(string $input): bool
     {
         return pathinfo($input, PATHINFO_EXTENSION) === 'json';
     }
@@ -129,10 +119,9 @@ class Loader
     /**
     * Returns the contents of a file
     *
-    * @param string $filename
     * @throws \RuntimeException
     */
-    protected function getDataFromFile($filename)
+    protected function getDataFromFile(string $filename): string
     {
         $json = @file_get_contents($filename);
 
@@ -148,10 +137,9 @@ class Loader
     * Checks that data is valid for type
     *
     * @param mixed $data
-    * @param integer $type
     * @throws \RuntimeException
     */
-    protected function checkData($data, $type)
+    protected function checkData($data, string $type): void
     {
         $dataType = gettype($data);
 
@@ -175,42 +163,42 @@ class Loader
     /**
     * Decodes a json string
     *
-    * This function normalizes pre PHP7 behaviour to report an error with
-    * an empty string
+    * This function allows a JSON text as per RFC 8259, except for an empty string
     *
     * @param string $value
     * @return mixed
     * @throws \RuntimeException
     */
-    protected function decodeJson($value)
+    protected function decodeJson(string $value)
     {
         $result = $value;
-        $errCode = 0;
+        $errorMsg = null;
 
-        if ($this->checkJson($value, $errCode)) {
+        if ($this->checkJson($value, $errorMsg)) {
             $result = json_decode($value);
-            $errCode = json_last_error();
+
+            if (json_last_error() > 0) {
+                $errorMsg = json_last_error_msg();
+            }
         }
 
-        if ($errCode) {
-            throw new \RuntimeException($this->getJsonError($errCode));
+        if ($errorMsg !== null) {
+            throw new \RuntimeException($this->getJsonError($errorMsg));
         }
 
         return $result;
     }
 
-    protected function checkJson(&$value, &$errCode)
+    protected function checkJson(string &$value, ?string &$errorMsg): bool
     {
         $value = trim($value);
-        $object = '#^\\{(?:.*)\\}$#s';
-        $array = '#^\\[(?:.*)\\]$#s';
 
-        if (preg_match($object, $value) || preg_match($array, $value)) {
+        if (Utils::stringIsJson($value)) {
             return true;
         }
 
-        if (!strlen($value)) {
-            $errCode = JSON_ERROR_SYNTAX;
+        if (Utils::stringIsEmpty($value)) {
+            $errorMsg = 'Syntax error';
         }
 
         return false;
@@ -219,19 +207,11 @@ class Loader
     /**
     * Returns a formatted json error message
     *
-    * @param integer $code
-    * @return string
     */
-    protected function getJsonError($code)
+    protected function getJsonError(string $errorMsg): string
     {
-        $msg = $code;
-
-        if (function_exists('json_last_error_msg')) {
-            $msg = json_last_error_msg();
-        }
-
         $error = new Error();
-
-        return $error->get(Error::ERR_BAD_INPUT, sprintf('json error: %s', $msg));
+        $msg = sprintf('json error: %s', $errorMsg);
+        return $error->get(Error::ERR_BAD_INPUT, $msg);
     }
 }

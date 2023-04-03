@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Numbers;
 
 class MinimumTest extends \JsonWorks\Tests\Base
 {
-    public function testIntegerValid()
+    public function testIntegerValid(): void
     {
         $schema = '{
             "properties": {
@@ -16,10 +16,10 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 5
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testIntegerInvalid()
+    public function testIntegerInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -31,10 +31,10 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 4
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testFloatValid()
+    public function testFloatValid(): void
     {
         $schema = '{
             "properties": {
@@ -46,10 +46,10 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testFloatInvalid()
+    public function testFloatInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -61,10 +61,10 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 5.3999
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testIntegerExclusiveValid()
+    public function testIntegerExclusiveValid(): void
     {
         $schema = '{
             "properties": {
@@ -76,10 +76,10 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 6
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testIntegerExclusiveInvalid()
+    public function testIntegerExclusiveInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -91,10 +91,10 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 5
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 
-    public function testFloatExclusiveValid()
+    public function testFloatExclusiveValid(): void
     {
         $schema = '{
             "properties": {
@@ -106,10 +106,10 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 5.41
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testFloatExclusiveInvalid()
+    public function testFloatExclusiveInvalid(): void
     {
         $schema = '{
             "properties": {
@@ -121,6 +121,6 @@ class MinimumTest extends \JsonWorks\Tests\Base
             "test": 5.4
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Schema\Comparer;
 
@@ -6,199 +6,199 @@ use JohnStevenson\JsonWorks\Schema\Comparer;
 
 class EqualsTest extends \PHPUnit\Framework\TestCase
 {
-    protected $comparer;
+    protected Comparer $comparer;
 
     protected function setUp(): void
     {
         $this->comparer = new Comparer();
     }
 
-    public function testStringTrue()
+    public function testStringTrue(): void
     {
         $var1 = 'test string';
         $var2 = $var1;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testStringFalse1()
+    public function testStringFalse1(): void
     {
         $var1 = 'test string';
         $var2 = 'test string1';
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testStringFalse2()
+    public function testStringFalse2(): void
     {
         $var1 = 'test string';
         $var2 = 8;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testBooleanTrue()
+    public function testBooleanTrue(): void
     {
         $var1 = true;
         $var2 = $var1;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testBooleanFalse1()
+    public function testBooleanFalse1(): void
     {
         $var1 = true;
         $var2 = false;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testBooleanFalse2()
+    public function testBooleanFalse2(): void
     {
         $var1 = true;
         $var2 = 'test';
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testNullTrue()
+    public function testNullTrue(): void
     {
         $var1 = null;
         $var2 = $var1;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testNullFalse1()
+    public function testNullFalse1(): void
     {
         $var1 = null;
         $var2 = false;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testNullFalse2()
+    public function testNullFalse2(): void
     {
         $var1 = null;
         $var2 = 'test';
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testIntegerTrue()
+    public function testIntegerTrue(): void
     {
         $var1 = 654;
         $var2 = $var1;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testIntegerFalse1()
+    public function testIntegerFalse1(): void
     {
         $var1 = 654;
         $var2 = 655;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testIntegerFalse2()
+    public function testIntegerFalse2(): void
     {
         $var1 = 654;
         $var2 = array();
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testNumberTrue()
+    public function testNumberTrue(): void
     {
         $var1 = 6.6;
         $var2 = $var1;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testNumberFalse1()
+    public function testNumberFalse1(): void
     {
         $var1 = 6.6;
         $var2 = 6.5;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testNumberFalse2()
+    public function testNumberFalse2(): void
     {
         $var1 = 6.6;
         $var2 = null;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testMixedNumberTrue1()
+    public function testMixedNumberTrue1(): void
     {
         $var1 = 6.0;
         $var2 = 6;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testMixedNumberTrue2()
+    public function testMixedNumberTrue2(): void
     {
         $var1 = 6;
         $var2 = 6.0;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testMixedNumberFalse()
+    public function testMixedNumberFalse(): void
     {
         $var1 = 6.0;
         $var2 = 5;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testArrayTrue()
+    public function testArrayTrue(): void
     {
         $var1 = [1, true, 20];
         $var2 = $var1;
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testArrayFalse()
+    public function testArrayFalse(): void
     {
         $var1 = [1, true, 20];
         $var2 = 9;
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testArrayFalseDifferentSize()
+    public function testArrayFalseDifferentSize(): void
     {
         $var1 = [1, true, 20];
         $var2 = [1, true, 20, 5];
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testArrayFalseDifferentIndex()
+    public function testArrayFalseDifferentIndex(): void
     {
         $var1 = [1, true, 20];
         $var2 = [1, 20, true];
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testObjectTrue()
+    public function testObjectTrue(): void
     {
         $var1 = (object) ['name' => 'name', 'other' => 'other'];
         $var2 = (object) ['other' => 'other', 'name' => 'name'];
-        $this->assertTrue($this->comparer->equals($var1, $var2));
+        self::assertTrue($this->comparer->equals($var1, $var2));
     }
 
-    public function testObjectFalse()
+    public function testObjectFalse(): void
     {
         $var1 = (object) ['name' => 'name', 'other' => 'other'];
         $var2 = 'other';
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testObjectFalseDifferentSize()
+    public function testObjectFalseDifferentSize(): void
     {
         $var1 = (object) ['name' => 'name', 'other' => 'other'];
         $var2 = (object) ['name' => 'name'];
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testObjectFalseDifferentKeys()
+    public function testObjectFalseDifferentKeys(): void
     {
         $var1 = (object) ['name' => 'name', 'other' => 'other'];
         $var2 = (object) ['other' => 'other', 'name1' => 'name1'];
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 
-    public function testObjectFalseDifferentValues()
+    public function testObjectFalseDifferentValues(): void
     {
         $var1 = (object) ['name' => 'name', 'other' => 'other'];
         $var2 = (object) ['other' => true, 'name' => 'name'];
-        $this->assertFalse($this->comparer->equals($var1, $var2));
+        self::assertFalse($this->comparer->equals($var1, $var2));
     }
 }

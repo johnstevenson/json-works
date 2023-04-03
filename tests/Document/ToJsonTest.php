@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Document;
 
@@ -6,7 +6,7 @@ use \JohnStevenson\JsonWorks\Utils;
 
 class ToJsonTest extends \JsonWorks\Tests\Base
 {
-    public function testNoData()
+    public function testNoData(): void
     {
         $schema = null;
         $data = null;
@@ -16,11 +16,11 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document->tidy();
 
         $json = $document->toJson(false);
-        $this->assertTrue($document->validate());
-        $this->assertEquals($this->getExpectedJson($expected), $json);
+        self::assertTrue($document->validate());
+        self::assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testPathWithSlash()
+    public function testPathWithSlash(): void
     {
         $schema = null;
 
@@ -33,10 +33,10 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $json = $document->toJson(false);
-        $this->assertEquals($expected, $json);
+        self::assertEquals($expected, $json);
     }
 
-    public function testEscapeUnicode()
+    public function testEscapeUnicode(): void
     {
         $schema = null;
 
@@ -49,10 +49,10 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $json = $document->toJson(false);
-        $this->assertEquals($expected, $json);
+        self::assertEquals($expected, $json);
     }
 
-    public function testTidyNoSchema()
+    public function testTidyNoSchema(): void
     {
         $schema = null;
 
@@ -76,11 +76,11 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document->tidy();
 
         $json = $document->toJson(false);
-        $this->assertTrue($document->validate());
-        $this->assertEquals($this->getExpectedJson($expected), $json);
+        self::assertTrue($document->validate());
+        self::assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testNoTidySchema()
+    public function testNoTidySchema(): void
     {
         $schema = '{
             "required": ["prop2"]
@@ -98,11 +98,11 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $json = $document->toJson(false);
-        $this->assertTrue($document->validate());
-        $this->assertEquals($this->getExpectedJson($expected), $json);
+        self::assertTrue($document->validate());
+        self::assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testTidySchemaFail()
+    public function testTidySchemaFail(): void
     {
         $schema = '{
             "required": ["prop2"]
@@ -119,10 +119,10 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         // Set order to true for test coverage
         $document->tidy(true);
 
-        $this->assertFalse($document->validate());
+        self::assertFalse($document->validate());
     }
 
-    public function testTidyNestedNoSchema()
+    public function testTidyNestedNoSchema(): void
     {
         $schema = null;
 
@@ -157,11 +157,11 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document->tidy();
 
         $json = $document->toJson(false);
-        $this->assertTrue($document->validate());
-        $this->assertEquals($this->getExpectedJson($expected), $json);
+        self::assertTrue($document->validate());
+        self::assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testNoTidyNestedSchema()
+    public function testNoTidyNestedSchema(): void
     {
         $schema = '{
             "properties": {
@@ -195,11 +195,11 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $json = $document->toJson(false);
-        $this->assertTrue($document->validate());
-        $this->assertEquals($this->getExpectedJson($expected), $json);
+        self::assertTrue($document->validate());
+        self::assertEquals($this->getExpectedJson($expected), $json);
     }
 
-    public function testTidyNestedSchemaFail()
+    public function testTidyNestedSchemaFail(): void
     {
         $schema = '{
             "properties": {
@@ -230,10 +230,10 @@ class ToJsonTest extends \JsonWorks\Tests\Base
 
         $document = $this->getDocument($schema, $data);
         $document->tidy();
-        $this->assertFalse($document->validate());
+        self::assertFalse($document->validate());
     }
 
-    public function testPretty()
+    public function testPretty(): void
     {
         $schema = null;
 
@@ -256,6 +256,6 @@ class ToJsonTest extends \JsonWorks\Tests\Base
         $document = $this->getDocument($schema, $data);
 
         $json = $document->toJson(true);
-        $this->assertEquals($expected, $json);
+        self::assertEquals($expected, $json);
     }
 }

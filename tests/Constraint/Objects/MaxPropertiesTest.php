@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Objects;
 
 class MaxPropertiesTest extends \JsonWorks\Tests\Base
 {
-    public function testSimpleValid()
+    public function testSimpleValid(): void
     {
         $schema = '{
             "maxProperties": 2
@@ -15,10 +15,10 @@ class MaxPropertiesTest extends \JsonWorks\Tests\Base
             "prop2": 2
         }';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testSimpleInvalid()
+    public function testSimpleInvalid(): void
     {
         $schema = '{
             "maxProperties": 2
@@ -30,6 +30,6 @@ class MaxPropertiesTest extends \JsonWorks\Tests\Base
             "prop3": 3
         }';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

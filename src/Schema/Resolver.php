@@ -1,31 +1,22 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JohnStevenson\JsonWorks\Schema;
 
-use JohnStevenson\JsonWorks\Helpers\Loader;
+use \stdClass;
 
 class Resolver
 {
-    /**
-    * @var \JohnStevenson\JsonWorks\Helpers\Loader
-    */
-    protected $loader;
+    protected Cache $cache;
 
-    /**
-    * @var cache
-    */
-    protected $cache;
-
-    protected $basePath;
-
-    public function __construct($schema, $basePath)
+    public function __construct(stdClass $schema)
     {
-        $this->loader = new Loader;
         $this->cache = new Cache($schema);
-        $this->basePath = $basePath;
     }
 
-    public function getRef($ref)
+    /**
+     * @return mixed
+     */
+    public function getRef(string $ref)
     {
         return $this->cache->resolveRef($ref);
     }

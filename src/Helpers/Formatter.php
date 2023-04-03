@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -10,7 +10,8 @@
 
 namespace JohnStevenson\JsonWorks\Helpers;
 
-use stdClass;
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Helpers\Format\Copier;
 use JohnStevenson\JsonWorks\Helpers\Format\Orderer;
 use JohnStevenson\JsonWorks\Helpers\Format\Pruner;
@@ -20,20 +21,9 @@ use JohnStevenson\JsonWorks\Helpers\Format\Pruner;
 */
 class Formatter
 {
-    /**
-    * @var Format\Copier
-    */
-    protected $copier;
-
-    /**
-    * @var Format\Orderer
-    */
-    protected $orderer;
-
-    /**
-    * @var Format\Pruner
-    */
-    protected $pruner;
+    protected ?Copier $copier = null;
+    protected ?Orderer $orderer = null;
+    protected ?Pruner $pruner = null;
 
     /**
     * Returns an unreferenced copy of the data
@@ -44,7 +34,7 @@ class Formatter
     */
     public function copy($data)
     {
-        if (!$this->copier) {
+        if ($this->copier === null) {
             $this->copier = new Copier();
         }
 
@@ -61,7 +51,7 @@ class Formatter
     */
     public function order($data, $schema)
     {
-        if (!$this->orderer) {
+        if ($this->orderer === null) {
             $this->orderer = new Orderer();
         }
 
@@ -79,7 +69,7 @@ class Formatter
     */
     public function prune($data)
     {
-        if (!$this->pruner) {
+        if ($this->pruner === null) {
             $this->pruner = new Pruner();
         }
 

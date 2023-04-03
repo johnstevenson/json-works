@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -26,13 +26,12 @@ class Error
     * Returns a formatted error message
     *
     * @api
-    * @param string $code
-    * @param string $msg
-    * @return string
     */
-    public function get($code, $msg)
+    public function get(string $code, string $msg): string
     {
-        if ($caption = $this->codeGetCaption($code)) {
+        $caption = $this->codeGetCaption($code);
+
+        if ($caption !== null) {
             $error = sprintf('%s: %s [%s]', $code, $caption, $msg);
         } else {
             $error = sprintf('%s: %s', $code, $msg);
@@ -43,13 +42,10 @@ class Error
 
     /**
     * Returns an error caption
-    *
-    * @param string $code
-    * @return string
     */
-    protected function codeGetCaption($code)
+    protected function codeGetCaption(string $code): ?string
     {
-        $result = '';
+        $result = null;
 
         switch ($code) {
             case self::ERR_NOT_FOUND:

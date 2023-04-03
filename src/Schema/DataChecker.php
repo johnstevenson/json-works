@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -10,33 +11,40 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Comparer;
 
 class DataChecker
 {
-    protected $comparer;
+    protected Comparer $comparer;
 
     public function __construct()
     {
         $this->comparer = new Comparer();
     }
 
-    public function checkType($value, $required)
+    /**
+     * @param mixed $value
+     * @param string|array<string>|null $required
+     */
+    public function checkType($value, $required): void
     {
         $type = $this->comparer->getSpecific($value);
 
         if ($required !== null) {
-
             $types = (array) $required;
 
-            if (!in_array($type, $types)) {
+            if (!in_array($type, $types, true)) {
                 $error = $this->formatError(implode('|', $types), $type);
                 throw new \RuntimeException($error);
             }
         }
     }
 
-    public function checkArray(array $schema, $key)
+    /**
+     * @param array<mixed> $schema
+     */
+    public function checkArray(array $schema, string $key): void
     {
         if ($key !== 'type') {
             $this->checkArrayCount($schema);
@@ -45,7 +53,10 @@ class DataChecker
         $this->checkArrayValues($schema, $key);
     }
 
-    public function checkContainerTypes($schema, $type)
+    /**
+     * @param mixed $schema
+     */
+    public function checkContainerTypes($schema, string $type): void
     {
         foreach ($schema as $value) {
             if (!$this->comparer->checkType($value, $type)) {
@@ -55,16 +66,23 @@ class DataChecker
         }
     }
 
-    public function emptySchema($schema)
+    /**
+     * @param mixed $schema
+     */
+    public function emptySchema($schema): bool
     {
         $this->checkType($schema, 'object');
 
-        return count((array) $schema) === 0;
+        return Utils::arrayIsEmpty((array) $schema);
     }
 
-    public function checkForRef($schema, &$ref)
+    /**
+     * @param mixed $schema
+     */
+    public function checkForRef($schema, ?string &$ref): bool
     {
         if ($result = (is_object($schema) && property_exists($schema, '$ref'))) {
+            // @phpstan-ignore-next-line
             $ref = $schema->{'$ref'};
             $this->checkType($ref, 'string');
         }
@@ -72,7 +90,7 @@ class DataChecker
         return $result;
     }
 
-    public function formatError($expected, $value)
+    public function formatError(string $expected, string $value): string
     {
         return sprintf(
             "Invalid schema value: expected '%s', got '%s'",
@@ -81,7 +99,10 @@ class DataChecker
         );
     }
 
-    protected function checkArrayCount(array $schema)
+    /**
+     * @param array<mixed> $schema
+     */
+    protected function checkArrayCount(array $schema): void
     {
         if (count($schema) <= 0) {
             $error = $this->formatError('> 0', '0');
@@ -89,19 +110,25 @@ class DataChecker
         }
     }
 
-    protected function checkArrayValues(array $schema, $key)
+    /**
+     * @param array<mixed> $schema
+     */
+    protected function checkArrayValues(array $schema, string $key): void
     {
-        if (in_array($key, ['enum', 'type', 'required'])) {
+        if (in_array($key, ['enum', 'type', 'required'], true)) {
             $this->checkUnique($schema);
         }
 
         if ($key !== 'enum') {
-            $type = in_array($key, ['type', 'required']) ? 'string' : 'object';
+            $type = in_array($key, ['type', 'required'], true) ? 'string' : 'object';
             $this->checkContainerTypes($schema, $type);
         }
     }
 
-    protected function checkUnique(array $schema)
+    /**
+     * @param array<mixed> $schema
+     */
+    protected function checkUnique(array $schema): void
     {
         if (!$this->comparer->uniqueArray($schema)) {
             $error = $this->formatError('unique', 'duplicates');

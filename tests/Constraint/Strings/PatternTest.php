@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Strings;
 
 class PatternTest extends \JsonWorks\Tests\Base
 {
-    public function testValid()
+    public function testValid(): void
     {
         $schema = '{
             "pattern": "es"
@@ -12,10 +12,10 @@ class PatternTest extends \JsonWorks\Tests\Base
 
         $data = 'test';
 
-        $this->assertTrue($this->validate($schema, $data));
+        self::assertTrue($this->validate($schema, $data));
     }
 
-    public function testInvalid()
+    public function testInvalid(): void
     {
         $schema = '{
             "pattern": "ts"
@@ -23,6 +23,6 @@ class PatternTest extends \JsonWorks\Tests\Base
 
         $data = 'test';
 
-        $this->assertFalse($this->validate($schema, $data));
+        self::assertFalse($this->validate($schema, $data));
     }
 }

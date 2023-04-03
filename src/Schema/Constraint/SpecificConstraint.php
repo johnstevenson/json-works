@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
+use \stdClass;
+
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\JsonTypes;
-use JohnStevenson\JsonWorks\Schema\Constraints\Manager;
+use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 
 class SpecificConstraint extends BaseConstraint
 {
-    /**
-    * @var \JohnStevenson\JsonWorks\Schema\JsonTypes
-    */
-    protected $jsonTypes;
+    protected JsonTypes $jsonTypes;
 
     public function __construct(Manager $manager)
     {
@@ -26,19 +27,26 @@ class SpecificConstraint extends BaseConstraint
         $this->jsonTypes = new JsonTypes();
     }
 
-    public function validate($data, $schema)
+    /**
+    * @param mixed $data
+    */
+    public function validate($data, stdClass $schema): void
     {
-        if ($name = $this->getInstanceName($data)) {
+        $name = $this->getInstanceName($data);
+        if (Utils::stringNotEmpty($name)) {
             $validator = $this->manager->factory($name);
             $validator->validate($data, $schema);
         }
     }
 
-    protected function getInstanceName($data)
+    /**
+    * @param mixed $data
+    */
+    protected function getInstanceName($data): string
     {
         $result = $this->jsonTypes->getGeneric($data);
 
-        if (in_array($result, ['boolean', 'null'])) {
+        if (in_array($result, ['boolean', 'null'], true)) {
             $result = '';
         }
 

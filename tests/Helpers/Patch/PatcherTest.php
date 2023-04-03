@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers\Patch;
 
@@ -6,14 +6,14 @@ use JohnStevenson\JsonWorks\Helpers\Patcher;
 
 class PatcherTest extends \JsonWorks\Tests\Base
 {
-    protected $patcher;
+    protected Patcher $patcher;
 
     protected function setUp(): void
     {
         $this->patcher = new Patcher();
     }
 
-    public function testAddEmptyArrayKey()
+    public function testAddEmptyArrayKey(): void
     {
         $data = json_decode('{
             "prop1": {
@@ -30,11 +30,11 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $path = '/prop1//2';
         $value = true;
 
-        $this->assertTrue($this->patcher->add($data, $path, $value));
-        $this->assertEquals($expected, $data);
+        self::assertTrue($this->patcher->add($data, $path, $value));
+        self::assertEquals($expected, $data);
     }
 
-    public function testReplaceNullRoot()
+    public function testReplaceNullRoot(): void
     {
         $data = null;
 
@@ -51,11 +51,11 @@ class PatcherTest extends \JsonWorks\Tests\Base
             }
         }');
 
-        $this->assertTrue($this->patcher->replace($data, $path, $value));
-        $this->assertEquals($expected, $data);
+        self::assertTrue($this->patcher->replace($data, $path, $value));
+        self::assertEquals($expected, $data);
     }
 
-    public function testReplaceArrayValue()
+    public function testReplaceArrayValue(): void
     {
         $data = json_decode('{
             "collection": [0, 1, 2, 3]
@@ -68,11 +68,11 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $path = '/collection/2';
         $value = 4;
 
-        $this->assertTrue($this->patcher->replace($data, $path, $value));
-        $this->assertEquals($expected, $data);
+        self::assertTrue($this->patcher->replace($data, $path, $value));
+        self::assertEquals($expected, $data);
     }
 
-    public function testReplaceObjectProperty()
+    public function testReplaceObjectProperty(): void
     {
         $data = json_decode('{
             "prop1": {
@@ -89,11 +89,11 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $path = '/prop1/inner1';
         $value = true;
 
-        $this->assertTrue($this->patcher->replace($data, $path, $value));
-        $this->assertEquals($expected, $data);
+        self::assertTrue($this->patcher->replace($data, $path, $value));
+        self::assertEquals($expected, $data);
     }
 
-    public function testReplaceRootWithScalar()
+    public function testReplaceRootWithScalar(): void
     {
         $data = json_decode('{
             "prop1": {
@@ -106,11 +106,11 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $path = '';
         $value = true;
 
-        $this->assertTrue($this->patcher->replace($data, $path, $value));
-        $this->assertEquals($expected, $data);
+        self::assertTrue($this->patcher->replace($data, $path, $value));
+        self::assertEquals($expected, $data);
     }
 
-    public function testReplaceMissingObjectPropertyFails()
+    public function testReplaceMissingObjectPropertyFails(): void
     {
         $data = json_decode('{
             "prop1": {
@@ -123,7 +123,7 @@ class PatcherTest extends \JsonWorks\Tests\Base
         $path = '/prop1/inner2';
         $value = true;
 
-        $this->assertFalse($this->patcher->replace($data, $path, $value));
-        $this->assertEquals($expected, $data);
+        self::assertFalse($this->patcher->replace($data, $path, $value));
+        self::assertEquals($expected, $data);
     }
 }

@@ -1,21 +1,29 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
+
+use \stdClass;
 
 use JohnStevenson\JsonWorks\Schema\DataChecker;
 use JohnStevenson\JsonWorks\Schema\Resolver;
 
 class Manager
 {
-    public $dataPath;
-    public $errors;
-    public $stopOnError;
-    public $dataChecker;
+    /** @var array<mixed> */
+    public array $dataPath;
 
+    /** @var array<string> */
+    public array $errors;
+
+    /** @var array<class-string> */
     protected $constraints;
-    protected $resolver;
 
-    public function __construct(Resolver $resolver, $stopOnError)
+    public bool $stopOnError;
+    public DataChecker $dataChecker;
+
+    protected Resolver $resolver;
+
+    public function __construct(Resolver $resolver, bool $stopOnError)
     {
         $this->resolver = $resolver;
         $this->stopOnError = $stopOnError;
@@ -26,7 +34,11 @@ class Manager
         $this->dataChecker = new DataChecker();
     }
 
-    public function validate($data, $schema, $key = null)
+    /**
+     * @param mixed $data
+     * @param mixed $schema
+     */
+    public function validate($data, $schema, ?string $key = null): void
     {
         $schema = $this->setValue($schema);
 
@@ -48,7 +60,7 @@ class Manager
         array_pop($this->dataPath);
     }
 
-    public function factory($name)
+    public function factory(string $name): object
     {
         if (!isset($this->constraints[$name])) {
             $class = sprintf('\%s\%sConstraint', __NAMESPACE__, ucfirst($name));
@@ -62,16 +74,16 @@ class Manager
     * Fetches a value from the schema
     *
     * @param mixed $schema
-    * @param mixed $key
     * @param mixed $value
-    * @param mixed $required
-    * @throws RuntimeException
+    * @param mixed|null $required
+    * @throws \RuntimeException
     */
-    public function getValue($schema, $key, &$value, $required = null)
+    public function getValue($schema, string $key, &$value, $required = null): bool
     {
         if (is_object($schema)) {
 
             if ($result = property_exists($schema, $key)) {
+                // @phpstan-ignore-next-line
                 $value = $this->setValue($schema->$key);
                 $this->dataChecker->checkType($value, $required);
             }
@@ -83,6 +95,10 @@ class Manager
         throw new \RuntimeException($error);
     }
 
+    /**
+     * @param mixed $schema
+     * @return mixed
+     */
     protected function setValue($schema)
     {
         if ($this->dataChecker->checkForRef($schema, $ref)) {

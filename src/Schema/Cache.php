@@ -1,47 +1,41 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JohnStevenson\JsonWorks\Schema;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Helpers\Finder;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\DataChecker;
 
 class Cache
 {
-    /**
-    * @var DataChecker
-    */
-    protected $dataChecker;
+    protected Store $store;
+    protected DataChecker $dataChecker;
+    protected Finder $finder;
 
-    /**
-    * @var \JohnStevenson\JsonWorks\Helpers\Finder
-    */
-    protected $finder;
+    /** @var array<string> */
+    protected array $parents;
 
-    /**
-    * @var Store
-    */
-    protected $store;
-
-    /**
-    * @var array
-    */
-    protected $parents;
-
-    public function __construct($schema)
+    public function __construct(stdClass $schema)
     {
         $this->store = new Store;
 
         $ref = $this->makeRef('/', '#');
-        $this->store->addRoot('/', $schema, $ref);
+        //$this->store->addRoot('/', $schema, $ref);
+        $this->store->addRoot('/', $schema);
 
         $this->dataChecker = new DataChecker;
         $this->finder = new Finder;
     }
 
-    public function resolveRef($ref)
+    /**
+     * @return mixed
+     */
+    public function resolveRef(string $ref)
     {
-        $this->splitRef($ref, $doc, $path);
+        list($doc, $path) = $this->splitRef($ref);
 
         if ($this->store->hasRoot($doc)) {
             $this->parents = [];
@@ -55,19 +49,27 @@ class Cache
 
             return $schema;
         }
+
+        $error = $this->getRefError('Unable to find $ref', $ref);
+        throw new \RuntimeException($error);
     }
 
-    protected function resolve($ref)
+    /**
+     * @return mixed
+     */
+    protected function resolve(string $ref)
     {
-        $this->splitRef($ref, $doc, $path);
+        list($doc, $path) = $this->splitRef($ref);
 
-        if ($schema = $this->store->get($doc, $path, $data)) {
+        $schema = $this->store->get($doc, $path, $data);
+        if ($schema !== null) {
             return $schema;
         }
 
         $this->checkParents($ref);
 
-        if ($schema = $this->find($ref, $doc, $path, $data)) {
+        $schema = $this->find($ref, $doc, $path, $data);
+        if ($schema !== null) {
             return $schema;
         }
 
@@ -75,17 +77,27 @@ class Cache
         throw new \RuntimeException($error);
     }
 
-    protected function splitRef($ref, &$doc, &$path)
+    /**
+     * @return array{0: string, 1: string}
+     */
+    protected function splitRef(string $ref): array
     {
-        $parts = explode('#', $ref, 2);
+        list($doc, $path) = explode('#', $ref, 2);
 
-        $doc = $parts[0] ?: '/';
-        $path = $parts[1] ?: '#';
+        if (Utils::stringIsEmpty($doc)) {
+            $doc = '/';
+        }
+
+        if (Utils::stringIsEmpty($path)) {
+            $path = '#';
+        }
+
+        return [$doc, $path];
     }
 
-    protected function checkParents($ref)
+    protected function checkParents(string $ref): void
     {
-        if (!in_array($ref, $this->parents)) {
+        if (!in_array($ref, $this->parents, true)) {
             return;
         }
 
@@ -93,15 +105,20 @@ class Cache
         throw new \RuntimeException($error);
     }
 
-    protected function makeRef($doc, $path)
+    protected function makeRef(string $doc, string $path): string
     {
         $doc = $doc !== '/' ? $doc : '';
 
         return sprintf('%s#%s', $doc, $path);
     }
 
-    protected function find($ref, $doc, $path, $data)
+    /**
+     * @param mixed $data
+     * @return mixed|null
+     */
+    protected function find(string $ref, string $doc, string $path, $data)
     {
+        $error = '';
         $target = new Target($path, $error);
 
         if ($this->finder->get($data, $target)) {
@@ -113,9 +130,15 @@ class Cache
 
             return $this->processFoundRef($ref, $foundRef, $childRef);
         }
+
+        return null;
     }
 
-    protected function processFoundSchema($ref, $schema)
+    /**
+     * @param mixed $schema
+     * @return mixed
+     */
+    protected function processFoundSchema(string $ref, $schema)
     {
         if ($this->dataChecker->checkForRef($schema, $childRef)) {
             $this->parents[] = $ref;
@@ -127,36 +150,44 @@ class Cache
         return $schema;
     }
 
-    protected function processFoundRef($ref, $foundRef, $childRef)
+    /**
+     * @return mixed|null
+     */
+    protected function processFoundRef(string $ref, string $foundRef, string $childRef)
     {
         $this->parents[] = $foundRef;
+        $schema = $this->resolve($childRef);
 
-        if ($schema = $this->resolve($childRef)) {
-            $this->addRef($foundRef, $schema);
+        $this->addRef($foundRef, $schema);
 
-            // remove foundRef from parents
-            $key = array_search($foundRef, $this->parents);
-            unset($this->parents[$key]);
+        // remove foundRef from parents
+        $key = array_search($foundRef, $this->parents, true);
+        unset($this->parents[$key]);
 
-            return $this->resolve($ref);
-        }
+        return $this->resolve($ref);
     }
 
-    protected function addRef($ref, $schema)
+    /**
+     * @param mixed $schema
+     */
+    protected function addRef(string $ref, $schema): void
     {
-        $this->splitRef($ref, $doc, $path);
+        list($doc, $path) = $this->splitRef($ref);
 
         if (!$this->store->add($doc, $path, $schema)) {
             throw new \RuntimeException($this->getRecursionError($ref));
         }
     }
 
-    protected function getRecursionError($ref)
+    protected function getRecursionError(string $ref): string
     {
         return $this->getRefError('Recursion searching for $ref', $ref);
     }
 
-    protected function getRefError($caption, $ref)
+    /**
+     * @param string|array<string> $ref
+     */
+    protected function getRefError(string $caption, $ref): string
     {
         return sprintf('%s [%s]', $caption, implode(', ', (array) $ref));
     }

@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Objects;
 
 class InvalidSchemaTest extends \JsonWorks\Tests\Base
 {
-    public function testMinPropertiesNotInteger1()
+    public function testMinPropertiesNotInteger1(): void
     {
         $schema = '{
             "minProperties": "1"
@@ -19,7 +19,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMinPropertiesNotInteger2()
+    public function testMinPropertiesNotInteger2(): void
     {
         $schema = '{
             "minProperties": 2.0
@@ -34,7 +34,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMinPropertiesNegative()
+    public function testMinPropertiesNegative(): void
     {
         $schema = '{
             "minProperties": -6
@@ -49,7 +49,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxPropertiesNotInteger1()
+    public function testMaxPropertiesNotInteger1(): void
     {
         $schema = '{
             "maxProperties": "1"
@@ -64,7 +64,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxPropertiesNotInteger2()
+    public function testMaxPropertiesNotInteger2(): void
     {
         $schema = '{
             "maxProperties": 2.0
@@ -79,7 +79,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaxPropertiesNegative()
+    public function testMaxPropertiesNegative(): void
     {
         $schema = '{
             "maxProperties": -6
@@ -94,7 +94,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testRequiredNotArray()
+    public function testRequiredNotArray(): void
     {
         $schema = '{
             "required": "prop1"
@@ -109,7 +109,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testRequiredEmptyArray()
+    public function testRequiredEmptyArray(): void
     {
         $schema = '{
             "required": []
@@ -125,7 +125,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testRequiredNotStringArray()
+    public function testRequiredNotStringArray(): void
     {
         $schema = '{
             "required": ["prop1", 0, "prop3"]
@@ -141,7 +141,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testRequiredNotUniqueArray()
+    public function testRequiredNotUniqueArray(): void
     {
         $schema = '{
             "required": ["prop1", "prop3", "prop1", "prop3"]
@@ -157,7 +157,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testAdditionalNotObjectOrBoolean()
+    public function testAdditionalNotObjectOrBoolean(): void
     {
         $schema = '{
             "additionalProperties": 1
@@ -172,7 +172,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testPropertiesNotObject()
+    public function testPropertiesNotObject(): void
     {
         $schema = '{
             "properties": [
@@ -189,7 +189,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testPropertyValueNotObject()
+    public function testPropertyValueNotObject(): void
     {
         $schema = '{
             "properties": {
@@ -208,7 +208,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testPatternPropertiesNotObject()
+    public function testPatternPropertiesNotObject(): void
     {
         $schema = '{
             "patternProperties": [
@@ -225,7 +225,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testPatternPropertyValueNotObject()
+    public function testPatternPropertyValueNotObject(): void
     {
         $schema = '{
             "patternProperties": {

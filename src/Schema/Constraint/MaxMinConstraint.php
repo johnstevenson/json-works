@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,33 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
+
+use \stdClass;
 
 class MaxMinConstraint extends BaseConstraint
 {
-    /**
-    * @var bool
-    */
-    protected $max;
-
-    /**
-    * @var bool
-    */
-    protected $length;
-
-    /**
-    * @var string
-    */
-    protected $caption;
+    protected bool $max;
+    protected bool $length;
+    protected string $caption;
 
     /**
     * The main method
     *
     * @param mixed $data
-    * @param mixed $schema
-    * @param mixed $key
     */
-    public function validate($data, $schema, $key)
+    public function validate($data, stdClass $schema, string $key): void
     {
         if (!$this->getInteger($schema, $key, $value)) {
             return;
@@ -52,9 +42,8 @@ class MaxMinConstraint extends BaseConstraint
     * Sets protected values
     *
     * @param mixed $data
-    * @param string $key
     */
-    protected function setValues($data, $key)
+    protected function setValues($data, string $key): void
     {
         $this->max = (bool) preg_match('/^max/', $key);
 
@@ -68,13 +57,10 @@ class MaxMinConstraint extends BaseConstraint
     /**
     * Returns true if a valid integer is found in the schema
     *
-    * @param mixed $schema
-    * @param string $key
     * @param mixed $value Set by method
-    * @return bool
-    * @throws RuntimeException
+    * @throws \RuntimeException
     */
-    protected function getInteger($schema, $key, &$value)
+    protected function getInteger(stdClass $schema, string $key, &$value): bool
     {
         if (!$this->getValue($schema, $key, $value, 'integer')) {
             return false;
@@ -84,28 +70,16 @@ class MaxMinConstraint extends BaseConstraint
             return true;
         }
 
-        $error = $this->formatError('>= 0', $value);
+        $error = $this->formatError('>= 0', (string) $value);
         throw new \RuntimeException($error);
     }
 
-    /**
-    * The main comparison
-    *
-    * @param integer $count
-    * @param integer $value
-    * @return bool
-    */
-    protected function compare($count, $value)
+    protected function compare(int $count, int $value): bool
     {
         return $this->max ? $count <= $value : $count >= $value;
     }
 
-    /**
-    * Adds an appropriate error
-    *
-    * @param integer $value
-    */
-    protected function setError($count, $value)
+    protected function setError(int $count, int $value): void
     {
         if ($this->max) {
             $error = "has too many %s [%d], maximum is '%d'";

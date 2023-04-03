@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -12,6 +12,7 @@ namespace JohnStevenson\JsonWorks\Helpers\Patch;
 
 use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
 /**
 * A class for holding various properties when searching for or building data
@@ -22,72 +23,35 @@ class Target
     const TYPE_OBJECT = 1;
     const TYPE_ARRAY = 2;
 
-    /**
-    * @var bool
-    */
-    public $invalid = false;
-
-    /**
-    * @var integer
-    */
-    public $type = self::TYPE_VALUE;
-
-    /**
-    * @var string|integer
-    */
+    /** @var string|integer */
     public $key = '';
 
-    /**
-    * @var string
-    */
-    public $path = '';
-
-    /**
-    * @var array
-    */
+    /** @var array<string> */
     public $tokens = [];
 
-    /**
-    * @var mixed
-    */
+    /** @var mixed */
     public $element;
 
-    /**
-    * @var string
-    */
-    public $foundPath = '';
+    public string $foundPath = '';
 
-    /**
-    * @var mixed
-    */
+    /** @var mixed */
     public $parent;
 
-    /**
-    * @var string
-    */
-    public $childKey = '';
-
-    /**
-    * @var string
-    */
-    public $error = '';
-
-    /**
-    * @var \JohnStevenson\JsonWorks\Helpers\Tokenizer
-    */
-    public $tokenizer;
+    public bool $invalid = false;
+    public int $type = self::TYPE_VALUE;
+    public string $path = '';
+    public string $childKey = '';
+    public string $error = '';
+    public Tokenizer $tokenizer;
 
     /**
     * Constructor
     *
-    * @param string $path
-    * @param string $error
     */
-    public function __construct($path, &$error)
+    public function __construct(string $path, string &$error)
     {
         $this->path = $path;
         $this->error =& $error;
-
         $this->tokenizer = new Tokenizer();
 
         if (!$this->tokenizer->decode($this->path, $this->tokens)) {
@@ -99,9 +63,9 @@ class Target
     /**
     * Sets type and key for an array
     *
-    * @param string|number $index
+    * @param string|integer $index
     */
-    public function setArray($index)
+    public function setArray($index): void
     {
         $this->type = self::TYPE_ARRAY;
         $this->key = (int) $index;
@@ -109,10 +73,8 @@ class Target
 
     /**
     * Sets type and key for an object
-    *
-    * @param string $key
     */
-    public function setObject($key)
+    public function setObject(string $key): void
     {
         $this->type = self::TYPE_OBJECT;
         $this->key = $key;
@@ -122,13 +84,12 @@ class Target
     * Sets or clears an error message
     *
     * @api
-    * @param string|null $code
     */
-    public function setError($code)
+    public function setError(?string $code): void
     {
         $this->error = '';
 
-        if (!empty($code)) {
+        if ($code !== null) {
             $error = new Error();
             $this->error = $error->get($code, $this->path);
             $this->invalid = $code === Error::ERR_PATH_KEY;
@@ -139,9 +100,8 @@ class Target
     * Add a token to the found path
     *
     * @api
-    * @param string $token
     */
-    public function setFoundPath($token)
+    public function setFoundPath(string $token): void
     {
         $this->foundPath = $this->tokenizer->add($this->foundPath, $token);
     }
@@ -150,14 +110,13 @@ class Target
     * Sets element and error if not already set
     *
     * @api
-    * @param bool $found If the element has been found
     * @param mixed $element
     */
-    public function setResult($found, &$element)
+    public function setResult(bool $found, &$element): void
     {
         $this->element =& $element;
 
-        if (!$found && !$this->error) {
+        if (!$found && Utils::stringIsEmpty($this->error)) {
             $this->setError(Error::ERR_NOT_FOUND);
         }
     }

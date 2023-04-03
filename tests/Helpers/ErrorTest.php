@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Helpers;
 
@@ -6,14 +6,14 @@ use JohnStevenson\JsonWorks\Helpers\Error;
 
 class ErrorTest extends \PHPUnit\Framework\TestCase
 {
-    protected $error;
+    protected Error $error;
 
     protected function setUp(): void
     {
         $this->error = new Error();
     }
 
-    public function testKnownCodes()
+    public function testKnownCodes(): void
     {
         $class = new \ReflectionClass($this->error);
         $msg = 'something';
@@ -21,19 +21,19 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
 
         foreach ($class->getConstants() as $code) {
             $result = $this->error->get($code, $msg);
-            $this->assertStringStartsWith($code, $result);
+            self::assertStringStartsWith($code, $result);
             $expected = $code !== Error::ERR_VALIDATE ? '[something]' : $msg;
-            $this->assertStringEndsWith($expected, $result);
+            self::assertStringEndsWith($expected, $result);
         }
     }
 
-    public function testUnknownCode()
+    public function testUnknownCode(): void
     {
         $code = 'ERR_UNKNOWN';
         $msg = 'Custom message';
 
         $result = $this->error->get($code, $msg);
-        $this->assertStringStartsWith('ERR_UNKNOWN', $result);
-        $this->assertStringEndsWith('Custom message', $result);
+        self::assertStringStartsWith('ERR_UNKNOWN', $result);
+        self::assertStringEndsWith('Custom message', $result);
     }
 }

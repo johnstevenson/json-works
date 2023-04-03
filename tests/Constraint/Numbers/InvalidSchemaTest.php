@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace JsonWorks\Tests\Constraint\Numbers;
 
 class InvalidSchemaTest extends \JsonWorks\Tests\Base
 {
-    public function testMinimumNotNumber()
+    public function testMinimumNotNumber(): void
     {
         $schema = '{
             "properties": {
@@ -20,7 +20,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testExclusiveNoMinimum()
+    public function testExclusiveNoMinimum(): void
     {
         $schema = '{
             "properties": {
@@ -36,7 +36,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMaximumNotNumber()
+    public function testMaximumNotNumber(): void
     {
         $schema = '{
             "properties": {
@@ -52,7 +52,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testExclusiveNoMaximum()
+    public function testExclusiveNoMaximum(): void
     {
         $schema = '{
             "properties": {
@@ -68,7 +68,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMultipleOfZeroValue()
+    public function testMultipleOfZeroValue(): void
     {
         $schema = '{
             "properties": {
@@ -84,7 +84,7 @@ class InvalidSchemaTest extends \JsonWorks\Tests\Base
         $this->validate($schema, $data);
     }
 
-    public function testMultipleOfNegativeValue()
+    public function testMultipleOfNegativeValue(): void
     {
         $schema = '{
             "properties": {

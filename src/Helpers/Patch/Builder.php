@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the Json-Works package.
  *
@@ -10,26 +10,21 @@
 
 namespace JohnStevenson\JsonWorks\Helpers\Patch;
 
-use InvalidArgumentException;
+use \InvalidArgumentException;
+
 use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
 class Builder
 {
-    /**
-    * @var Target
-    */
-    protected $target;
-
-    /**
-    * @var mixed
-    */
+    /** @var mixed */
     protected $data;
 
-    /**
-    * @var mixed
-    */
+    /** @var mixed */
     protected $element;
+
+    protected Target $target;
 
     /**
     * Returns a new element to be added to the data
@@ -46,7 +41,7 @@ class Builder
 
         $this->initData();
 
-        if (empty($target->tokens)) {
+        if (Utils::arrayIsEmpty($target->tokens)) {
             $this->data = $value;
         } else {
             $this->processTokens($target->tokens, $value);
@@ -56,11 +51,11 @@ class Builder
     }
 
     /**
-    * Initializes the data    *
+    * Initializes the data
     */
-    protected function initData()
+    protected function initData(): void
     {
-        if (!empty($this->target->tokens)) {
+        if (Utils::arrayNotEmpty($this->target->tokens)) {
 
             $key = $this->target->tokens[0];
 
@@ -80,18 +75,16 @@ class Builder
     /**
     * Builds new elements from the remaining tokens
     *
-    * @param array $tokens
+    * @param array<string> $tokens
     * @param mixed $value The value to add to the final element
     */
-    protected function processTokens(array $tokens, $value)
+    protected function processTokens(array $tokens, $value): void
     {
-        while (!empty($tokens)) {
-
+        while (Utils::arrayNotEmpty($tokens)) {
             $key = array_shift($tokens);
 
-            if (!empty($tokens)) {
+            if (Utils::arrayNotEmpty($tokens)) {
                 $this->addElement($key, $tokens[0]);
-
             } else {
                 // No tokens left so set the value
                 $this->setValue($key, $value);
@@ -104,10 +97,8 @@ class Builder
     *
     * The new container is created on the current root element and its type
     * depends on the nature of the key.
-    *
-    * @param string $key
     */
-    protected function createContainer($key)
+    protected function createContainer(string $key): void
     {
         if ($key === '-' || $key === '0') {
             $this->element = [];
@@ -118,18 +109,17 @@ class Builder
 
     /**
     * Adds a new container member to an object or array
-    *
-    * @param string $key
-    * @param string $containerKey
     */
-    protected function addElement($key, $containerKey)
+    protected function addElement(string $key, string $containerKey): void
     {
         if (is_array($this->element)) {
             $this->element[0] = null;
             $this->element =& $this->element[0];
 
         } else {
+            // @phpstan-ignore-next-line
             $this->element->$key = null;
+            // @phpstan-ignore-next-line
             $this->element =& $this->element->$key;
         }
 
@@ -138,10 +128,8 @@ class Builder
 
     /**
     * Sets external target data for incorporating the data
-    *
-    * @param string $key
     */
-    protected function setTarget($key)
+    protected function setTarget(string $key): void
     {
         if (is_array($this->data)) {
             $this->checkArrayKey($this->data, $key, $index);
@@ -155,16 +143,15 @@ class Builder
     /**
     * Sets an array item or an object property
     *
-    * @param string $key
     * @param mixed $value
     */
-    protected function setValue($key, $value)
+    protected function setValue(string $key, $value): void
     {
         if (is_array($this->element)) {
             $this->checkArrayKey($this->element, $key, $index);
             $this->element[$index] = $value;
-
         } else {
+            // @phpstan-ignore-next-line
             $this->element->$key = $value;
         }
     }
@@ -172,15 +159,15 @@ class Builder
     /**
     * Checks if an array key is valid and sets its index
     *
-    * @param array $array
-    * @param string $key
-    * @param integer $index Set by method
+    * @param array<mixed> $array
+    * @param integer|null $index Set by method
     * @throws InvalidArgumentException
     */
-    protected function checkArrayKey(array $array, $key, &$index)
+    protected function checkArrayKey(array $array, string $key, ?int &$index): void
     {
-        if ($result = preg_match('/^(?:(-)|(0)|([1-9]\d*))$/', $key)) {
+        $result = Utils::isMatch('/^(?:(-)|(0)|([1-9]\d*))$/', $key);
 
+        if ($result) {
             if ($key === '-') {
                 $index = count($array);
             } else {

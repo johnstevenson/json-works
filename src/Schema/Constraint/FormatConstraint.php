@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -8,17 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Schema\Constraints;
+namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 class FormatConstraint extends BaseConstraint
 {
-    /**
-    * The main method
-    *
-    * @param string $data
-    * @param string $format
-    */
-    public function validate($data, $format)
+    public function validate(string $data, string $format): void
     {
         if (!$this->checkKnownFormat($data, $format)) {
             $error = sprintf("Unknown format '%s'", $format);
@@ -26,22 +21,37 @@ class FormatConstraint extends BaseConstraint
         }
     }
 
-    protected function checkKnownFormat($data, $format)
+    protected function checkKnownFormat(string $data, string $format): bool
     {
         if ($format === 'date-time') {
-            $method = 'checkDateTime';
-        } else {
-            $method = 'check' . ucfirst(preg_replace('/v[46]$/', '', $format));
+            $this->checkDateTime($data, $format);
+            return true;
         }
 
-        if ($result = method_exists($this, $method)) {
-            $this->$method($data, $format);
+        if ($format === 'email') {
+            $this->checkEmail($data, $format);
+            return true;
         }
 
-        return $result;
+        if ($format === 'hostname') {
+            $this->checkHostname($data, $format);
+            return true;
+        }
+
+        if ($format === 'ipv4' || $format === 'ipv6') {
+            $this->checkIp($data, $format);
+            return true;
+        }
+
+        if ($format === 'uri') {
+            $this->checkUri($data, $format);
+            return true;
+        }
+
+        return false;
     }
 
-    protected function checkDateTime($data, $format)
+    protected function checkDateTime(string $data, string $format): void
     {
         $regex = '/^\d{4}-\d{2}-\d{2}[T| ]\d{2}:\d{2}:\d{2}(\.\d{1})?(Z|[\+|-]\d{2}:\d{2})?$/i';
 
@@ -50,12 +60,12 @@ class FormatConstraint extends BaseConstraint
         }
     }
 
-    protected function checkEmail($data, $format)
+    protected function checkEmail(string $data, string $format): void
     {
         $this->filter($data, $format, FILTER_VALIDATE_EMAIL);
     }
 
-    protected function checkHostname($data, $format)
+    protected function checkHostname(string $data, string $format): void
     {
         $regex = '/^[_a-z]+\.([_a-z]+\.?)+$/i';
 
@@ -64,18 +74,18 @@ class FormatConstraint extends BaseConstraint
         }
     }
 
-    protected function checkIp($data, $format)
+    protected function checkIp(string $data, string $format): void
     {
         $flags = $format === 'ipv4' ? FILTER_FLAG_IPV4 : FILTER_FLAG_IPV6;
         $this->filter($data, $format, FILTER_VALIDATE_IP, $flags);
     }
 
-    protected function checkUri($data, $format)
+    protected function checkUri(string $data, string $format): void
     {
         $this->filter($data, $format, FILTER_VALIDATE_URL);
     }
 
-    protected function filter($data, $format, $filter, $flags = 0)
+    protected function filter(string $data, string $format, int $filter, int $flags = 0): void
     {
         $flags |= FILTER_NULL_ON_FAILURE;
 
@@ -84,7 +94,7 @@ class FormatConstraint extends BaseConstraint
         }
     }
 
-    protected function setError($data, $format)
+    protected function setError(string $data, string $format): void
     {
         $error = sprintf("Invalid %s '%s'", $format, $data);
         $this->addError($error);
