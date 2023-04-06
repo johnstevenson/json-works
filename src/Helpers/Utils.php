@@ -10,6 +10,8 @@
 
 namespace JohnStevenson\JsonWorks\Helpers;
 
+use \stdClass;
+
 use Composer\Pcre\Preg;
 
 class Utils
@@ -58,5 +60,20 @@ class Utils
     public static function arrayNotEmpty(array $value): bool
     {
         return count($value) > 0;
+    }
+
+    /**
+     * @param mixed $data
+     */
+    public static function jsonEncode($data, int $options = 0): string
+    {
+        $options = ($options & ~JSON_THROW_ON_ERROR);
+        $result = json_encode($data, $options);
+
+        if ($result === false) {
+            throw new \RuntimeException(json_last_error_msg());
+        }
+
+        return $result;
     }
 }

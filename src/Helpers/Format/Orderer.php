@@ -86,24 +86,23 @@ class Orderer
             return null;
         }
 
-        return is_object($schema->$key) ? $schema->$key : null;
+        return ($schema->$key instanceof stdClass) ? $schema->$key : null;
     }
 
     /**
     * Creates schema properties from ordered data properties
     *
     * @param object $data
-    * @return object|null
     */
-    protected function getPropertiesFromData($data)
+    protected function getPropertiesFromData($data): stdClass
     {
-        $result = new \stdClass();
+        $result = new stdClass();
 
         $keys = array_keys((array) $data);
         sort($keys, SORT_NATURAL | SORT_FLAG_CASE);
 
         foreach ($keys as $key) {
-            $result->$key = new \stdClass();
+            $result->$key = new stdClass();
         }
 
         return $result;
@@ -113,7 +112,7 @@ class Orderer
     * Orders an array using the schema items properties
     *
     * @param mixed $data
-    * @param object $schema
+    * @param stdClass $schema
     * @return mixed[]
     */
     protected function orderArray($data, $schema)
@@ -138,7 +137,7 @@ class Orderer
     {
         $result = [];
 
-        foreach ($properties as $key => $schema) {
+        foreach (get_object_vars($properties) as $key => $schema) {
             if (property_exists($data, $key)) {
                 // @phpstan-ignore-next-line
                 $result[$key] = $this->run($data->$key, $schema);

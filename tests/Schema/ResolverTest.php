@@ -321,7 +321,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
 
         $data = $this->objectFromJson($data);
 
-        foreach ($data as $key => $value) {
+        foreach (get_object_vars($data) as $key => $value) {
             $msg = sprintf('Testing success with data property: %s', $key);
             $prop = (object) [$key => $value];
 
@@ -370,7 +370,7 @@ class ResolverTest extends \JsonWorks\Tests\Base
 
         $data = $this->objectFromJson($data);
 
-        foreach ($data as $key => $value) {
+        foreach (get_object_vars($data) as $key => $value) {
             $msg = sprintf('Testing success with data property: %s', $key);
             $prop = (object) [$key => $value];
 

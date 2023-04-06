@@ -99,7 +99,7 @@ class Comparer extends JsonTypes
             return false;
         }
 
-        foreach ($obj1 as $key => $value) {
+        foreach (get_object_vars($obj1) as $key => $value) {
             if (!$this->hasEqualProperty($obj2, $key, $value)) {
                 return false;
             }

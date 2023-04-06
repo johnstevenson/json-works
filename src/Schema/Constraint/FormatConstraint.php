@@ -11,6 +11,8 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
+use JohnStevenson\JsonWorks\Helpers\Utils;
+
 class FormatConstraint extends BaseConstraint
 {
     public function validate(string $data, string $format): void
@@ -55,7 +57,7 @@ class FormatConstraint extends BaseConstraint
     {
         $regex = '/^\d{4}-\d{2}-\d{2}[T| ]\d{2}:\d{2}:\d{2}(\.\d{1})?(Z|[\+|-]\d{2}:\d{2})?$/i';
 
-        if (!preg_match($regex, $data) || false === strtotime($data)) {
+        if (!Utils::isMatch($regex, $data) || false === strtotime($data)) {
             $this->setError($data, $format);
         }
     }
@@ -69,7 +71,7 @@ class FormatConstraint extends BaseConstraint
     {
         $regex = '/^[_a-z]+\.([_a-z]+\.?)+$/i';
 
-        if (!preg_match($regex, $data) || strlen($data) > 255) {
+        if (!Utils::isMatch($regex, $data) || strlen($data) > 255) {
             $this->setError($data, $format);
         }
     }

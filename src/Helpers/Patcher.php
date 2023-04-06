@@ -114,6 +114,7 @@ class Patcher
                 $target->element->{$target->key} = $value;
                 break;
             case Target::TYPE_ARRAY:
+                // @phpstan-ignore-next-line
                 array_splice($target->element, $target->key, 0, [$value]);
                 break;
         }

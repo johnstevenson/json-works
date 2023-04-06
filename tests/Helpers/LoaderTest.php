@@ -47,14 +47,18 @@ class LoaderTest extends \JsonWorks\Tests\Base
     protected function getResource()
     {
         if ($this->resource === null) {
-            $this->resource = fopen(__FILE__, 'r');
+            $fp = fopen(__FILE__, 'r');
+
+            if ($fp !== false) {
+                $this->resource = $fp;
+            }
         }
 
         return $this->resource;
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string>|array<string, mixed>
      */
     protected function getAllData(bool $keysOnly = false): array
     {

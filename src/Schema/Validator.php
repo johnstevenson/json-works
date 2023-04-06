@@ -51,9 +51,17 @@ class Validator
         return Utils::arrayIsEmpty($this->errors);
     }
 
-    public function getErrors(bool $single): string
+    /**
+     * @return array<string>
+     */
+    public function getErrors(): array
     {
-        return $single ? array_shift($this->errors) : $this->errors;
+        return $this->errors;
+    }
+
+    public function getLastError(): string
+    {
+        return $this->errors[0] ?? '';
     }
 
     public function setStopOnError(bool $value): void

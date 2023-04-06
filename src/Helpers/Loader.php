@@ -10,6 +10,8 @@
 
 namespace JohnStevenson\JsonWorks\Helpers;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Formatter;
 
@@ -70,7 +72,7 @@ class Loader
     *
     * @api
     * @param mixed $input
-    * @return object
+    * @return stdClass
     */
     public function loadSchema($input)
     {

@@ -2,6 +2,8 @@
 
 namespace JsonWorks\Tests;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Document;
 use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Validator;
@@ -34,7 +36,7 @@ class Base extends \PHPUnit\Framework\TestCase
         $validator = new Validator($schema);
 
         if (!$result = $validator->check($data)) {
-            $error = $validator->getErrors(true);
+            $error = $validator->getLastError();
             if (Utils::stringNotEmpty($message)) {
                 $message = sprintf('%s:%s', $message, $error);
             }
@@ -62,23 +64,24 @@ class Base extends \PHPUnit\Framework\TestCase
         return $document;
     }
 
-    protected function getSchema(?string $schema): object
+    protected function getSchema(?string $schema): stdClass
     {
         return $this->getSchemaObject($schema);
     }
 
     /**
-     * @param string|object $obj
-     * @param string $name
+     * @param class-string $className
      * @param array<mixed> $args
      * @return mixed
      */
-    protected function callMethod($obj, $name, $args = [])
+    protected function callMethod(string $className, string $methodName, array $args = [])
     {
-        $class = new \ReflectionClass($obj);
-        $method = $class->getMethod($name);
+        $reflection = new \ReflectionClass($className);
+        $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
-        return $method->invokeArgs($obj, $args);
+
+        $class = $reflection->newInstance();
+        return $method->invokeArgs($class, $args);
     }
 
     /**
@@ -99,7 +102,7 @@ class Base extends \PHPUnit\Framework\TestCase
         return $data;
     }
 
-    protected function getSchemaObject(?string $schema): object
+    protected function getSchemaObject(?string $schema): stdClass
     {
         $schema = $schema ?? '{}';
 
@@ -120,11 +123,11 @@ class Base extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    protected function objectFromJson(string $json): object
+    protected function objectFromJson(string $json): stdClass
     {
         $result = json_decode($json);
 
-        if (!is_object($result)) {
+        if (!($result instanceof stdClass)) {
             throw new \InvalidArgumentException('Test not run, json is not an object');
         }
 
@@ -151,13 +154,24 @@ class Base extends \PHPUnit\Framework\TestCase
     protected function getExpectedJson(?string $expected): string
     {
         $expected = $expected ?? '';
+        $result = json_encode(json_decode($expected));
 
-        return json_encode(json_decode($expected));
+        if ($result === false) {
+            throw new \InvalidArgumentException('Test not run, expected json is invalid');
+        }
+
+        return $result;
     }
 
     protected function getFixtureFile(string $filename): string
     {
-        return file_get_contents($this->getFixturePath($filename));
+        $contents = file_get_contents($this->getFixturePath($filename));
+
+        if ($contents === false) {
+            throw new \InvalidArgumentException('Test not run, fixture file cannot be opened');
+        }
+
+        return $contents;
     }
 
     protected function getFixturePath(string $filename): string

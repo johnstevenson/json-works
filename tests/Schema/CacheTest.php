@@ -2,6 +2,8 @@
 
 namespace JsonWorks\Tests\Schema;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Schema\Cache;
 
 class CacheTest extends \JsonWorks\Tests\Base
@@ -9,7 +11,7 @@ class CacheTest extends \JsonWorks\Tests\Base
     /**
      * @return mixed
      */
-    protected function resolve(string $ref, object $schema)
+    protected function resolve(string $ref, stdClass $schema)
     {
         $cache = new Cache($schema);
 

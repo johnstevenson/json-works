@@ -88,7 +88,7 @@ class BaseDocument
         }
 
         if (!$result = $this->validator->check($this->data)) {
-            $this->lastError = $this->validator->getErrors(true);
+            $this->lastError = $this->validator->getLastError();
         }
 
         return $result;

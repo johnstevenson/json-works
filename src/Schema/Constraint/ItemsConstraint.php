@@ -22,9 +22,12 @@ class ItemsConstraint extends BaseConstraint
     {
         list($items, $additional) = $this->getItemValues($schema);
 
-        if (is_object($items)) {
+        if ($items instanceof stdClass) {
             $this->validateObjectItems($data, $items);
-        } else {
+            return;
+        }
+
+        if (is_array($items)) {
             $this->checkArrayItems($data, $items, $additional);
             $this->validateArrayItems($data, $items, $additional);
         }
@@ -93,7 +96,7 @@ class ItemsConstraint extends BaseConstraint
                 $this->manager->validate($value, $items[$key], strval($key));
             } else {
 
-                if (is_object($additional)) {
+                if ($additional instanceof stdClass) {
                     $this->validateObjectItems(array_slice($data, $key), $additional);
                 }
                 break;

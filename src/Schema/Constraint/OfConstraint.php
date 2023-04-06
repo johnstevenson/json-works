@@ -17,17 +17,15 @@ use JohnStevenson\JsonWorks\Schema\ValidationException;
 
 class OfConstraint extends BaseConstraint
 {
-    protected string $type;
-    protected bool $matchFirst;
-
     /**
      * @param mixed $data
      * @param object|array<mixed> $schema
      */
     public function validate($data, $schema, string $key): void
     {
-        $schemas = $this->setDetails($schema, $key);
-        $matches = $this->getMatches($data, $schemas);
+        $matchFirst = in_array($key, ['anyOf', 'not'], true);
+        $schemas = is_array($schema) ? $schema : [$schema];
+        $matches = $this->getMatches($data, $schemas, $matchFirst);
 
         if (!$this->checkResult($key, $matches, count($schemas))) {
             $this->addError($this->getError($key));
@@ -35,22 +33,10 @@ class OfConstraint extends BaseConstraint
     }
 
     /**
-     * @param object|array<mixed> $schema
-     * @return array<object>
-     */
-    protected function setDetails($schema, string $key): array
-    {
-        $this->type = $key === 'not' ? 'object' : 'array';
-        $this->matchFirst = in_array($key, ['anyOf', 'not'], true);
-
-        return $this->type === 'object' ? [$schema] : $schema;
-    }
-
-    /**
      * @param mixed $data
-     * @param array<object> $schemas
+     * @param array<stdClass> $schemas
      */
-    protected function getMatches($data, array $schemas): int
+    protected function getMatches($data, array $schemas, bool $matchFirst): int
     {
         $result = 0;
 
@@ -59,7 +45,7 @@ class OfConstraint extends BaseConstraint
             if ($this->testChild($data, $subSchema)) {
                 ++$result;
 
-                if ($this->matchFirst) {
+                if ($matchFirst) {
                     break;
                 }
             }

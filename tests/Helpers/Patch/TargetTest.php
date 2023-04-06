@@ -8,7 +8,7 @@ use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 class TargetTest extends \JsonWorks\Tests\Base
 {
     /**
-     * @param string|int $value
+     * @param string|int|false $value
      */
     protected function getMsg(string $key, $value): string
     {

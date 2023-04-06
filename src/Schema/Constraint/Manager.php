@@ -15,7 +15,7 @@ class Manager
     /** @var array<string> */
     public array $errors;
 
-    /** @var array<class-string> */
+    /** @var array<object> */
     protected $constraints;
 
     public bool $stopOnError;

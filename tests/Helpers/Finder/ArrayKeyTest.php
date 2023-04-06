@@ -8,11 +8,6 @@ class ArrayKeyTest extends \JsonWorks\Tests\Base
 {
     protected Finder $finder;
 
-    protected function setUp(): void
-    {
-        $this->finder = new Finder();
-    }
-
     public function testIsArrayKeyTrue(): void
     {
         $values = ['0', '109'];
@@ -22,7 +17,7 @@ class ArrayKeyTest extends \JsonWorks\Tests\Base
             $expected = (int) $value;
             $msg = sprintf('Testing key "%s"', $value);
 
-            $result = $this->callMethod($this->finder, 'isArrayKey', [$value, &$index]);
+            $result = $this->callMethod(Finder::class, 'isArrayKey', [$value, &$index]);
             self::assertTrue($result, $msg);
             self::assertEquals($expected, $index, $msg);
         }
@@ -36,7 +31,7 @@ class ArrayKeyTest extends \JsonWorks\Tests\Base
         foreach ($values as $value) {
             $msg = sprintf('Testing key "%s"', $value);
 
-            $result = $this->callMethod($this->finder, 'isArrayKey', [$value, &$index]);
+            $result = $this->callMethod(Finder::class, 'isArrayKey', [$value, &$index]);
             self::assertFalse($result, $msg);
         }
     }

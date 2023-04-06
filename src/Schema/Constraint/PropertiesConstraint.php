@@ -17,7 +17,7 @@ use JohnStevenson\JsonWorks\Helpers\Utils;
 
 class PropertiesConstraint extends BaseConstraint
 {
-    /** @var array<object> */
+    /** @var array<array{data: mixed, schema: stdClass, key: string}> */
     protected array $children;
 
     /**
@@ -112,7 +112,7 @@ class PropertiesConstraint extends BaseConstraint
     */
     protected function mergeAdditional(array $set, $additional): void
     {
-        if (is_object($additional)) {
+        if ($additional instanceof stdClass) {
 
             foreach ($set as $key => $data) {
                 $this->addChild($data, $additional, $key);

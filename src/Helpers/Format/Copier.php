@@ -43,6 +43,10 @@ class Copier extends BaseFormat
     {
         $result = [];
 
+        if (is_object($data)) {
+            $data = get_object_vars($data);
+        }
+
         foreach ($data as $key => $value) {
             $result[$key] = $this->run($value);
         }
