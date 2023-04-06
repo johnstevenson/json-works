@@ -61,7 +61,7 @@ class Store
     /**
      * @return mixed
      */
-    protected function getData(string $doc, ?string &$path)
+    protected function getData(string $doc, string &$path)
     {
         if (!$this->matchPath($doc, $path, $partPath)) {
             return $this->data[$doc]['#'];

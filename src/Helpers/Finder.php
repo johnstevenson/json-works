@@ -87,7 +87,12 @@ class Finder
                 return false;
             }
 
-            $this->target->setFoundPath(array_shift($tokens));
+            $token = array_shift($tokens);
+            if ($token === null) {
+                break;
+            }
+
+            $this->target->setFoundPath($token);
         }
 
         return true;

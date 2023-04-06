@@ -51,8 +51,8 @@ class Builder
     }
 
     /**
-    * Initializes the data
-    */
+     * Initializes the data
+     */
     protected function initData(): void
     {
         if (Utils::arrayNotEmpty($this->target->tokens)) {
@@ -73,15 +73,19 @@ class Builder
     }
 
     /**
-    * Builds new elements from the remaining tokens
-    *
-    * @param array<string> $tokens
-    * @param mixed $value The value to add to the final element
-    */
+     * Builds new elements from the remaining tokens
+     *
+     * @param array<string> $tokens
+     * @param mixed $value The value to add to the final element
+     */
     protected function processTokens(array $tokens, $value): void
     {
-        while (Utils::arrayNotEmpty($tokens)) {
+        while (true) {
             $key = array_shift($tokens);
+
+            if ($key === null) {
+                break;
+            }
 
             if (Utils::arrayNotEmpty($tokens)) {
                 $this->addElement($key, $tokens[0]);

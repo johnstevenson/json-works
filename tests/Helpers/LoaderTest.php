@@ -47,11 +47,13 @@ class LoaderTest extends \JsonWorks\Tests\Base
     protected function getResource()
     {
         if ($this->resource === null) {
-            $fp = fopen(__FILE__, 'r');
+            $file = __FILE__;
 
-            if ($fp !== false) {
-                $this->resource = $fp;
+            if (false === ($fp = fopen($file, 'r'))) {
+                throw new \RuntimeException('Test not run, unable to open: '.$file);
             }
+
+            $this->resource = $fp;
         }
 
         return $this->resource;
