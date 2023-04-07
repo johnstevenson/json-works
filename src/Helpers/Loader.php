@@ -20,10 +20,6 @@ use JohnStevenson\JsonWorks\Helpers\Formatter;
 */
 class Loader
 {
-    const TYPE_DOCUMENT = 'LOAD_TYPE_DOCUMENT';
-    const TYPE_SCHEMA = 'LOAD_TYPE_SCHEMA';
-    const TYPE_PATCH = 'LOAD_TYPE_PATCH';
-
     /**
     * Processes input to be used as a document
     *
@@ -38,7 +34,14 @@ class Loader
     */
     public function loadData($input)
     {
-        return $this->processInput($input, self::TYPE_DOCUMENT);
+        $result = $this->processInput($input);
+        $dataType = gettype($result);
+
+        if ($dataType !== 'resource') {
+            return $result;
+        }
+
+        throw new \RuntimeException($this->getInputError($dataType));
     }
 
     /**
@@ -57,7 +60,14 @@ class Loader
     */
     public function loadPatch($input): array
     {
-        return $this->processInput($input, self::TYPE_PATCH);
+        $result = $this->processInput($input);
+
+        if (is_array($result)) {
+            return $result;
+        }
+
+        $dataType = gettype($result);
+        throw new \RuntimeException($this->getInputError($dataType));
     }
 
     /**
@@ -76,7 +86,14 @@ class Loader
     */
     public function loadSchema($input)
     {
-        return $this->processInput($input, self::TYPE_SCHEMA);
+        $result = $this->processInput($input);
+
+        if ($result instanceof stdClass) {
+            return $result;
+        }
+
+        $dataType = gettype($result);
+        throw new \RuntimeException($this->getInputError($dataType));
     }
 
     /**
@@ -85,7 +102,7 @@ class Loader
     * @param mixed $data
     * @return mixed
     */
-    protected function processInput($data, string $type)
+    protected function processInput($data)
     {
         if (is_string($data)) {
             $data = $this->processStringInput($data);
@@ -93,8 +110,6 @@ class Loader
             $formatter = new Formatter();
             $data = $formatter->copy($data);
         }
-
-        $this->checkData($data, $type);
 
         return $data;
     }
@@ -133,33 +148,6 @@ class Loader
         }
 
         return $json;
-    }
-
-    /**
-    * Checks that data is valid for type
-    *
-    * @param mixed $data
-    * @throws \RuntimeException
-    */
-    protected function checkData($data, string $type): void
-    {
-        $dataType = gettype($data);
-
-        switch ($type) {
-            case self::TYPE_SCHEMA:
-                $valid = $dataType === 'object';
-                break;
-            case self::TYPE_PATCH:
-                $valid = $dataType === 'array';
-                break;
-            default:
-                $valid = $dataType !== 'resource';
-        }
-
-        if (!$valid) {
-            $error = new Error();
-            throw new \RuntimeException($error->get(Error::ERR_BAD_INPUT, $dataType));
-        }
     }
 
     /**
@@ -204,6 +192,13 @@ class Loader
         }
 
         return false;
+    }
+
+    protected function getInputError(string $dataType): string
+    {
+        $error = new Error();
+
+        return $error->get(Error::ERR_BAD_INPUT, $dataType);
     }
 
     /**

@@ -9,13 +9,13 @@ use JohnStevenson\JsonWorks\Schema\Resolver;
 
 class Manager
 {
-    /** @var array<mixed> */
+    /** @var array<string> */
     public array $dataPath;
 
     /** @var array<string> */
     public array $errors;
 
-    /** @var array<object> */
+    /** @var array<ConstraintInterface> */
     protected $constraints;
 
     public bool $stopOnError;
@@ -36,74 +36,84 @@ class Manager
 
     /**
      * @param mixed $data
-     * @param mixed $schema
+     * @param stdClass|array<mixed> $schema
      */
     public function validate($data, $schema, ?string $key = null): void
     {
         $schema = $this->setValue($schema);
 
-        if ($this->dataChecker->emptySchema($schema)) {
+        if ($this->dataChecker->isEmptySchema($schema)) {
             return;
         }
 
         $this->dataPath[] = strval($key);
 
         // Check commmon types first
-        $common = $this->factory('common');
-
-        if ($common->validate($data, $schema)) {
-
-            $specific = $this->factory('specific');
-            $specific->validate($data, $schema);
+        if ($this->checkCommonTypes($data, $schema)) {
+            $constraint = $this->factory(SpecificConstraint::class);
+            $constraint->validate($data, $schema);
         }
 
         array_pop($this->dataPath);
     }
 
-    public function factory(string $name): object
+    /**
+     * @template T of ConstraintInterface
+     * @param class-string<T> $class
+     */
+    public function factory(string $class): ConstraintInterface
     {
-        if (!isset($this->constraints[$name])) {
-            $class = sprintf('\%s\%sConstraint', __NAMESPACE__, ucfirst($name));
-            $this->constraints[$name] = new $class($this);
+        if (!isset($this->constraints[$class])) {
+            $this->constraints[$class] = new $class($this);
         }
 
-        return $this->constraints[$name];
+        return $this->constraints[$class];
     }
 
     /**
     * Fetches a value from the schema
     *
-    * @param mixed $schema
     * @param mixed $value
-    * @param mixed|null $required
+    * @param array<string>|null $required
     * @throws \RuntimeException
     */
-    public function getValue($schema, string $key, &$value, $required = null): bool
+    public function getValue(stdClass $schema, string $key, &$value, ?array $required = null): bool
     {
-        if (is_object($schema)) {
+        $result = property_exists($schema, $key);
 
-            if ($result = property_exists($schema, $key)) {
-                // @phpstan-ignore-next-line
-                $value = $this->setValue($schema->$key);
-                $this->dataChecker->checkType($value, $required);
-            }
-
-            return $result;
+        if ($result) {
+            $value = $this->setValue($schema->$key);
+            $this->dataChecker->checkType($value, $required);
         }
 
-        $error = $this->dataChecker->formatError('object', gettype($schema));
-        throw new \RuntimeException($error);
+        return $result;
     }
 
     /**
-     * @param mixed $schema
-     * @return mixed
+     * @param mixed $data
+     * @param stdClass|array<mixed> $schema
+     */
+    protected function checkCommonTypes($data, $schema): bool
+    {
+        $errorCount = count($this->errors);
+
+        $constraint = $this->factory(CommonConstraint::class);
+        $constraint->validate($data, $schema);
+
+        return count($this->errors) === $errorCount;
+    }
+
+    /**
+     * @param stdClass|array<mixed> $schema
+     * @return stdClass|array<mixed>
      */
     protected function setValue($schema)
     {
-        if ($this->dataChecker->checkForRef($schema, $ref)) {
+        $ref = $this->dataChecker->checkForRef($schema);
+
+        if ($ref !== null) {
             $schema = $this->resolver->getRef($ref);
-            $this->dataChecker->checkType($schema, 'object');
+            $this->dataChecker->checkType($schema, ['object']);
         }
 
         return $schema;

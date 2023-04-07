@@ -17,10 +17,10 @@ use JohnStevenson\JsonWorks\Helpers\Error;
 */
 class Error
 {
-    const ERR_NOT_FOUND = 'ERR_NOT_FOUND';
-    const ERR_PATH_KEY = 'ERR_PATH_KEY';
-    const ERR_BAD_INPUT = 'ERR_BAD_INPUT';
-    const ERR_VALIDATE = 'ERR_VALIDATE';
+    public const ERR_NOT_FOUND = 'ERR_NOT_FOUND';
+    public const ERR_PATH_KEY = 'ERR_PATH_KEY';
+    public const ERR_BAD_INPUT = 'ERR_BAD_INPUT';
+    public const ERR_VALIDATE = 'ERR_VALIDATE';
 
     /**
     * Returns a formatted error message

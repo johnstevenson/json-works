@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /*
  * This file is part of the Json-Works package.
  *
@@ -15,4 +16,10 @@ use \stdClass;
 interface ConstraintInterface
 {
     public function __construct(Manager $manager);
+
+    /**
+     * @param mixed $data
+     * @param stdClass|array<mixed> $schema
+     */
+    public function validate($data, $schema, ?string $key = null): void;
 }

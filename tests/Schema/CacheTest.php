@@ -279,23 +279,4 @@ class CacheTest extends \JsonWorks\Tests\Base
 
         self::assertEquals($expected, $result);
     }
-
-    public function testReffedItem(): void
-    {
-        $schema = '{
-            "a": [ "number", "boolean" ],
-            "b": { "$ref": "#/a" },
-            "c": { "$ref": "#/b/1" }
-        }';
-
-        $schema = $this->objectFromJson($schema);
-        $expected = $schema->a[1];
-
-        // Tests that #/b/1 finds the parent #/a, resolves it and adds it
-        // to #b, then searches #b for /1
-        $ref = '#/b/1';
-
-        $result = $this->resolve($ref, $schema);
-        self::assertEquals($expected, $result);
-    }
 }

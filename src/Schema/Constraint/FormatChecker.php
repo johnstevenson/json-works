@@ -13,9 +13,9 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use JohnStevenson\JsonWorks\Helpers\Utils;
 
-class FormatConstraint extends BaseConstraint
+class FormatChecker extends BaseConstraint
 {
-    public function validate(string $data, string $format): void
+    public function check(string $data, string $format): void
     {
         if (!$this->checkKnownFormat($data, $format)) {
             $error = sprintf("Unknown format '%s'", $format);

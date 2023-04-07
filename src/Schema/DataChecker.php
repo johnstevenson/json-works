@@ -11,6 +11,8 @@
 
 namespace JohnStevenson\JsonWorks\Schema;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Comparer;
 
@@ -25,17 +27,15 @@ class DataChecker
 
     /**
      * @param mixed $value
-     * @param string|array<string>|null $required
+     * @param array<string>|null $required
      */
-    public function checkType($value, $required): void
+    public function checkType($value, ?array $required): void
     {
         $type = $this->comparer->getSpecific($value);
 
         if ($required !== null) {
-            $types = (array) $required;
-
-            if (!in_array($type, $types, true)) {
-                $error = $this->formatError(implode('|', $types), $type);
+            if (!in_array($type, $required, true)) {
+                $error = $this->formatError(implode('|', $required), $type);
                 throw new \RuntimeException($error);
             }
         }
@@ -54,11 +54,13 @@ class DataChecker
     }
 
     /**
-     * @param mixed $schema
+     * @param object|array<mixed> $schema
      */
     public function checkContainerTypes($schema, string $type): void
     {
-        foreach ($schema as $value) {
+        $container = is_object($schema) ? get_object_vars($schema) : $schema;
+
+        foreach ($container as $value) {
             if (!$this->comparer->checkType($value, $type)) {
                 $error = $this->formatError($type, 'mixed');
                 throw new \RuntimeException($error);
@@ -69,9 +71,9 @@ class DataChecker
     /**
      * @param mixed $schema
      */
-    public function emptySchema($schema): bool
+    public function isEmptySchema($schema): bool
     {
-        $this->checkType($schema, 'object');
+        $this->checkType($schema, ['object']);
 
         return Utils::arrayIsEmpty((array) $schema);
     }
@@ -79,12 +81,19 @@ class DataChecker
     /**
      * @param mixed $schema
      */
-    public function checkForRef($schema, ?string &$ref): bool
+    public function checkForRef($schema): ?string
     {
-        if ($result = (is_object($schema) && property_exists($schema, '$ref'))) {
-            // @phpstan-ignore-next-line
-            $ref = $schema->{'$ref'};
-            $this->checkType($ref, 'string');
+        $result = null;
+
+        if (!($schema instanceof stdClass) || !property_exists($schema, '$ref')) {
+            return $result;
+        }
+
+        $result = $schema->{'$ref'};
+
+        if (!is_string($result)) {
+            $error = $this->formatError('string', gettype($result));
+            throw new \RuntimeException($error);
         }
 
         return $result;

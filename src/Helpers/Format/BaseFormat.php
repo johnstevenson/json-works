@@ -18,19 +18,19 @@ class BaseFormat
     /**
     * Returns true if the data is an object or array
     *
-    * The $isObject param is set and reports if $data is either an object or an
+    * The $asObject param is set and reports if $data is either an object or an
     * associative array
     *
     * @param object|array<mixed>|mixed $data The data to check
     */
-    protected function isContainer($data, ?bool &$isObject): bool
+    protected function isContainer($data, ?bool &$asObject): bool
     {
-        if ($isObject = is_object($data)) {
+        if ($asObject = is_object($data)) {
             return true;
         }
 
         if (is_array($data)) {
-            $isObject = $this->isAssociative($data);
+            $asObject = $this->isAssociative($data);
             return true;
         }
 
@@ -63,8 +63,8 @@ class BaseFormat
     * @param object|array<mixed> $data
     * @return object|array<mixed>
     */
-    protected function formatContainer($data, bool $isObject)
+    protected function formatContainer($data, bool $asObject)
     {
-        return $isObject ? (object) $data: $data;
+        return $asObject ? (object) $data: $data;
     }
 }

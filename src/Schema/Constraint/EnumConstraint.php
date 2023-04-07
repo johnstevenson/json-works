@@ -11,10 +11,13 @@
 
 namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
+use \stdClass;
+
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Comparer;
 use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 
-class EnumConstraint extends BaseConstraint
+class EnumConstraint extends BaseConstraint implements ConstraintInterface
 {
     protected Comparer $comparer;
 
@@ -26,10 +29,15 @@ class EnumConstraint extends BaseConstraint
 
     /**
      * @param mixed $data
-     * @param array<mixed> $schema
+     * @param stdClass|array<mixed> $schema
      */
-    public function validate($data, array $schema): void
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!is_array($schema)) {
+            $error = Utils::getArgumentError('$schema', 'array', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
         foreach ($schema as $value) {
             if ($this->comparer->equals($value, $data)) {
                 return;

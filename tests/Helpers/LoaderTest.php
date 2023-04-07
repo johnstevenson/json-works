@@ -6,6 +6,10 @@ use JohnStevenson\JsonWorks\Helpers\Loader;
 
 class LoaderTest extends \JsonWorks\Tests\Base
 {
+    const TYPE_DOCUMENT = 'LOAD_TYPE_DOCUMENT';
+    const TYPE_SCHEMA = 'LOAD_TYPE_SCHEMA';
+    const TYPE_PATCH = 'LOAD_TYPE_PATCH';
+
     protected Loader $loader;
     /** @var resource|null */
     protected $resource;
@@ -29,11 +33,11 @@ class LoaderTest extends \JsonWorks\Tests\Base
     protected function callLoader(string $loadType, $data)
     {
         switch ($loadType) {
-            case Loader::TYPE_DOCUMENT:
+            case self::TYPE_DOCUMENT:
                 return $this->loader->loadData($data);
-            case Loader::TYPE_SCHEMA:
+            case self::TYPE_SCHEMA:
                 return $this->loader->loadSchema($data);
-            case Loader::TYPE_PATCH:
+            case self::TYPE_PATCH:
                 return $this->loader->loadPatch($data);
             default:
                 $msg = sprintf("Unknown load type '%s', test not run", $loadType);
@@ -166,7 +170,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
     public function testLoadDataTypes(): void
     {
-        $loadType = Loader::TYPE_DOCUMENT;
+        $loadType = self::TYPE_DOCUMENT;
 
         // everything is valid
         $valid = $this->getAllData(true);
@@ -177,7 +181,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
     public function testLoadDataFiles(): void
     {
-        $loadType = Loader::TYPE_DOCUMENT;
+        $loadType = self::TYPE_DOCUMENT;
 
         $this->runValidFileTest($loadType, 'pretty.json');
         $this->runInvalidFilesTest($loadType);
@@ -185,7 +189,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
     public function testLoadSchemaTypes(): void
     {
-        $loadType = Loader::TYPE_SCHEMA;
+        $loadType = self::TYPE_SCHEMA;
         $valid = ['object'];
 
         $this->runValidTypesTest($loadType, $valid);
@@ -194,7 +198,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
     public function testLoadSchemaFiles(): void
     {
-        $loadType = Loader::TYPE_SCHEMA;
+        $loadType = self::TYPE_SCHEMA;
 
         $this->runValidFileTest($loadType, 'schema.json');
         $this->runInvalidFilesTest($loadType);
@@ -202,7 +206,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
     public function testLoadPatchTypes(): void
     {
-        $loadType = Loader::TYPE_PATCH;
+        $loadType = self::TYPE_PATCH;
         $valid = ['array'];
 
         $this->runValidTypesTest($loadType, $valid);
@@ -211,7 +215,7 @@ class LoaderTest extends \JsonWorks\Tests\Base
 
     public function testLoadPatchFiles(): void
     {
-        $loadType = Loader::TYPE_PATCH;
+        $loadType = self::TYPE_PATCH;
 
         $this->runValidFileTest($loadType, 'patch.json');
         $this->runInvalidFilesTest($loadType);

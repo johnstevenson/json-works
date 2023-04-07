@@ -18,23 +18,23 @@ use \stdClass;
 class Orderer
 {
     /**
-    * Reorders object properties using the schema order
-    *
-    * @internal
-    * @param mixed $data
-    * @return mixed
-    */
+     * Reorders object properties using the schema order
+     *
+     * @internal
+     * @param mixed $data
+     * @return mixed
+     */
     public function run($data, ?stdClass $schema)
     {
         $properties = $this->objectWithSchema($data, $schema);
 
-        if ($properties !== null) {
+        if ($properties !== null && ($data instanceof stdClass)) {
             return $this->orderObject($data, $properties);
         }
 
         $items = $this->arrayWithSchema($data, $schema);
 
-        if ($items !== null) {
+        if ($items !== null && is_array($data)) {
             return $this->orderArray($data, $items);
         }
 
@@ -42,10 +42,10 @@ class Orderer
     }
 
     /**
-    * Returns schema items if they are relevant and exist
-    *
-    * @param mixed $data
-    */
+     * Returns schema items if they are relevant and exist
+     *
+     * @param mixed $data
+     */
     protected function arrayWithSchema($data, ?stdClass $schema): ?stdClass
     {
         if (!is_array($data)) {
@@ -57,10 +57,10 @@ class Orderer
     }
 
     /**
-    * Returns schema properties if they are relevant and exist
-    *
-    * @param mixed $data
-    */
+     * Returns schema properties if they are relevant and exist
+     *
+     * @param mixed $data
+     */
     protected function objectWithSchema($data, ?stdClass $schema): ?stdClass
     {
         if (!is_object($data)) {
@@ -77,9 +77,9 @@ class Orderer
     }
 
     /**
-    * Returns schema properties if valid, otherwise null
-    *
-    */
+     * Returns schema properties if valid, otherwise null
+     *
+     */
     protected function getProperties(?stdClass $schema, string $key): ?stdClass
     {
         if (!isset($schema->$key)) {
@@ -90,10 +90,10 @@ class Orderer
     }
 
     /**
-    * Creates schema properties from ordered data properties
-    *
-    * @param object $data
-    */
+     * Creates schema properties from ordered data properties
+     *
+     * @param object $data
+     */
     protected function getPropertiesFromData($data): stdClass
     {
         $result = new stdClass();
@@ -109,13 +109,12 @@ class Orderer
     }
 
     /**
-    * Orders an array using the schema items properties
-    *
-    * @param mixed $data
-    * @param stdClass $schema
-    * @return mixed[]
-    */
-    protected function orderArray($data, $schema)
+     * Orders an array using the schema items properties
+     *
+     * @param array<mixed> $data
+     * @return array<mixed>
+     */
+    protected function orderArray(array $data, stdClass $schema): array
     {
         $result = [];
 
@@ -127,21 +126,16 @@ class Orderer
     }
 
     /**
-    * Orders an object using the schema properties
-    *
-    * @param mixed $data
-    * @param object $properties
-    * @return object
-    */
-    protected function orderObject($data, $properties)
+     * Orders an object using the schema properties
+     */
+    protected function orderObject(stdClass $data, stdClass $properties): stdClass
     {
         $result = [];
 
+        /** @var stdClass $schema */
         foreach (get_object_vars($properties) as $key => $schema) {
             if (property_exists($data, $key)) {
-                // @phpstan-ignore-next-line
                 $result[$key] = $this->run($data->$key, $schema);
-                // @phpstan-ignore-next-line
                 unset($data->$key);
             }
         }

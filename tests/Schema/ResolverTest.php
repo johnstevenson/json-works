@@ -419,4 +419,42 @@ class ResolverTest extends \JsonWorks\Tests\Base
         $result = $resolver->getRef($ref);
         self::assertEquals($expected, $result);
     }
+
+    public function testRecursive() : void
+    {
+        $schema = '{
+            "type": "object",
+            "properties": {
+            "name": { "type": "string" },
+            "children": {
+                  "type": "array",
+                  "items": { "$ref": "#" }
+                }
+              }
+        }';
+
+        $data = '{
+            "name": "Elizabeth",
+            "children": [
+                {
+                    "name": "Charles",
+                    "children": [
+                        {
+                            "name": "William",
+                            "children": [
+                                { "name": "George" },
+                                { "name": "Charlotte" }
+                            ]
+                        },
+                        {
+                          "name": "Harry"
+                        }
+                    ]
+                }
+            ]
+        }';
+
+        list($result, $error) = $this->validateEx($schema, $data, 'Testing success');
+        self::assertTrue($result, $error);
+    }
 }

@@ -13,25 +13,41 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
-class MaxMinConstraint extends BaseConstraint
+use JohnStevenson\JsonWorks\Helpers\Utils;
+
+class MaxMinConstraint extends BaseConstraint implements ConstraintInterface
 {
     protected bool $max;
     protected bool $length;
     protected string $caption;
 
     /**
-    * The main method
-    *
-    * @param mixed $data
-    */
-    public function validate($data, stdClass $schema, string $key): void
+     * @param mixed $data
+     * @param stdClass|array<mixed> $schema
+     */
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
+        if (!is_string($key)) {
+            $error = Utils::getArgumentError('$key', 'string', $key);
+            throw new \InvalidArgumentException($error);
+        }
+
         if (!$this->getInteger($schema, $key, $value)) {
             return;
         }
 
         $this->setValues($data, $key);
-        $count = $this->length ? mb_strlen($data) : count((array) $data);
+
+        if ($this->length && is_string($data)) {
+            $count = mb_strlen($data);
+        } else {
+            $count =  count((array) $data);
+        }
 
         if (!$this->compare($count, $value)) {
             $this->setError($count, $value);
@@ -45,9 +61,9 @@ class MaxMinConstraint extends BaseConstraint
     */
     protected function setValues($data, string $key): void
     {
-        $this->max = (bool) preg_match('/^max/', $key);
+        $this->max = Utils::isMatch('/^max/', $key);
 
-        if ($this->length = (bool) preg_match('/Length$/', $key)) {
+        if ($this->length = Utils::isMatch('/Length$/', $key)) {
             $this->caption = 'characters';
         } else {
             $this->caption = is_object($data) ? 'properties' : 'elements';
@@ -57,12 +73,12 @@ class MaxMinConstraint extends BaseConstraint
     /**
     * Returns true if a valid integer is found in the schema
     *
-    * @param mixed $value Set by method
+    * @param int $value Set by method
     * @throws \RuntimeException
     */
     protected function getInteger(stdClass $schema, string $key, &$value): bool
     {
-        if (!$this->getValue($schema, $key, $value, 'integer')) {
+        if (!$this->getValue($schema, $key, $value, ['integer'])) {
             return false;
         }
 

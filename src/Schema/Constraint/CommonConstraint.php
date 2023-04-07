@@ -13,9 +13,10 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\DataChecker;
 
-class CommonConstraint extends BaseConstraint
+class CommonConstraint extends BaseConstraint implements ConstraintInterface
 {
     protected DataChecker $dataChecker;
 
@@ -27,13 +28,16 @@ class CommonConstraint extends BaseConstraint
 
     /**
      * @param mixed $data
+     * @param stdClass|array<mixed> $schema
      */
-    public function validate($data, stdClass $schema): bool
+    public function validate($data, $schema, ?string $key = null): void
     {
-        $errors = count($this->manager->errors);
-        $this->run($data, $schema);
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
 
-        return count($this->manager->errors) === $errors;
+        $this->run($data, $schema);
     }
 
     /**
@@ -52,7 +56,8 @@ class CommonConstraint extends BaseConstraint
 
         foreach (get_object_vars($schema) as $key => $subSchema) {
             if (isset($common[$key])) {
-                $this->getValue($schema, $key, $subSchema, $common[$key]);
+                $required = (array) $common[$key];
+                $this->getValue($schema, $key, $subSchema, $required);
                 $this->checkSchema($subSchema, $key);
                 $this->check($data, $subSchema, $key);
             }
@@ -68,24 +73,38 @@ class CommonConstraint extends BaseConstraint
             $schema = (array) $schema;
         }
 
-        if ($key !== 'not') {
+        if ($key !== 'not' && is_array($schema)) {
             $this->dataChecker->checkArray($schema, $key);
         }
     }
 
     /**
      * @param mixed $data
-     * @param mixed $subSchema
+     * @param array<mixed> $subSchema
      */
     protected function check($data, $subSchema, string $key): void
     {
-        $name = in_array($key, ['enum', 'type'], true) ? $key : 'of';
-        $validator = $this->manager->factory($name);
+        switch ($key) {
+            case 'enum':
+                $class = EnumConstraint::class;
+                break;
+            case 'type':
+                $class = TypeConstraint::class;
+                break;
+            default:
+                $class = OfConstraint::class;
+                break;
+        }
 
+        $validator =$this->manager->factory($class);
+        $validator->validate($data, $subSchema, $key);
+
+        /*
         if ($name === 'of') {
             $validator->validate($data, $subSchema, $key);
         } else {
             $validator->validate($data, $subSchema);
         }
+        */
     }
 }

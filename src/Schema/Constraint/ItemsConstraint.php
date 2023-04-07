@@ -13,13 +13,26 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
-class ItemsConstraint extends BaseConstraint
+use JohnStevenson\JsonWorks\Helpers\Utils;
+
+class ItemsConstraint extends BaseConstraint implements ConstraintInterface
 {
     /**
      * @param mixed $data
+     * @param stdClass|array<mixed> $schema
      */
-    public function validate($data, stdClass $schema): void
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!is_array($data)) {
+            $error = Utils::getArgumentError('$data', 'array', $data);
+            throw new \InvalidArgumentException($error);
+        }
+
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
         list($items, $additional) = $this->getItemValues($schema);
 
         if ($items instanceof stdClass) {
@@ -54,9 +67,9 @@ class ItemsConstraint extends BaseConstraint
     }
 
     /**
-     * @param mixed $data
+     * @param array<mixed> $data
      */
-    protected function validateObjectItems($data, stdClass $schema): void
+    protected function validateObjectItems(array $data, stdClass $schema): void
     {
         $key = 0;
 
@@ -67,11 +80,11 @@ class ItemsConstraint extends BaseConstraint
     }
 
     /**
-     * @param mixed $data
+     * @param array<mixed> $data
      * @param array<mixed> $items
      * @param object|boolean|null $additional
      */
-    protected function checkArrayItems($data, array $items, $additional): void
+    protected function checkArrayItems(array $data, array $items, $additional): void
     {
         if (false === $additional) {
             if (count($data) > count($items)) {
@@ -81,11 +94,11 @@ class ItemsConstraint extends BaseConstraint
     }
 
     /**
-     * @param mixed $data
+     * @param array<mixed> $data
      * @param array<mixed> $items
      * @param object|boolean|null $additional
      */
-    protected function validateArrayItems($data, array $items, $additional): void
+    protected function validateArrayItems(array $data, array $items, $additional): void
     {
         $key = 0;
         $itemsCount = count($items);
@@ -93,7 +106,9 @@ class ItemsConstraint extends BaseConstraint
         foreach ($data as $value) {
 
             if ($key < $itemsCount) {
-                $this->manager->validate($value, $items[$key], strval($key));
+                /** @var array<mixed> $item */
+                $item = $items[$key];
+                $this->manager->validate($value, $item, strval($key));
             } else {
 
                 if ($additional instanceof stdClass) {

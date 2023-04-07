@@ -21,28 +21,23 @@ class Cache
     public function __construct(stdClass $schema)
     {
         $this->store = new Store;
-
-        $ref = $this->makeRef('/', '#');
-        //$this->store->addRoot('/', $schema, $ref);
         $this->store->addRoot('/', $schema);
 
         $this->dataChecker = new DataChecker;
         $this->finder = new Finder;
     }
 
-    /**
-     * @return mixed
-     */
-    public function resolveRef(string $ref)
+    public function resolveRef(string $ref): stdClass
     {
         list($doc, $path) = $this->splitRef($ref);
 
         if ($this->store->hasRoot($doc)) {
             $this->parents = [];
-
             $schema = $this->resolve($ref);
 
-            if ($this->dataChecker->checkForRef($schema, $childRef)) {
+            $childRef = $this->dataChecker->checkForRef($schema);
+
+            if ($childRef !== null) {
                 $error = $this->getRefError('Circular reference found', $ref);
                 throw new \RuntimeException($error);
             }
@@ -50,14 +45,10 @@ class Cache
             return $schema;
         }
 
-        $error = $this->getRefError('Unable to find $ref', $ref);
-        throw new \RuntimeException($error);
+        throw new \RuntimeException($this->getResolveError($ref));
     }
 
-    /**
-     * @return mixed
-     */
-    protected function resolve(string $ref)
+    protected function resolve(string $ref): stdClass
     {
         list($doc, $path) = $this->splitRef($ref);
 
@@ -73,8 +64,7 @@ class Cache
             return $schema;
         }
 
-        $error = $this->getRefError('Unable to find $ref', $ref);
-        throw new \RuntimeException($error);
+        throw new \RuntimeException($this->getResolveError($ref));
     }
 
     /**
@@ -114,33 +104,35 @@ class Cache
 
     /**
      * @param mixed $data
-     * @return mixed|null
      */
-    protected function find(string $ref, string $doc, string $path, $data)
+    protected function find(string $ref, string $doc, string $path, $data): ?stdClass
     {
         $error = '';
         $target = new Target($path, $error);
 
         if ($this->finder->get($data, $target)) {
-            return $this->processFoundSchema($ref, $target->element);
+            if ($target->element instanceof stdClass) {
+                return $this->processFoundSchema($ref, $target->element);
+            }
+
+            throw new \RuntimeException($this->getResolveError($ref));
         }
 
-        if ($this->dataChecker->checkForRef($target->element, $childRef)) {
-            $foundRef = $this->makeRef($doc, $target->foundPath);
+        $childRef = $this->dataChecker->checkForRef($target->element);
 
+        if ($childRef !== null) {
+            $foundRef = $this->makeRef($doc, $target->foundPath);
             return $this->processFoundRef($ref, $foundRef, $childRef);
         }
 
         return null;
     }
 
-    /**
-     * @param mixed $schema
-     * @return mixed
-     */
-    protected function processFoundSchema(string $ref, $schema)
+    protected function processFoundSchema(string $ref, stdClass $schema): stdClass
     {
-        if ($this->dataChecker->checkForRef($schema, $childRef)) {
+        $childRef = $this->dataChecker->checkForRef($schema);
+
+        if ($childRef !== null) {
             $this->parents[] = $ref;
             $schema = $this->resolve($childRef);
         }
@@ -150,10 +142,7 @@ class Cache
         return $schema;
     }
 
-    /**
-     * @return mixed|null
-     */
-    protected function processFoundRef(string $ref, string $foundRef, string $childRef)
+    protected function processFoundRef(string $ref, string $foundRef, string $childRef): stdClass
     {
         $this->parents[] = $foundRef;
         $schema = $this->resolve($childRef);
@@ -167,16 +156,18 @@ class Cache
         return $this->resolve($ref);
     }
 
-    /**
-     * @param mixed $schema
-     */
-    protected function addRef(string $ref, $schema): void
+    protected function addRef(string $ref, stdclass $schema): void
     {
         list($doc, $path) = $this->splitRef($ref);
 
         if (!$this->store->add($doc, $path, $schema)) {
             throw new \RuntimeException($this->getRecursionError($ref));
         }
+    }
+
+    protected function getResolveError(string $ref): string
+    {
+        return $this->getRefError('Unable to find $ref', $ref);
     }
 
     protected function getRecursionError(string $ref): string

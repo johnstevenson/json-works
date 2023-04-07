@@ -17,8 +17,9 @@ use JohnStevenson\JsonWorks\Schema\Comparer;
 use JohnStevenson\JsonWorks\Schema\Constraint\ItemsConstraint;
 use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 use JohnStevenson\JsonWorks\Schema\Constraint\MaxMinConstraint;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
-class ArrayConstraint extends BaseConstraint
+class ArrayConstraint extends BaseConstraint implements ConstraintInterface
 {
     protected Comparer $comparer;
     protected ItemsConstraint $items;
@@ -33,10 +34,21 @@ class ArrayConstraint extends BaseConstraint
     }
 
     /**
-     * @param array<mixed> $data
+     * @param mixed $data
+     * @param stdClass|array<mixed> $schema
      */
-    public function validate(array $data, stdClass $schema): void
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!is_array($data)) {
+            $error = Utils::getArgumentError('$data', 'array', $data);
+            throw new \InvalidArgumentException($error);
+        }
+
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
         // max and min
         $this->checkMaxMin($data, $schema);
 
@@ -73,7 +85,7 @@ class ArrayConstraint extends BaseConstraint
 
     protected function isUnique(stdClass $schema): bool
     {
-        if ($this->getValue($schema, 'uniqueItems', $value, 'boolean')) {
+        if ($this->getValue($schema, 'uniqueItems', $value, ['boolean'])) {
             return $value;
         }
 

@@ -11,10 +11,9 @@ use JohnStevenson\JsonWorks\Schema\Validator;
 class Base extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param mixed $schema
      * @param mixed $data
      */
-    protected function validate($schema, $data): bool
+    protected function validate(?string $schema, $data): bool
     {
         $schema = $this->getSchemaObject($schema);
         $data = $this->getValidData($data);
@@ -24,11 +23,10 @@ class Base extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $schema
      * @param mixed $data
      * @return array{0: bool, 1: string}
      */
-    protected function validateEx($schema, $data, string $message = ''): array
+    protected function validateEx(?string $schema, $data, string $message = ''): array
     {
         $schema = $this->getSchemaObject($schema);
         $data = $this->getValidData($data);
@@ -45,11 +43,7 @@ class Base extends \PHPUnit\Framework\TestCase
         return [$result, $message];
     }
 
-    /**
-     * @param mixed $schema
-     * @param mixed $data
-     */
-    protected function getDocument($schema, $data): Document
+    protected function getDocument(?string $schema, ?string $data): Document
     {
         $schema = $this->getSchemaObject($schema);
         $data = $data ?? null;
@@ -86,12 +80,11 @@ class Base extends \PHPUnit\Framework\TestCase
 
     /**
      * @param mixed $data
-     * @return object|array<mixed>
+     * @return mixed
      */
     protected function getValidData($data)
     {
         if (is_string($data)) {
-
             $data = trim($data);
 
             if (Utils::stringIsJson($data)) {
@@ -110,14 +103,14 @@ class Base extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return object|array<mixed>
+     * @return mixed
      */
     protected function decodeJson(string $json)
     {
         $result = json_decode($json);
 
         if (null === $result) {
-            throw new \InvalidArgumentException('Test not run, not valid json');
+            throw new \InvalidArgumentException('Test not run, json not valid');
         }
 
         return $result;

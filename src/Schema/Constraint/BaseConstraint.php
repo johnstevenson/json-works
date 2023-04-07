@@ -18,7 +18,7 @@ use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 use JohnStevenson\JsonWorks\Schema\ValidationException;
 
-abstract class BaseConstraint implements ConstraintInterface
+abstract class BaseConstraint
 {
     protected Manager $manager;
     protected Tokenizer $tokenizer;
@@ -46,9 +46,9 @@ abstract class BaseConstraint implements ConstraintInterface
 
     /**
      * @param mixed $value Set by method
-     * @param array<string>|string|null $required
+     * @param array<string>|null $required
      */
-    public function getValue(stdClass $schema, string $key, &$value, $required = null): bool
+    public function getValue(stdClass $schema, string $key, &$value, ?array $required = null): bool
     {
         return $this->manager->getValue($schema, $key, $value, $required);
     }

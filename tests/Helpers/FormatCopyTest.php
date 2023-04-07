@@ -2,6 +2,8 @@
 
 namespace JsonWorks\Tests\Helpers;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Helpers\Formatter;
 
 class FormatCopyTest extends \JsonWorks\Tests\Base
@@ -16,10 +18,11 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
     public function testFromObject(): void
     {
         $obj1 = (object) ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
-        $obj2 = $this->formatter->copy($obj1);
+        $obj2 = (object) $this->formatter->copy($obj1);
 
         $obj1->lastName = 'Smith';
         $expected = 'Bloggs';
+
         self::assertEquals($expected, $obj2->lastName);
     }
 
@@ -35,8 +38,8 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
     public function testDeepFromObject(): void
     {
         $obj = (object) ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
-        $obj1 = (object) ['users' => array($obj)];
-        $obj2 = $this->formatter->copy($obj1);
+        $obj1 = (object) ['users' => [$obj]];
+        $obj2 = (object) $this->formatter->copy($obj1);
 
         $obj1->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -46,9 +49,8 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
     public function testDeepFromAssoc(): void
     {
         $arr = ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
-        $obj1 = (object) ['users' => array($arr)];
-
-        $obj2 = $this->formatter->copy($obj1);
+        $obj1 = (object) ['users' => [$arr]];
+        $obj2 = (object) $this->formatter->copy($obj1);
 
         $expected = (object) $arr;
         self::assertEquals($expected, $obj2->users[0]);
@@ -57,10 +59,11 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
     public function testArrayDeepFromObject(): void
     {
         $obj = (object) ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
-        $obj1 = (object) ['users' => array($obj)];
+        $obj1 = (object) ['users' => [$obj]];
         $arr1 = [9, $obj1];
 
-        $arr2 = $this->formatter->copy($arr1);
+        /** @var array{0: int, 1: stdClass } */
+        $arr2 = (array) $this->formatter->copy($arr1);
 
         $arr1[1]->users[0]->lastName = 'Smith';
         $expected = 'Bloggs';
@@ -70,10 +73,11 @@ class FormatCopyTest extends \JsonWorks\Tests\Base
     public function testArrayDeepFromAssoc(): void
     {
         $arr = ['firstname' => 'Fred', 'lastName' => 'Bloggs'];
-        $obj = (object) ['users' => array($arr)];
+        $obj = (object) ['users' => [$arr]];
         $arr1 = [9, $obj];
 
-        $arr2 = $this->formatter->copy($arr1);
+        /** @var array{0: int, 1: stdClass } */
+        $arr2 = (array) $this->formatter->copy($arr1);
 
         $expected = (object) $arr;
         self::assertEquals($expected, $arr2[1]->users[0]);

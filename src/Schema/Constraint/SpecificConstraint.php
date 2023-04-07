@@ -17,7 +17,7 @@ use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\JsonTypes;
 use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 
-class SpecificConstraint extends BaseConstraint
+class SpecificConstraint extends BaseConstraint implements ConstraintInterface
 {
     protected JsonTypes $jsonTypes;
 
@@ -28,21 +28,50 @@ class SpecificConstraint extends BaseConstraint
     }
 
     /**
-    * @param mixed $data
-    */
-    public function validate($data, stdClass $schema): void
+     * @param mixed $data
+     * @param stdClass|array<mixed> $schema
+     */
+    public function validate($data, $schema, ?string $key = null): void
     {
-        $name = $this->getInstanceName($data);
-        if (Utils::stringNotEmpty($name)) {
-            $validator = $this->manager->factory($name);
-            $validator->validate($data, $schema);
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
         }
+
+        $dataType = $this->getInstanceType($data);
+        $class = null;
+
+        if (Utils::stringIsEmpty($dataType)) {
+            return;
+        }
+
+        switch ($dataType) {
+            case 'array':
+                $class = ArrayConstraint::class;
+                break;
+            case 'number':
+                $class = NumberConstraint::class;
+                break;
+            case 'object':
+                $class = ObjectConstraint::class;
+                break;
+            case 'string':
+                $class = StringConstraint::class;
+                break;
+        }
+
+        if ($class === null) {
+            throw new \RuntimeException('Unknown constraint: '.$dataType);
+        }
+
+        $validator = $this->manager->factory($class);
+        $validator->validate($data, $schema);
     }
 
     /**
     * @param mixed $data
     */
-    protected function getInstanceName($data): string
+    protected function getInstanceType($data): string
     {
         $result = $this->jsonTypes->getGeneric($data);
 

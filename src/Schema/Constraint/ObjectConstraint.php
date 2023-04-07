@@ -13,11 +13,12 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 use JohnStevenson\JsonWorks\Schema\Constraint\MaxMinConstraint;
 use JohnStevenson\JsonWorks\Schema\Constraint\PropertiesConstraint;
 
-class ObjectConstraint extends BaseConstraint
+class ObjectConstraint extends BaseConstraint implements ConstraintInterface
 {
     protected MaxMinConstraint $maxMin;
     protected PropertiesConstraint $properties;
@@ -31,9 +32,20 @@ class ObjectConstraint extends BaseConstraint
 
     /**
      * @param mixed $data
+     * @param stdClass|array<mixed> $schema
      */
-    public function validate($data, stdClass $schema): void
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!is_object($data)) {
+            $error = Utils::getArgumentError('$data', 'object', $data);
+            throw new \InvalidArgumentException($error);
+        }
+
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
         // max and min
         $this->checkMaxMin($data, $schema);
 
@@ -43,10 +55,7 @@ class ObjectConstraint extends BaseConstraint
         $this->properties->validate($data, $schema);
     }
 
-    /**
-     * @param mixed $data
-     */
-    protected function checkMaxMin($data, stdClass $schema): void
+    protected function checkMaxMin(object $data, stdClass $schema): void
     {
         // maxProperties
         $this->maxMin->validate($data, $schema, 'maxProperties');
@@ -55,19 +64,15 @@ class ObjectConstraint extends BaseConstraint
         $this->maxMin->validate($data, $schema, 'minProperties');
     }
 
-    /**
-     * @param mixed $data
-     */
-    protected function checkRequired($data, stdClass $schema): void
+    protected function checkRequired(object $data, stdClass $schema): void
     {
-        if (!$this->getValue($schema, 'required', $value, 'array')) {
+        if (!$this->getValue($schema, 'required', $value, ['array'])) {
             return;
         }
 
         $this->manager->dataChecker->checkArray($value, 'required');
 
         foreach ($value as $name) {
-
             if (!property_exists($data, $name)) {
                 $this->addError(sprintf("is missing required property '%s'", $name));
             }

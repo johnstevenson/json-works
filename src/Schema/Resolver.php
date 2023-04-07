@@ -13,10 +13,7 @@ class Resolver
         $this->cache = new Cache($schema);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getRef(string $ref)
+    public function getRef(string $ref): stdClass
     {
         return $this->cache->resolveRef($ref);
     }

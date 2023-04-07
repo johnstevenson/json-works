@@ -26,8 +26,11 @@ class Copier extends BaseFormat
     {
         $isObject = null;
 
-        if ($this->isContainer($data, $isObject)) {
-            return $this->copyContainer($data, $isObject);
+        if ($this->isContainer($data, $asObject)) {
+            // for phpstan
+            if (is_object($data) || is_array($data)) {
+                return $this->copyContainer($data, $asObject);
+            }
         }
 
         return $data;
@@ -39,7 +42,7 @@ class Copier extends BaseFormat
     * @param object|array<mixed> $data The data to copy
     * @return object|array<mixed> An unreferenced copy
     */
-    protected function copyContainer($data, bool $isObject)
+    protected function copyContainer($data, bool $asObject)
     {
         $result = [];
 
@@ -51,6 +54,6 @@ class Copier extends BaseFormat
             $result[$key] = $this->run($value);
         }
 
-        return $this->formatContainer($result, $isObject);
+        return $this->formatContainer($result, $asObject);
     }
 }

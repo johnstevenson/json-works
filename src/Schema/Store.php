@@ -6,13 +6,10 @@ use \stdClass;
 
 class Store
 {
-    /** @var array<mixed> */
+    /** @var array<string, array<string, stdClass>> */
     protected array $data = [];
 
-    /**
-     * @param object|array<mixed> $schema
-     */
-    public function add(string $doc, string $path, $schema): bool
+    public function add(string $doc, string $path, stdClass $schema): bool
     {
         if (!$this->matchPath($doc, $path, $partPath)) {
             $this->data[$doc][$path] = $schema;

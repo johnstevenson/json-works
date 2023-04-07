@@ -13,13 +13,26 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
-class NumberConstraint extends BaseConstraint
+use JohnStevenson\JsonWorks\Helpers\Utils;
+
+class NumberConstraint extends BaseConstraint implements ConstraintInterface
 {
     /**
      * @param mixed $data
+     * @param stdClass|array<mixed> $schema
      */
-    public function validate($data, stdClass $schema): void
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!is_int($data) && !is_float($data)) {
+            $error = Utils::getArgumentError('$data', 'int|float', $data);
+            throw new \InvalidArgumentException($error);
+        }
+
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
         // maximum
         $this->checkMaxMin($data, $schema, 'maximum', true);
 
@@ -31,7 +44,7 @@ class NumberConstraint extends BaseConstraint
     }
 
     /**
-     * @param mixed $data
+     * @param int|float $data
      */
     protected function checkMaxMin($data, stdClass $schema, string $key, bool $max): void
     {
@@ -48,7 +61,7 @@ class NumberConstraint extends BaseConstraint
     }
 
     /**
-     * @param mixed $data
+     * @param int|float $data
      */
     protected function checkMultipleOf($data, stdClass $schema): void
     {
@@ -67,11 +80,11 @@ class NumberConstraint extends BaseConstraint
 
     protected function getExclusive(stdClass $schema, string $key): bool
     {
-        return $this->getValue($schema, $key, $value, 'boolean');
+        return $this->getValue($schema, $key, $value, ['boolean']);
     }
 
     /**
-     * @param mixed $value Set by method
+     * @param int|float $value Set by method
      */
     protected function getNumber(stdClass $schema, string $key, bool $positiveNonZero, &$value): bool
     {
@@ -88,8 +101,8 @@ class NumberConstraint extends BaseConstraint
     }
 
     /**
-     * @param mixed $data
-     * @param mixed $value
+     * @param int|float $data
+     * @param int|float $value
      */
     protected function compare($data, $value, bool $exclusive, bool $max): void
     {
@@ -106,8 +119,8 @@ class NumberConstraint extends BaseConstraint
     }
 
     /**
-     * @param mixed $data
-     * @param mixed $value
+     * @param int|double $data
+     * @param int|float $value
      */
     protected function precisionCompare($data, $value, bool $exclusive, bool $max): bool
     {

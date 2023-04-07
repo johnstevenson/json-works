@@ -15,16 +15,22 @@ use \stdClass;
 
 use JohnStevenson\JsonWorks\Helpers\Utils;
 
-class PropertiesConstraint extends BaseConstraint
+class PropertiesConstraint extends BaseConstraint implements ConstraintInterface
 {
     /** @var array<array{data: mixed, schema: stdClass, key: string}> */
     protected array $children;
 
     /**
-    * @param mixed $data
-    */
-    public function validate($data, stdClass $schema): void
+     * @param mixed $data
+     * @param stdClass|array<mixed> $schema
+     */
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
         $additional = $this->getAdditional($schema);
         $this->children = [];
 
@@ -99,7 +105,7 @@ class PropertiesConstraint extends BaseConstraint
     */
     protected function getSchemaProperties(stdClass $schema, string $key, &$value): bool
     {
-        if ($result = $this->getValue($schema, $key, $value, 'object')) {
+        if ($result = $this->getValue($schema, $key, $value, ['object'])) {
             $this->manager->dataChecker->checkContainerTypes($value, 'object');
         }
 

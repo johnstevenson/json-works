@@ -153,6 +153,7 @@ class Builder
     {
         if (is_array($this->element)) {
             $this->checkArrayKey($this->element, $key, $index);
+            // @phpstan-ignore-next-line
             $this->element[$index] = $value;
         } else {
             // @phpstan-ignore-next-line

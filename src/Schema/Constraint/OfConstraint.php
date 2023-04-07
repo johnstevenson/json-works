@@ -13,16 +13,22 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
+use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\ValidationException;
 
-class OfConstraint extends BaseConstraint
+class OfConstraint extends BaseConstraint implements ConstraintInterface
 {
     /**
      * @param mixed $data
-     * @param object|array<mixed> $schema
+     * @param stdClass|array<mixed> $schema
      */
-    public function validate($data, $schema, string $key): void
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!is_string($key)) {
+            $error = Utils::getArgumentError('$key', 'string', $key);
+            throw new \InvalidArgumentException($error);
+        }
+
         $matchFirst = in_array($key, ['anyOf', 'not'], true);
         $schemas = is_array($schema) ? $schema : [$schema];
         $matches = $this->getMatches($data, $schemas, $matchFirst);
@@ -34,13 +40,18 @@ class OfConstraint extends BaseConstraint
 
     /**
      * @param mixed $data
-     * @param array<stdClass> $schemas
+     * @param array<mixed> $schemas
      */
     protected function getMatches($data, array $schemas, bool $matchFirst): int
     {
         $result = 0;
 
         foreach ($schemas as $subSchema) {
+            // type check
+            if (!($subSchema instanceof stdClass)) {
+                $error = Utils::getArgumentError('$subSchema', 'stdClass', $subSchema);
+                throw new \InvalidArgumentException($error);
+            }
 
             if ($this->testChild($data, $subSchema)) {
                 ++$result;

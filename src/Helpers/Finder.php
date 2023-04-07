@@ -10,6 +10,8 @@
 
 namespace JohnStevenson\JsonWorks\Helpers;
 
+use \stdClass;
+
 use JohnStevenson\JsonWorks\Helpers\Error;
 use JohnStevenson\JsonWorks\Helpers\Patch\Target;
 
@@ -126,17 +128,17 @@ class Finder
      */
     protected function findArray(string $token): bool
     {
-
         if (!$this->isArrayKey($token, $index)) {
             $this->target->setError(Error::ERR_PATH_KEY);
             return false;
         }
 
-        if ($result = (isset($this->element[$index]) || array_key_exists($index, $this->element))) {
+        if (is_array($this->element) && array_key_exists($index, $this->element)) {
             $this->element = &$this->element[$index];
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
     /**
@@ -146,12 +148,14 @@ class Finder
     */
     protected function findObject(string $token): bool
     {
-        if ($result = property_exists($this->element, $token)) {
-            // @phpstan-ignore-next-line
+        if ($this->element instanceof stdClass
+            && property_exists($this->element, $token)
+        ) {
             $this->element = &$this->element->$token;
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
     /**

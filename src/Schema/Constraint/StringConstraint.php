@@ -13,23 +13,36 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
-class StringConstraint extends BaseConstraint
+use JohnStevenson\JsonWorks\Helpers\Utils;
+
+class StringConstraint extends BaseConstraint implements ConstraintInterface
 {
     protected MaxMinConstraint $maxMin;
-    protected FormatConstraint $format;
+    protected FormatChecker $formatChecker;
 
     public function __construct(Manager $manager)
     {
         parent::__construct($manager);
         $this->maxMin = new MaxMinConstraint($manager);
-        $this->format = new FormatConstraint($manager);
+        $this->formatChecker = new FormatChecker($manager);
     }
 
     /**
-    * @param mixed $data
-    */
-    public function validate($data, stdClass $schema): void
+     * @param mixed $data
+     * @param stdClass|array<mixed> $schema
+     */
+    public function validate($data, $schema, ?string $key = null): void
     {
+        if (!is_string($data)) {
+            $error = Utils::getArgumentError('$data', 'string', $data);
+            throw new \InvalidArgumentException($error);
+        }
+
+        if (!($schema instanceof stdClass)) {
+            $error = Utils::getArgumentError('$schema', 'sdtClass', $schema);
+            throw new \InvalidArgumentException($error);
+        }
+
         // maxLength
         $this->maxMin->validate($data, $schema, 'maxLength');
 
@@ -38,7 +51,7 @@ class StringConstraint extends BaseConstraint
 
         // format
         if ($this->getString($schema, 'format', $format)) {
-            $this->format->validate($data, $format);
+            $this->formatChecker->check($data, $format);
         }
 
         // pattern
@@ -47,10 +60,7 @@ class StringConstraint extends BaseConstraint
         }
     }
 
-    /**
-    * @param mixed $data
-    */
-    protected function checkPattern($data, string $pattern): void
+    protected function checkPattern(string $data, string $pattern): void
     {
         if (!$this->matchPattern($pattern, $data)) {
             $this->addError(sprintf('does not match pattern: %s', $pattern));
@@ -62,6 +72,6 @@ class StringConstraint extends BaseConstraint
     */
     protected function getString(stdClass $schema, string $key, &$value): bool
     {
-        return $this->getValue($schema, $key, $value, 'string');
+        return $this->getValue($schema, $key, $value, ['string']);
     }
 }

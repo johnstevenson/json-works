@@ -31,10 +31,8 @@ class Patcher
     *
     * If jsonPatch is set, elements will only be added to the root or an
     * existing element. See RFC 6902 (http://tools.ietf.org/html/rfc6902)
-    *
-    * @param mixed $jsonPatch
     */
-    public function __construct($jsonPatch = false)
+    public function __construct(bool $jsonPatch = false)
     {
         $this->jsonPatch = $jsonPatch;
         $this->builder = new Builder();

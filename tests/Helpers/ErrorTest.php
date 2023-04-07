@@ -17,9 +17,11 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
     {
         $class = new \ReflectionClass($this->error);
         $msg = 'something';
-        $expected = '[something]';
 
         foreach ($class->getConstants() as $code) {
+            if (!is_string($code)) {
+                throw new \UnexpectedValueException('Error constant must be string');
+            }
             $result = $this->error->get($code, $msg);
             self::assertStringStartsWith($code, $result);
             $expected = $code !== Error::ERR_VALIDATE ? '[something]' : $msg;

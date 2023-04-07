@@ -30,8 +30,10 @@ class Pruner extends BaseFormat
     {
         $this->keep = true;
 
-        if ($this->isContainer($data, $object)) {
-            return $this->pruneContainer($data, $object);
+        if ($this->isContainer($data, $asObject)) {
+            $container = is_object($data) ? get_object_vars($data) : (array) $data;
+
+            return $this->pruneContainer($container, $asObject);
         }
 
         return $data;
@@ -40,11 +42,10 @@ class Pruner extends BaseFormat
     /**
     * Recursively removes empty objects and arrays from the container
     *
-    * @param mixed $container The data container to prune
-    * @param mixed $object Whether the result should be an object
+    * @param array<mixed> $container The data container to prune
     * @return object|array<mixed> An unreferenced copy of the pruned container
     */
-    protected function pruneContainer($container, $object)
+    protected function pruneContainer(array $container, bool $asObject)
     {
         $result = [];
 
@@ -58,6 +59,6 @@ class Pruner extends BaseFormat
 
         $this->keep = Utils::arrayNotEmpty($result);
 
-        return $this->formatContainer($result, $object);
+        return $this->formatContainer($result, $asObject);
     }
 }

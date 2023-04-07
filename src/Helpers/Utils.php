@@ -76,4 +76,18 @@ class Utils
 
         return $result;
     }
+
+    /**
+     * @param mixed $value
+     */
+    public static function getArgumentError(string $name, string $expected, $value): string
+    {
+        if (is_object($value)) {
+            $type = get_class($value);
+        } else {
+            $type = gettype($value);
+        }
+
+        return sprintf("Argument '%s' expected '%s', got '%s'", $name, $expected, $type);
+    }
 }

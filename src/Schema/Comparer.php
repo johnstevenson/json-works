@@ -25,14 +25,17 @@ class Comparer extends JsonTypes
         }
 
         if ($type === 'array') {
+            // @phpstan-ignore-next-line
             return $this->equalsArray($value1, $value2);
         }
 
         if ($type === 'number') {
+            // @phpstan-ignore-next-line
             return $this->equalsNumber($value1, $value2);
         }
 
         if ($type === 'object') {
+            // @phpstan-ignore-next-line
             return $this->equalsObject($value1, $value2);
         }
 
