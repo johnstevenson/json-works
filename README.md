@@ -1,17 +1,15 @@
 Json-Works
 ==========
 
-[![Build Status](https://travis-ci.org/johnstevenson/json-works.png?branch=master)](https://travis-ci.org/johnstevenson/json-works)
-
 A PHP library to create, edit, query and validate [JSON](http://www.json.org/).
 
 ## Contents
-* [About](#About)
-* [Installation](#Installation)
-* [Usage](#Usage)
-* [License](#License)
+* [About](#about)
+* [Installation](#installation)
+* [Usage](#usage)
+* [License](#license)
 
-<a name="About"></a>
+
 ## About
 
 The library is intended to be used with nested json structures, or with json data that needs validation. Or in any situation where you would find it is easier to do something like this:
@@ -30,18 +28,18 @@ which will give you the following json:
 
 ```
 {
-	"path": {
-		"to": {
-			"nested": {
-				"array": [
-					{
+    "path": {
+        "to": {
+            "nested": {
+                "array": [
+                    {
                         "firstName": "Fred",
                         "lastName": "Blogg"
                     }
-				]
-			}
-		}
-	}
+                ]
+            }
+        }
+    }
 }
 ```
 
@@ -69,12 +67,12 @@ to end up with:
 
 ```
 {
-	"users": [
-		{
+    "users": [
+        {
             "firstName": "Fred",
             "lastName": "Bloggs"
         }
-	]
+    ]
 }
 ```
 
@@ -93,7 +91,7 @@ Json-Works includes an implementation of [JSON Schema][schema], version 4. This 
     "items": {
         "properties": {
             "firstName": {"type": "string"},
-			"lastName": {"type": "string"}
+            "lastName": {"type": "string"}
         },
         "required": ["firstName", "lastName"]
     }
@@ -121,7 +119,6 @@ $result = $document->validate();
 
 Without a schema, any value can be added anywhere.
 
-<a name="Installation"></a>
 ## Installation
 This package is available via [Composer][composer] as `johnstevenson/json-works`.
 Either run the following command in your project directory:
@@ -140,19 +137,14 @@ or add the requirement to your `composer.json` file:
 }
 ```
 
-<a name="Usage"></a>
 ## Usage
 
-Full usage [documentation][wiki] is available in the Wiki.
+See the [documentation](docs/home.md)
 
-<a name="License"></a>
 ## License
 
 Json-Works is licensed under the MIT License - see the `LICENSE` file for details.
 
-[pointer]: http://tools.ietf.org/html/rfc6901/
-[schema]: http://json-schema.org/
-[composer]: http://getcomposer.org
-[download]: https://github.com/johnstevenson/json-works/archive/master.zip
-[wiki]:https://github.com/johnstevenson/json-works/wiki/Home
-
+[pointer]: https://www.rfc-editor.org/rfc/rfc6901
+[schema]: https://json-schema.org/
+[composer]: https://getcomposer.org
