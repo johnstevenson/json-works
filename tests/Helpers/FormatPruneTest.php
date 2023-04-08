@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Formatter;
 
 class FormatPruneTest extends \JsonWorks\Tests\Base
 {

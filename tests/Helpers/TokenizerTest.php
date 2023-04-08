@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+use JohnStevenson\JsonWorks\Tokenizer;
 
 class TokenizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -45,6 +45,14 @@ class TokenizerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
+    public function testAddWithEmptyKey(): void
+    {
+        $path = '/prop1/prop2';
+        $value = '';
+        $expected = '/prop1/prop2/';
+        self::assertEquals($expected, $this->tokenizer->add($path, $value));
+    }
+
     public function testAddPathEmpty(): void
     {
         $path = '';
@@ -57,7 +65,7 @@ class TokenizerTest extends \PHPUnit\Framework\TestCase
     {
         $path = '';
         $value = '';
-        $expected = '';
+        $expected = '/';
         self::assertEquals($expected, $this->tokenizer->add($path, $value));
     }
 
@@ -72,7 +80,15 @@ class TokenizerTest extends \PHPUnit\Framework\TestCase
     public function testDecodePathPlain(): void
     {
         $value = '/prop1/prop2/prop3';
-        $expected = array('prop1', 'prop2', 'prop3');
+        $expected = ['prop1', 'prop2', 'prop3'];
+        self::assertTrue($this->tokenizer->decode($value, $tokens));
+        self::assertEquals($expected, $tokens);
+    }
+
+    public function testDecodeWithEmptyKey(): void
+    {
+        $value = '/prop1/prop2/';
+        $expected = ['prop1', 'prop2', ''];
         self::assertTrue($this->tokenizer->decode($value, $tokens));
         self::assertEquals($expected, $tokens);
     }
@@ -80,7 +96,7 @@ class TokenizerTest extends \PHPUnit\Framework\TestCase
     public function testDecodePathEncoded(): void
     {
         $value = '/key~01/key~02~1sub';
-        $expected = array('key~1', 'key~2/sub');
+        $expected = ['key~1', 'key~2/sub'];
         self::assertTrue($this->tokenizer->decode($value, $tokens));
         self::assertEquals($expected, $tokens);
     }
@@ -105,7 +121,7 @@ class TokenizerTest extends \PHPUnit\Framework\TestCase
 
     public function testEncodePathWithEncodeChars(): void
     {
-        $value = array('key~1', 'key~2//sub', 'key3');
+        $value = ['key~1', 'key~2//sub', 'key3'];
         $expected = '/key~01/key~02~1~1sub/key3';
         self::assertEquals($expected, $this->tokenizer->encode($value));
     }
@@ -121,6 +137,13 @@ class TokenizerTest extends \PHPUnit\Framework\TestCase
     {
         $value = '0';
         $expected = '/0';
+        self::assertEquals($expected, $this->tokenizer->encode($value));
+    }
+
+    public function testEncodeWithEmptyKey(): void
+    {
+        $value = ['prop1', 'prop2', ''];
+        $expected = '/prop1/prop2/';
         self::assertEquals($expected, $this->tokenizer->encode($value));
     }
 }

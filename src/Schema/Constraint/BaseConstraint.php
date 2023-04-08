@@ -13,7 +13,7 @@ namespace JohnStevenson\JsonWorks\Schema\Constraint;
 
 use \stdClass;
 
-use JohnStevenson\JsonWorks\Helpers\Tokenizer;
+use JohnStevenson\JsonWorks\Tokenizer;
 use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Constraint\Manager;
 use JohnStevenson\JsonWorks\Schema\ValidationException;

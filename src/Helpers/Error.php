@@ -25,8 +25,6 @@ class Error
 
     /**
     * Returns a formatted error message
-    *
-    * @api
     */
     public function get(string $code, string $msg): string
     {

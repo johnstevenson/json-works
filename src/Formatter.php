@@ -9,27 +9,28 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Helpers;
+namespace JohnStevenson\JsonWorks;
 
 use \stdClass;
 
 use JohnStevenson\JsonWorks\Helpers\Format\Copier;
 use JohnStevenson\JsonWorks\Helpers\Format\Orderer;
 use JohnStevenson\JsonWorks\Helpers\Format\Pruner;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
 /**
-* A class for manipulating array, object or json data
+ * A class for manipulating array, object or json data.
+ * @api
 */
 class Formatter
 {
-    protected ?Copier $copier = null;
-    protected ?Orderer $orderer = null;
-    protected ?Pruner $pruner = null;
+    private ?Copier $copier = null;
+    private ?Orderer $orderer = null;
+    private ?Pruner $pruner = null;
 
     /**
     * Returns an unreferenced copy of the data
     *
-    * @api
     * @param mixed $data
     * @return mixed
     */
@@ -45,7 +46,6 @@ class Formatter
     /**
     * Reorders object properties using the schema order
     *
-    * @api
     * @param mixed $data
     * @param stdClass|null $schema
     * @return mixed An unreferenced copy of the ordered data
@@ -64,7 +64,6 @@ class Formatter
     /**
     * Removes empty objects and arrays from the data
     *
-    * @api
     * @param mixed $data
     * @return mixed An unreferenced copy of the pruned data
     */

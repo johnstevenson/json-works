@@ -49,7 +49,7 @@ class Patcher
     public function add(&$data, string $path, $value): bool
     {
         if ($result = $this->getElement($data, $path, $value, $target)) {
-            $this->addData($target, $value);
+            $result = $this->addData($target, $value);
         }
 
         return $result;
@@ -86,7 +86,7 @@ class Patcher
     public function replace(&$data, string $path, $value): bool
     {
         if ($result = $this->find($data, $path, $target)) {
-            $this->addData($target, $value);
+            $result = $this->addData($target, $value);
         }
 
         return $result;
@@ -102,21 +102,40 @@ class Patcher
     *
     * @param mixed $value
     */
-    protected function addData(Target $target, $value): void
+    protected function addData(Target $target, $value): bool
     {
+        $result = true;
+        $error = '';
+
         switch ($target->type) {
             case Target::TYPE_VALUE:
                 $target->element = $value;
                 break;
             case Target::TYPE_OBJECT:
-                // @phpstan-ignore-next-line
-                $target->element->{$target->key} = $value;
+                if (is_object($target->element)) {
+                    // @phpstan-ignore-next-line
+                    $target->element->{$target->key} = $value;
+                } else {
+                    $error = sprintf("property '%s'", $target->key);
+                }
                 break;
             case Target::TYPE_ARRAY:
-                // @phpstan-ignore-next-line
-                array_splice($target->element, $target->key, 0, [$value]);
+                if (is_array($target->element)) {
+                    // @phpstan-ignore-next-line
+                    array_splice($target->element, $target->key, 0, [$value]);
+                } else {
+                    $error =sprintf("offset '%d'", $target->key);
+                }
                 break;
         }
+
+        if (Utils::stringNotEmpty($error)) {
+            $result = false;
+            $type = gettype($target->element);
+            $this->error = sprintf('Cannot assign %s to %s', $error, $type);
+        }
+
+        return $result;
     }
 
     /**

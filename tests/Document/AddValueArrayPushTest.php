@@ -14,7 +14,7 @@ class AddValueArrayPushTest extends \JsonWorks\Tests\Base
         $value = 1;
         $expected = [$value];
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 
     public function testRootSingleZero(): void
@@ -27,7 +27,7 @@ class AddValueArrayPushTest extends \JsonWorks\Tests\Base
         $value = 1;
         $expected = [$value];
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 
     public function testRootMultiDash(): void
@@ -37,7 +37,7 @@ class AddValueArrayPushTest extends \JsonWorks\Tests\Base
         $value = 1;
         $expected = [[[$value]]];
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 
     public function testRootMultiZero(): void
@@ -47,7 +47,7 @@ class AddValueArrayPushTest extends \JsonWorks\Tests\Base
         $value = 1;
         $expected = [[[$value]]];
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 
     public function testRootMultiMixed(): void
@@ -57,6 +57,6 @@ class AddValueArrayPushTest extends \JsonWorks\Tests\Base
         $value = 1;
         $expected = [[[$value]]];
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 }

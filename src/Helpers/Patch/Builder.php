@@ -137,7 +137,7 @@ class Builder
     protected function setTarget(string $key): void
     {
         if (is_array($this->data)) {
-            $this->checkArrayKey($this->data, $key, $index);
+            $this->checkArrayKey(count($this->data), $key, $index);
             $this->target->setArray($index);
 
         } else {
@@ -153,7 +153,7 @@ class Builder
     protected function setValue(string $key, $value): void
     {
         if (is_array($this->element)) {
-            $this->checkArrayKey($this->element, $key, $index);
+            $this->checkArrayKey(count($this->element), $key, $index);
             // @phpstan-ignore-next-line
             $this->element[$index] = $value;
         } else {
@@ -165,20 +165,19 @@ class Builder
     /**
     * Checks if an array key is valid and sets its index
     *
-    * @param array<mixed> $array
     * @param integer|null $index Set by method
     * @throws InvalidArgumentException
     */
-    protected function checkArrayKey(array $array, string $key, ?int &$index): void
+    protected function checkArrayKey(int $itemCount, string $key, ?int &$index): void
     {
         $result = Utils::isMatch('/^(?:(-)|(0)|([1-9]\d*))$/', $key);
 
         if ($result) {
             if ($key === '-') {
-                $index = count($array);
+                $index = $itemCount;
             } else {
                 $index = (int) $key;
-                $result = $index <= count($array);
+                $result = $index <= $itemCount;
             }
         }
 

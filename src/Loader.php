@@ -9,16 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Helpers;
+namespace JohnStevenson\JsonWorks;
 
 use \stdClass;
 
 use JohnStevenson\JsonWorks\Helpers\Error;
-use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
 /**
-* A class for loading input data*
-*/
+ * A class for loading input data.
+ * @api
+ */
 class Loader
 {
     /**
@@ -27,13 +28,12 @@ class Loader
     * The input can be:
     *   - a json string, passed to json_decode
     *   - a .json filename, passed to file_get_contents then json_decode
-    *   - an object, class, array or scalar
+    *   - an object, class, array
     *
-    * @api
     * @param mixed $input
     * @return mixed
     */
-    public function loadData($input)
+    public function getData($input)
     {
         $result = $this->processInput($input);
         $dataType = gettype($result);
@@ -55,11 +55,10 @@ class Loader
     *
     * The resulting data must be an array.
     *
-    * @api
     * @param mixed $input
     * @return array<mixed>
     */
-    public function loadPatch($input): array
+    public function getPatch($input): array
     {
         $result = $this->processInput($input);
 
@@ -81,11 +80,10 @@ class Loader
     *
     * The resulting data must be an object.
     *
-    * @api
     * @param mixed $input
     * @return stdClass
     */
-    public function loadSchema($input)
+    public function getSchema($input)
     {
         $result = $this->processInput($input);
 
@@ -103,7 +101,7 @@ class Loader
     * @param mixed $data
     * @return mixed
     */
-    protected function processInput($data)
+    private function processInput($data)
     {
         if (is_string($data)) {
             $data = $this->processStringInput($data);
@@ -120,7 +118,7 @@ class Loader
     *
     * @return mixed
     */
-    protected function processStringInput(string $input)
+    private function processStringInput(string $input)
     {
         if ($this->isFile($input)) {
             $input = $this->getDataFromFile($input);
@@ -129,7 +127,7 @@ class Loader
         return $this->decodeJson($input);
     }
 
-    protected function isFile(string $input): bool
+    private function isFile(string $input): bool
     {
         return pathinfo($input, PATHINFO_EXTENSION) === 'json';
     }
@@ -139,7 +137,7 @@ class Loader
     *
     * @throws \RuntimeException
     */
-    protected function getDataFromFile(string $filename): string
+    private function getDataFromFile(string $filename): string
     {
         $json = @file_get_contents($filename);
 
@@ -160,7 +158,7 @@ class Loader
     * @return mixed
     * @throws \RuntimeException
     */
-    protected function decodeJson(string $value)
+    private function decodeJson(string $value)
     {
         $result = $value;
         $errorMsg = null;
@@ -180,7 +178,7 @@ class Loader
         return $result;
     }
 
-    protected function checkJson(string &$value, ?string &$errorMsg): bool
+    private function checkJson(string &$value, ?string &$errorMsg): bool
     {
         $value = trim($value);
 
@@ -195,7 +193,7 @@ class Loader
         return false;
     }
 
-    protected function getInputError(string $dataType): string
+    private function getInputError(string $dataType): string
     {
         $error = new Error();
 
@@ -206,7 +204,7 @@ class Loader
     * Returns a formatted json error message
     *
     */
-    protected function getJsonError(string $errorMsg): string
+    private function getJsonError(string $errorMsg): string
     {
         $error = new Error();
         $msg = sprintf('json error: %s', $errorMsg);

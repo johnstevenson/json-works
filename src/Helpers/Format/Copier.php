@@ -12,17 +12,17 @@
 namespace JohnStevenson\JsonWorks\Helpers\Format;
 
 /**
-* A class to return an unreferenced copy of the data, with an optional callback
-*/
+ * A class to return an unreferenced copy of the data, with an optional callback
+ */
 class Copier extends BaseFormat
 {
     /**
-    * Returns an unreferenced copy of the data
-    *
-    * @internal
-    * @param object|array<mixed>|mixed $data
-    * @return object|array<mixed>|mixed
-    */
+     * Returns an unreferenced copy of the data
+     *
+     * @internal
+     * @param object|array<mixed>|mixed $data
+     * @return object|array<mixed>|mixed
+     */
     public function run($data)
     {
         $isObject = null;
@@ -38,11 +38,11 @@ class Copier extends BaseFormat
     }
 
     /**
-    * Recursively copies an object or array
-    *
-    * @param object|array<mixed> $data The data to copy
-    * @return object|array<mixed> An unreferenced copy
-    */
+     * Recursively copies an object or array
+     *
+     * @param object|array<mixed> $data The data to copy
+     * @return object|array<mixed> An unreferenced copy
+     */
     protected function copyContainer($data, bool $asObject)
     {
         $result = [];

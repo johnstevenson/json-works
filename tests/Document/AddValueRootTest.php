@@ -10,7 +10,7 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $path = '';
         $value = (object) ['prop1' => 1, 'prop2' => 'value'];
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($value, $document->data);
+        self::assertEquals($value, $document->getData());
     }
 
     public function testArray(): void
@@ -19,7 +19,7 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $path = '';
         $value = [1, 'value'];
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($value, $document->data);
+        self::assertEquals($value, $document->getData());
     }
 
     public function testScalar(): void
@@ -28,6 +28,6 @@ class AddValueRootTest extends \JsonWorks\Tests\Base
         $path = '';
         $value = 'value';
         self::assertTrue($document->addValue($path, $value));
-        self::assertEquals($value, $document->data);
+        self::assertEquals($value, $document->getData());
     }
 }

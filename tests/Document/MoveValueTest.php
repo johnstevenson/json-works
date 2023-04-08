@@ -34,7 +34,7 @@ class MoveValueTest extends \JsonWorks\Tests\Base
         $fromPath = '/prop1/collection/1';
         $toPath = '/prop2/collection/-';
         self::assertTrue($document->moveValue($fromPath, $toPath));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 
     public function testFail(): void

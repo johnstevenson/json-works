@@ -14,9 +14,14 @@ namespace JohnStevenson\JsonWorks;
 use JohnStevenson\JsonWorks\Helpers\Patcher;
 use JohnStevenson\JsonWorks\Helpers\Finder;
 
+
+/**
+ * A class for Querying and manipulating json data. *
+ * @api
+ */
 class Document extends BaseDocument
 {
-    protected Finder $finder;
+    private Finder $finder;
 
     public function __construct()
     {
@@ -27,70 +32,103 @@ class Document extends BaseDocument
     /**
     * Adds an element to the data
     *
-    * @param string $path
+    * @param string|array<string> $path
     * @param mixed $value
-    * @return bool If the value was added
     */
-    public function addValue(string $path, $value): bool
+    public function addValue($path, $value): bool
     {
-        $this->lastError = '';
+        $this->error = '';
+        $path = $this->getPath($path, '$path');
         $value = $this->formatter->copy($value);
         $patcher = new Patcher();
 
         if (!$result = $patcher->add($this->data, $path, $value)) {
-            $this->lastError = $patcher->getError();
+            $this->error = $patcher->getError();
         }
 
         return $result;
     }
 
-    public function copyValue(string $fromPath, string $toPath): bool
+    /**
+     * @param string|array<string> $fromPath
+     * @param string|array<string> $toPath
+     */
+    public function copyValue($fromPath, $toPath): bool
     {
-        return $this->workMove($fromPath, $toPath, false);
-    }
+        $fromPath = $this->getPath($fromPath, '$fromPath');
+        $toPath = $this->getPath($toPath, '$toPath');
 
-    public function deleteValue(string $path): bool
-    {
-        $patcher = new Patcher();
-
-        return $patcher->remove($this->data, $path);
+        return $this->doMove($fromPath, $toPath, false);
     }
 
     /**
+     * @param string|array<string> $path
+      */
+    public function deleteValue($path): bool
+    {
+        $path = $this->getPath($path, '$path');
+        $patcher = new Patcher();
+
+        if (!$result = $patcher->remove($this->data, $path)) {
+            $this->error = $patcher->getError();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|array<string> $path
      * @param mixed $default
      * @return mixed
      */
-    public function getValue(string $path, $default = null)
+    public function getValue($path, $default = null)
     {
+        $path = $this->getPath($path, '$path');
+
         if (!$this->hasValue($path, $value)) {
             $value = $default;
         }
+
+        $this->error = '';
 
         return $value;
     }
 
     /**
+     * @param string|array<string> $path
      * @param mixed $value
      */
-    public function hasValue(string $path, &$value): bool
+    public function hasValue($path, &$value): bool
     {
+        $path = $this->getPath($path, '$path');
         $value = null;
+        $this->error = $error = '';
 
-        if ($result = $this->finder->find($path, $this->data, $element, $this->lastError)) {
+        if ($result = $this->finder->find($path, $this->data, $element, $error)) {
             $value = $this->formatter->copy($element);
+        } else {
+            $this->error = $error;
         }
 
         return $result;
     }
 
-    public function moveValue(string $fromPath, string $toPath): bool
+    /**
+     * @param string|array<string> $fromPath
+     * @param string|array<string> $toPath
+     */
+    public function moveValue($fromPath, $toPath): bool
     {
-        return $this->workMove($fromPath, $toPath, true);
+        $fromPath = $this->getPath($fromPath, '$fromPath');
+        $toPath = $this->getPath($toPath, '$toPath');
+
+        return $this->doMove($fromPath, $toPath, true);
     }
 
-    protected function workMove(string $fromPath, string $toPath, bool $delete): bool
+    private function doMove(string $fromPath, string $toPath, bool $delete): bool
     {
         $result = false;
+        $this->error = '';
 
         if ($this->hasValue($fromPath, $value)) {
             if ($result = $this->addValue($toPath, $value)) {
@@ -101,5 +139,18 @@ class Document extends BaseDocument
         }
 
         return $result;
+    }
+
+    /**
+     * @param string|array<string> $value
+     */
+    private function getPath($value, string $varName): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        $tokenizer = new Tokenizer();
+        return $tokenizer->encode($value);
     }
 }

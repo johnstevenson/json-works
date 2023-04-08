@@ -39,7 +39,7 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
 
         $path = '/prop2/collection/3/1/firstName';
         self::assertTrue($document->deleteValue($path), 'Testing success: '.$path);
-        self::assertEquals(json_decode($expected), $document->data);
+        self::assertEquals(json_decode($expected), $document->getData());
 
         $path = '/prop2/collection/0/firstName';
         self::assertFalse($document->deleteValue($path), 'Testing fail: '.$path);
@@ -66,7 +66,7 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
 
         $path = '/1/1/2';
         self::assertTrue($document->deleteValue($path), 'Testing success: '.$path);
-        self::assertEquals(json_decode($expected), $document->data);
+        self::assertEquals(json_decode($expected), $document->getData());
 
         $path = '/0/3';
         self::assertFalse($document->deleteValue($path), 'Testing fail: '.$path);
@@ -87,7 +87,7 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
 
         $path = '/prop1';
         self::assertTrue($document->deleteValue($path));
-        self::assertEquals(json_decode($expected), $document->data);
+        self::assertEquals(json_decode($expected), $document->getData());
     }
 
     public function testArrayItemFromRoot(): void
@@ -101,7 +101,7 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
 
         $path = '/0';
         self::assertTrue($document->deleteValue($path));
-        self::assertEquals(json_decode($expected), $document->data);
+        self::assertEquals(json_decode($expected), $document->getData());
     }
 
     public function testObjectFromRoot(): void
@@ -119,7 +119,7 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
 
         $path = '';
         self::assertTrue($document->deleteValue($path));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 
     public function testArrayFromRoot(): void
@@ -133,6 +133,6 @@ class DeleteValueTest extends \JsonWorks\Tests\Base
 
         $path = '';
         self::assertTrue($document->deleteValue($path));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 }

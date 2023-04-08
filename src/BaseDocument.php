@@ -13,18 +13,17 @@ namespace JohnStevenson\JsonWorks;
 
 use \stdClass;
 
-use JohnStevenson\JsonWorks\Helpers\Formatter;
-use JohnStevenson\JsonWorks\Helpers\Loader;
 use JohnStevenson\JsonWorks\Schema\Validator;
 
 /**
-* A class for loading, validating json data
-*/
+ * A class for loading, formatting and validating json data. *
+ * @api
+ */
 class BaseDocument
 {
     /** @var mixed */
-    public $data;
-    public string $lastError = '';
+    protected $data;
+    protected string $error = '';
     protected ?stdClass $schema = null;
 
     protected Formatter $formatter;
@@ -41,7 +40,7 @@ class BaseDocument
     public function loadData($data): void
     {
         $loader = new Loader();
-        $this->data = $loader->loadData($data);
+        $this->data = $loader->getData($data);
     }
 
     /**
@@ -50,7 +49,7 @@ class BaseDocument
     public function loadSchema($data): void
     {
         $loader = new Loader();
-        $this->schema = $loader->loadSchema($data);
+        $this->schema = $loader->getSchema($data);
     }
 
     public function tidy(bool $order = false): void
@@ -68,6 +67,11 @@ class BaseDocument
     public function getData()
     {
         return $this->data;
+    }
+
+    public function getError(): string
+    {
+        return $this->error;
     }
 
     public function toJson(bool $pretty): string
@@ -89,7 +93,7 @@ class BaseDocument
         }
 
         if (!$result = $this->validator->check($this->data)) {
-            $this->lastError = $this->validator->getLastError();
+            $this->error = $this->validator->getLastError();
         }
 
         return $result;

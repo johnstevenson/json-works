@@ -14,7 +14,7 @@ namespace JohnStevenson\JsonWorks\Schema;
 use stdClass;
 
 use JohnStevenson\JsonWorks\BaseDocument;
-use JohnStevenson\JsonWorks\Helpers\Loader;
+use JohnStevenson\JsonWorks\Loader;
 use JohnStevenson\JsonWorks\Helpers\Utils;
 use JohnStevenson\JsonWorks\Schema\Resolver;
 use JohnStevenson\JsonWorks\Schema\ValidationException;
@@ -30,13 +30,10 @@ class Validator
     protected Loader $loader;
     protected Resolver $resolver;
 
-    /**
-     * @param mixed $schema
-     */
-    public function __construct($schema)
+    public function __construct(stdClass $schema)
     {
         $this->loader = new Loader;
-        $this->schema = $this->loader->loadSchema($schema);
+        $this->schema = $this->loader->getSchema($schema);
         $this->resolver = new Resolver($this->schema);
     }
 
@@ -88,6 +85,6 @@ class Validator
             return $data->getData();
         }
 
-        return $this->loader->loadData($data);
+        return $this->loader->getData($data);
     }
 }

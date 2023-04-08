@@ -9,17 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace JohnStevenson\JsonWorks\Helpers;
+namespace JohnStevenson\JsonWorks;
+
+use JohnStevenson\JsonWorks\Helpers\Utils;
 
 /**
-* A class for creating and manipulating JSON Pointers
-*/
+ * A class for creating and manipulating JSON Pointers.
+ * @api
+ */
 class Tokenizer
 {
     /**
     * Adds a token to an existing JSON Pointer
     *
-    * @api
     * @param string $pointer The existing JSON Pointer
     * @param string $token The token to add
     * @return string The new JSON Pointer
@@ -28,18 +30,12 @@ class Tokenizer
     {
         $encoded = $this->encodeToken($token);
 
-        // not sure about this bit, re empty string keys
-        if (Utils::stringNotEmpty($encoded)) {
-            $encoded = '/'.$encoded;
-        }
-
-        return $pointer.$encoded;
+        return $pointer.'/'.$encoded;
     }
 
     /**
     * Splits a JSON Pointer into individual tokens
     *
-    * @api
     * @param string $pointer The JSON Pointer to split
     * @param array<string> $tokens Placeholder for decoded tokens
     * @return bool If the pointer is valid
@@ -63,14 +59,17 @@ class Tokenizer
     /**
     * Creates a JSON Pointer from a string or an array of tokens
     *
-    * @api
     * @param string|array<string> $tokens
     * @return string The encoded JSON Pointer
     */
     public function encode($tokens): string
     {
         $result = '';
-        foreach ((array) $tokens as $value) {
+        foreach ((array) $tokens as $index => $value) {
+            // skip empty first token
+            if ($index === 0 && Utils::stringIsEmpty($value)) {
+                continue;
+            }
             $result = $this->add($result, $value);
         }
 
@@ -80,7 +79,6 @@ class Tokenizer
     /**
     * Encodes a JSON Pointer token
     *
-    * @api
     * @param string $token
     * @return string The encoded JSON Pointer
     */
@@ -95,7 +93,7 @@ class Tokenizer
     * @param string $token
     * @return string
     */
-    protected function processToken(string $token): string
+    private function processToken(string $token): string
     {
         return str_replace('~0', '~', str_replace('~1', '/', $token));
     }

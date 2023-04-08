@@ -126,4 +126,33 @@ class PatcherTest extends \JsonWorks\Tests\Base
         self::assertFalse($this->patcher->replace($data, $path, $value));
         self::assertEquals($expected, $data);
     }
+
+    /**
+     * @dataProvider scalarProvider
+     * @param mixed $data
+     */
+    public function testAssignToScalarFails($data, string $path): void
+    {
+        $expected = $data;
+        self::assertFalse($this->patcher->add($data, $path, 'value'));
+        self::assertEquals($expected, $data);
+    }
+
+    /**
+     * @return array<string, array<mixed>>
+     */
+    public function scalarProvider(): array
+    {
+        $prop = '/prop1';
+        $offset = '/0';
+
+        return [
+            'string with prop' =>   ['hello', $prop],
+            'string with offset' => ['hello', $offset],
+            'int with prop' =>      [10, $prop],
+            'int with offset' =>    [10, $offset],
+            'bool with prop' =>     [false, $prop],
+            'bool with offset' =>   [false, $offset],
+        ];
+    }
 }

@@ -1,17 +1,30 @@
-Json-Works
-==========
+# Json-Works
 
-A PHP library to create, edit, query and validate [JSON](https://www.json.org/).
+A PHP library to create, edit, query and validate [JSON][json].
 
-## Contents
-* [About](#about)
-* [Installation](#installation)
-* [Usage](#usage)
-* [License](#license)
+## Installation
 
-## About
+Install the latest version with:
 
-The library is intended to be used with nested json structures, or with json data that needs validation. Or in any situation where you would find it is easier to do something like this:
+```bash
+$ composer require johnstevenson/json-works
+```
+
+## Requirements
+
+* PHP 7.4 minimum, although using the latest PHP version is highly recommended.
+
+## Usage
+
+The library is intended to be used with complex json structures, or with json data that needs
+validation. Full usage information is available in the [documentation](docs/doc.md).
+
+* [Overview](#overview)
+* [Validation](#validation)
+
+### Overview
+Json-Works allows you to create, edit and query json data using [JSON Pointer][pointer] syntax. For
+example:
 
 ```php
 <?php
@@ -81,7 +94,23 @@ $document->deleteValue('/users/0');
 
 ### Validation
 
-Json-Works includes an implementation of [JSON Schema][schema], version 4. This allows you to validate your data. The following example schema describes an array containing objects whose properties are all required and whose types are defined.
+Json-Works includes an implementation of [JSON Schema][schema], version 4, which allows you to
+validate json data. If the document contains invalid or missing value data, the validation will fail
+with the error in `$document->getError()`.
+
+```php
+$document = new JohnStevenson\JsonWorks\Document();
+
+$document->loadData('path/to/data.json');
+$document->loadScheme('path/to/schema.json');
+
+if (!$document->validate()) {
+    $error = $document->getError();
+}
+```
+
+You can also validate data whilst building a document. The following example schema describes an
+array containing objects whose properties are all required and whose types are defined.
 
 ```json
 // schemas can be very simple
@@ -95,57 +124,26 @@ Json-Works includes an implementation of [JSON Schema][schema], version 4. This 
     }
 }
 ```
-Now when you try to add values, Json-Works will only do so if they are valid. So you have to check.
+
+Now you can check if your data is valid:
 
 ```php
 $document->loadSchema($schema);
+$document->addValue('/-', ['firstName'=> 'Fred']);
 
-$result = $document->addValue('/-', array('firstName'=> 'Fred', 'lastName' => 'Bloggs'));
-# true
-
-$result = $document->addValue('/-', array('firstName'=> 'Fred', 'lastName' => 3));
-# false, lastName is not a string
-
-$result = $document->addValue('/0', array('firstName'=> 'Fred'));
-# true, required values are not checked when we are building
-
-# but are checked if we validate directly
-
-$result = $document->validate();
-# false - required lastName is missing
-```
-
-Without a schema, any value can be added anywhere.
-
-<a name="Installation"></a>
-## Installation
-This package is available via [Composer][composer] as `johnstevenson/json-works`.
-Either run the following command in your project directory:
-
-```
-composer require "johnstevenson/json-works=1.1.*"
-```
-
-or add the requirement to your `composer.json` file:
-
-```json
-{
-    "require": {
-        "johnstevenson/json-works": "1.1.*"
-    }
+if (!$document->validate()) {
+    $error = $document->getError();
+    # "Property: '/0'. Error: is missing required property 'lastName'"
 }
 ```
 
-## Usage
-
-Full usage [documentation][wiki] is available in the Wiki.
+Without a schema, any value can be added anywhere.
 
 ## License
 
 Json-Works is licensed under the MIT License - see the `LICENSE` file for details.
 
+[json]: https://www.rfc-editor.org/rfc/rfc8259
 [pointer]: https://www.rfc-editor.org/rfc/rfc6901
 [schema]: https://json-schema.org/
 [composer]: https://getcomposer.org
-[wiki]:https://github.com/johnstevenson/json-works/wiki/Home
-

@@ -36,7 +36,7 @@ class CopyValueTest extends \JsonWorks\Tests\Base
         $toPath = '/prop2/collection/-';
 
         self::assertTrue($document->copyValue($fromPath, $toPath));
-        self::assertEquals($expected, $document->data);
+        self::assertEquals($expected, $document->getData());
     }
 
     public function testFail(): void

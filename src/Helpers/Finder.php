@@ -28,7 +28,6 @@ class Finder
     /**
     * Returns true if an element is found
     *
-    * @api
     * @param mixed $data
     * @param mixed $element Set by method if found
     * @param string $error Set by method
@@ -47,8 +46,7 @@ class Finder
     /**
     * Returns true if an element is found
     *
-    * @api
-    * @param mixed $data
+     * @param mixed $data
     */
     public function get(&$data, Target $target): bool
     {
@@ -162,7 +160,6 @@ class Finder
     /**
     * Returns true if the token is a valid array key
     *
-    * @api
     * @param mixed $index Set to an integer on success
     */
     protected function isArrayKey(string $token, &$index): bool

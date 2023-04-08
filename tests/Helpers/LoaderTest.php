@@ -2,7 +2,7 @@
 
 namespace JsonWorks\Tests\Helpers;
 
-use JohnStevenson\JsonWorks\Helpers\Loader;
+use JohnStevenson\JsonWorks\Loader;
 
 class LoaderTest extends \JsonWorks\Tests\Base
 {
@@ -34,11 +34,11 @@ class LoaderTest extends \JsonWorks\Tests\Base
     {
         switch ($loadType) {
             case self::TYPE_DOCUMENT:
-                return $this->loader->loadData($data);
+                return $this->loader->getData($data);
             case self::TYPE_SCHEMA:
-                return $this->loader->loadSchema($data);
+                return $this->loader->getSchema($data);
             case self::TYPE_PATCH:
-                return $this->loader->loadPatch($data);
+                return $this->loader->getPatch($data);
             default:
                 $msg = sprintf("Unknown load type '%s', test not run", $loadType);
                 throw new \InvalidArgumentException($msg);

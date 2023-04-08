@@ -4,7 +4,7 @@ namespace JsonWorks\Tests\Helpers;
 
 use \stdClass;
 
-use JohnStevenson\JsonWorks\Helpers\Formatter;
+use JohnStevenson\JsonWorks\Formatter;
 
 class FormatCopyTest extends \JsonWorks\Tests\Base
 {

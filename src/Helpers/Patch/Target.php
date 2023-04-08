@@ -12,8 +12,8 @@
 namespace JohnStevenson\JsonWorks\Helpers\Patch;
 
 use JohnStevenson\JsonWorks\Helpers\Error;
-use JohnStevenson\JsonWorks\Helpers\Tokenizer;
 use JohnStevenson\JsonWorks\Helpers\Utils;
+use JohnStevenson\JsonWorks\Tokenizer;
 
 /**
 * A class for holding various properties when searching for or building data
@@ -83,8 +83,6 @@ class Target
 
     /**
     * Sets or clears an error message
-    *
-    * @api
     */
     public function setError(?string $code): void
     {
@@ -99,8 +97,6 @@ class Target
 
     /**
     * Add a token to the found path
-    *
-    * @api
     */
     public function setFoundPath(string $token): void
     {
@@ -110,7 +106,6 @@ class Target
     /**
     * Sets element and error if not already set
     *
-    * @api
     * @param mixed $element
     */
     public function setResult(bool $found, &$element): void
