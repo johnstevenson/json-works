@@ -141,7 +141,7 @@ class PatcherTest extends \JsonWorks\Tests\Base
     /**
      * @return array<string, array<mixed>>
      */
-    public function scalarProvider(): array
+    public static function scalarProvider(): array
     {
         $prop = '/prop1';
         $offset = '/0';
