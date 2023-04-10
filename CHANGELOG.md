@@ -1,4 +1,5 @@
 ## [Unreleased]
+* Fixed: Issue when adding a new schema and not resetting the validator
 
 ## [2.0.0] - 2023-04-10
 * Added: Major refactor for PHP 7.4 upwards

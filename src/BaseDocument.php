@@ -50,6 +50,7 @@ class BaseDocument
     {
         $loader = new Loader();
         $this->schema = $loader->getSchema($data);
+        $this->validator = null;
     }
 
     public function tidy(bool $order = false): void
