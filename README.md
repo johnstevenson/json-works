@@ -1,5 +1,11 @@
 # Json-Works
 
+
+[![packagist](https://img.shields.io/packagist/v/johnstevenson/json-works)](https://packagist.org/packages/johnstevenson/json-works)
+[![Continuous Integration](https://github.com/johnstevenson/json-works/actions/workflows/continuous-integration.yml/badge.svg?branch=main)](https://github.com/johnstevenson/json-works/actions?query=branch:main)
+![license](https://img.shields.io/github/license/johnstevenson/json-works.svg)
+![php](https://img.shields.io/packagist/php-v/johnstevenson/json-works?colorB=8892BF)
+
 A PHP library to create, edit, query and validate [JSON][json].
 
 ## Installation
