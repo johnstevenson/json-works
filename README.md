@@ -118,7 +118,7 @@ if (!$document->validate()) {
 You can also validate data whilst building a document. The following example schema describes an
 array containing objects whose properties are all required and whose types are defined.
 
-```json
+```jsonc
 // schemas can be very simple
 {
     "items": {
