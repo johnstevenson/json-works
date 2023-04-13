@@ -93,8 +93,13 @@ class BaseDocument
             $this->validator = new Validator($this->schema);
         }
 
-        if (!$result = $this->validator->check($this->data)) {
-            $this->error = $this->validator->getLastError();
+        try {
+            if (!$result = $this->validator->check($this->data)) {
+                $this->error = $this->validator->getLastError();
+            }
+        } catch (\RuntimeException $e) {
+            $result = false;
+            $this->error = $e->getMessage();
         }
 
         return $result;
