@@ -75,12 +75,19 @@ class BaseDocument
         return $this->error;
     }
 
-    public function toJson(bool $pretty): string
+    public function toJson(bool $pretty): ?string
     {
         $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
         $options |= $pretty ? JSON_PRETTY_PRINT : 0;
 
-        return $this->formatter->toJson($this->data, $options);
+        try {
+            $result = $this->formatter->toJson($this->data, $options);
+        } catch (\RuntimeException $e) {
+            $result = null;
+            $this->error = $e->getMessage();
+        }
+
+        return $result;
     }
 
     public function validate(): bool

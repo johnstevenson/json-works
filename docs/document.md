@@ -165,10 +165,10 @@ Removes empty objects and arrays from the data. If *$order* is true and a schema
 function re-orders the data using the schema content.
 
 ### toJson
-string **toJson** ( bool `$pretty` )
+?string **toJson** ( bool `$pretty` )
 
 Returns a json-encoded string of `$document->data`. If *$pretty* is true, the output will be
-pretty-printed.
+pretty-printed. Returns null on failure with the error in `$document->getError()`.
 
 *Back to:* [Contents](#contents)
 

@@ -99,7 +99,6 @@ $data = $formatter->prune($data);
 ```
 
 ### toJson
-mixed **toJson** ( mixed `$data`, bool `$pretty` )
+string **toJson** ( mixed `$data`, int `$options` )
 
-Returns a json-encoded string of *$data*. Forward-slashes are not escaped and UTF-8 characters are
-not encoded. If *$pretty* is true, the output will be *pretty-printed*.
+Returns a json-encoded string of *$data*. Throws a *RuntimeException* on failure.
