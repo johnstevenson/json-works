@@ -1,4 +1,9 @@
 ## [Unreleased]
+
+## [2.1.0] - 2023-04-17
+* BC Break: `document->toJson()` can now return null on failure
+* Fixed: JSON encode exceptions are now caught and the error captured
+* Fixed: Invalid schema exceptions are now caught and the error captured
 * Fixed: Issue when adding a new schema and not resetting the validator
 
 ## [2.0.0] - 2023-04-10
