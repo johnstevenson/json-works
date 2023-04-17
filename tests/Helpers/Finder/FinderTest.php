@@ -15,7 +15,7 @@ class FinderTest extends \JsonWorks\Tests\Base
         $this->finder = new Finder();
     }
 
-    public function testGetRoot(): void
+    public function testGetRootObject(): void
     {
         $data = json_decode('{
             "prop1": {
@@ -26,6 +26,38 @@ class FinderTest extends \JsonWorks\Tests\Base
         $expected =& $data;
 
         $path = '';
+        $error = '';
+        $target = new Target($path, $error);
+
+        $result = $this->finder->get($data, $target);
+        self::assertTrue($result);
+        self::assertTrue($this->sameRef($expected, $target->element));
+        self::assertEquals('', $error);
+    }
+
+    public function testGetRootArray(): void
+    {
+        $data = json_decode('[0, 1, 2, 3]');
+
+        $expected =& $data;
+
+        $path = '';
+        $error = '';
+        $target = new Target($path, $error);
+
+        $result = $this->finder->get($data, $target);
+        self::assertTrue($result);
+        self::assertTrue($this->sameRef($expected, $target->element));
+        self::assertEquals('', $error);
+    }
+
+    public function testGetRootArrayValue(): void
+    {
+        $data = json_decode('[0, 1, 2, 3]');
+
+        $expected =& $data[2];
+
+        $path = '/2';
         $error = '';
         $target = new Target($path, $error);
 

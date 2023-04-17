@@ -2,7 +2,9 @@
 
 namespace JsonWorks\Tests\BaseDocument;
 
-class GetJsonTest extends \JsonWorks\Tests\Base
+use JohnStevenson\JsonWorks\Utils;
+
+class ToJsonTest extends \JsonWorks\Tests\Base
 {
     public function testNoData(): void
     {
@@ -16,6 +18,18 @@ class GetJsonTest extends \JsonWorks\Tests\Base
         $json = $document->toJson(false);
         self::assertTrue($document->validate());
         self::assertEquals($this->getExpectedJson($expected), $json);
+    }
+
+    public function testInvalidJson(): void
+    {
+        $data = (object) ['prop1' => "\xc3\x28"];
+
+        $document = new \JohnStevenson\JsonWorks\Document();
+        $document->loadData($data);
+
+        $json = $document->toJson(true);
+        self::assertNull($json);
+        self::assertStringContainsString('UTF-8', $document->getError());
     }
 
     public function testPathWithSlash(): void
